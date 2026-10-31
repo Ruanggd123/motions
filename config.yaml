@@ -1,0 +1,43 @@
+# Motions Pipeline - Configuração Global
+# Sistema automatizado de vídeos 3D low-poly/stylized
+
+render:
+  engine: "BLENDER_EEVEE"  # EEVEE para stylized, CYCLES para realista
+  resolution_x: 1080
+  resolution_y: 1920       # Formato vertical (Shorts/Reels/TikTok)
+  fps: 30
+  samples: 64              # Samples baixos para EEVEE stylized
+  output_format: "FFMPEG"
+  codec: "H264"
+  quality: "HIGH"
+
+scene:
+  style: "low_poly"
+  color_palette: "vibrant"  # vibrant, pastel, neon, earth
+  lighting: "studio_three_point"
+  background: "gradient"    # gradient, solid, hdri
+
+camera:
+  focal_length: 50
+  sensor_width: 36
+  clip_start: 0.1
+  clip_end: 1000
+  motion_blur: false
+
+animation:
+  default_duration: 15     # segundos
+  easing: "BEZIER"
+  keyframe_interpolation: "BEZIER"
+
+generators:
+  character:
+    base_mesh: "primitive"  # primitive, sculpted
+    max_vertices: 5000
+  environment:
+    grid_size: 10
+    prop_density: 0.3
+
+paths:
+  assets: "./assets"
+  output: "./output"
+  temp: "./temp"

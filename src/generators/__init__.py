@@ -1,0 +1,1 @@
+# Generators module - procedural asset creation

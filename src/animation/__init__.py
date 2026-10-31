@@ -1,0 +1,1 @@
+# Animation module - keyframe and camera motion control

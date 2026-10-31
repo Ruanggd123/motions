@@ -1,0 +1,89 @@
+{
+  "totalDuration": 71,
+  "beats": [
+    {
+      "id": 0,
+      "text": "Imagine a sala da sua casa, em um dia totalmente comum.",
+      "start": 0,
+      "end": 4.41,
+      "duration": 4.36
+    },
+    {
+      "id": 1,
+      "text": "Em cima da mesa, colocamos um gato curioso dentro de uma caixa de papelão.",
+      "start": 4.41,
+      "end": 9.81,
+      "duration": 5.4
+    },
+    {
+      "id": 2,
+      "text": "Junto com ele, há um único átomo instável, com cinquenta por cento de chance de disparar.",
+      "start": 9.81,
+      "end": 15.92,
+      "duration": 6.11
+    },
+    {
+      "id": 3,
+      "text": "Se o átomo disparar, este detector solta o martelo automaticamente.",
+      "start": 15.92,
+      "end": 20.97,
+      "duration": 5.05
+    },
+    {
+      "id": 4,
+      "text": "O martelo então quebra o frasco de veneno, mas se o átomo não disparar, nada acontece.",
+      "start": 20.97,
+      "end": 27.08,
+      "duration": 6.11
+    },
+    {
+      "id": 5,
+      "text": "Agora fechamos a caixa, e sem olhar lá dentro, ninguém sabe o que aconteceu.",
+      "start": 27.08,
+      "end": 32.56,
+      "duration": 5.48
+    },
+    {
+      "id": 6,
+      "text": "Para o nosso senso comum, o gato lá dentro só pode estar vivo, ou morto.",
+      "start": 32.56,
+      "end": 38.12,
+      "duration": 5.56
+    },
+    {
+      "id": 7,
+      "text": "Mas na física quântica, sem observador, o átomo fica nos dois estados ao mesmo tempo.",
+      "start": 38.12,
+      "end": 44.67,
+      "duration": 6.54
+    },
+    {
+      "id": 8,
+      "text": "Isso cria a superposição, onde o gato está cinquenta por cento vivo e cinquenta por cento morto simultaneamente.",
+      "start": 44.67,
+      "end": 51.91,
+      "duration": 7.24
+    },
+    {
+      "id": 9,
+      "text": "Essa mistura bizarra dura até o exato segundo em que abrimos a caixa para olhar.",
+      "start": 51.91,
+      "end": 57.03,
+      "duration": 5.12
+    },
+    {
+      "id": 10,
+      "text": "O simples ato de olhar faz a natureza decidir na hora, e a incerteza vira uma única realidade.",
+      "start": 57.03,
+      "end": 63.6,
+      "duration": 6.57
+    },
+    {
+      "id": 11,
+      "text": "Esse é o gato de Schrödinger, mostrando que no mundo quântico observar muda a realidade.",
+      "start": 63.6,
+      "end": 71,
+      "duration": 5.91
+    }
+  ]
+}

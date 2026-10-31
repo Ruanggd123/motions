@@ -1,0 +1,22 @@
+{
+  "name": "remotion-time-travel",
+  "version": "1.0.0",
+  "description": "Vídeo programático: E Se Você Voltasse 10 Segundos no Tempo?",
+  "scripts": {
+    "start": "remotion studio",
+    "build": "remotion render TimeTravelVideo out/video.mp4",
+    "upgrade": "remotion upgrade",
+    "test": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.242",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "4.0.242",
+    "@remotion/transitions": "4.0.242"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "typescript": "^5.5.3"
+  }
+}

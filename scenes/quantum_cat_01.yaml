@@ -1,0 +1,62 @@
+# Scene Definition: Quantum Cat 01 - "O Paradoxo do Gato"
+# História original explorando mecânica quântica com visual low-poly
+
+scene:
+  name: "quantum_cat_01"
+  title: "O Gato que está Vivo e Morto?"
+  duration: 15  # segundos
+  tags: ["fisica", "quanticas", "paradoxo"]
+
+environment:
+  type: "dark_lab"  # Laboratório escuro com iluminação dramática
+  colors:
+    top: [0.05, 0.05, 0.1]     # Azul muito escuro
+    bottom: [0.1, 0.1, 0.15]   # Cinza escuro
+  ground:
+    enabled: true
+    color: [0.2, 0.2, 0.25]   # Chão de laboratório
+    size: 25
+
+characters:
+  - name: "Quantum_Observer"
+    type: "simple_bot"
+    position: [-3, 0, 0]
+    scale: 1.0
+    animation: "thinking_pose"
+    color: [0.6, 0.8, 1.0]
+
+props:
+  - name: "Schrödinger_Box"
+    type: "emissive_cube"
+    position: [2, 0.5, 0]
+    scale: 1.2
+    color: [0.4, 0.4, 0.4]
+    emissive_strength: 0.5
+
+  - name: "Quantum_Glow"
+    type: "sphere_transparent"
+    position: [2, 0.5, 0]
+    scale: 1.5
+    color: [0.0, 1.0, 0.8]
+    opacity: 0.2
+
+camera:
+  start_position: [0, 2, 6]
+  end_position: [0, 1.5, 4]
+  target: [0, 0.5, 0]
+  motion: "slow_zoom"
+  fov_animation: true
+
+text_overlays:
+  - frame_start: 10
+    frame_end: 100
+    text: "Uma caixa. Um gato. Um veneno."
+    position: "bottom"
+  - frame_start: 110
+    frame_end: 220
+    text: "Enquanto não olhamos, ele está VIVO e MORTO ao mesmo tempo."
+    position: "center"
+  - frame_start: 230
+    frame_end: 440
+    text: "A realidade só existe quando é observada."
+    position: "center"

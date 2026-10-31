@@ -1,0 +1,62 @@
+{
+  "historias": [
+    {
+      "id": "video-004-1000-anos",
+      "tema": "E Se Você Voltasse 1000 Anos Atrás?",
+      "nicho": "Curiosidades / Espaço-Tempo",
+      "formato": "Escalada narrativa",
+      "data_criacao": "2026-10-25",
+      "status": "produzido"
+    },
+    {
+      "id": "video-005-mundo-submerso",
+      "tema": "E Se o Oceano Engolisse Sua Cidade?",
+      "nicho": "Curiosidades / Natureza Extrema",
+      "formato": "Escalada narrativa progressiva",
+      "data_criacao": "2026-10-26",
+      "status": "produzido"
+    },
+    {
+      "id": "video-006-futuro-2125",
+      "tema": "E Se Você Acordasse em 2125?",
+      "nicho": "Futurismo / Tecnologia Extrema",
+      "formato": "Escalada narrativa progressiva",
+      "data_criacao": "2026-10-26",
+      "status": "produzido"
+    },
+    {
+      "id": "video-007-terra-parou",
+      "tema": "E Se a Terra Parasse de Girar?",
+      "nicho": "Ciência Extrema / Apocalipse Natural",
+      "formato": "Escalada narrativa progressiva",
+      "data_criacao": "2026-10-28",
+      "status": "produzido",
+      "duracao": 50,
+      "cenas": 10,
+      "ambientes_variados": ["cidade", "furacão", "oceano", "deserto", "gelo", "floresta_morta", "savana", "espaço"]
+    },
+    {
+      "id": "video-008-turbina-jato",
+      "tema": "Como Funciona uma Turbina a Jato?",
+      "nicho": "Engenharia Extrema / Mecânica Aeronáutica",
+      "formato": "Cenas Aninhadas ASD-STE100",
+      "data_criacao": "2026-10-29",
+      "status": "produzido",
+      "duracao": 45,
+      "cenas": 9
+    },
+    {
+      "id": "video-009-cresce-cada-passo",
+      "tema": "E Se Você Crescesse a Cada Passo?",
+      "nicho": "Sobrevivência / Situações Absurdas",
+      "formato": "Escalada progressiva com sofrimento do personagem",
+      "data_criacao": "2026-10-29",
+      "status": "visual_aprovado",
+      "duracao": 50,
+      "cenas": 8,
+      "ambientes": ["rua_urbana", "cidade_gigante", "ceu_nuvens", "china_muralha", "oceano", "espaco_terra", "espaco_caos", "espaco_cta"],
+      "elementos_geometricos_totais": 82,
+      "workflow_fases": "A_aprovado_B_implementado_C_pendente_D_pendente"
+    }
+  ]
+}

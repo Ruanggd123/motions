@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Production build outputs
+dist/
+remotion-video/out/
+
+# Sub-projects and external tools
+tools/
+
+# Temporary and cache files
+output/frames*
+output/*_tts*
+output/stills*
+*.log
+.DS_Store
+Thumbs.db
+
+# Local environment
+.env
+.env.local
+.env.*.local
