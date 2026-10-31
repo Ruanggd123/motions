@@ -597,7 +597,8 @@ const server = http.createServer(async (req, res) => {
         const {
           lines,
           voice = 'pt-BR-AntonioNeural',
-          rate = '+0%',
+          rate = '-1%',
+          pitch = '-24Hz',
           outWav = 'output/master_audio.wav',
           outMp3 = 'output/master_audio.mp3'
         } = JSON.parse(body);
@@ -610,7 +611,7 @@ const server = http.createServer(async (req, res) => {
 
         fs.writeFileSync(txtFile, lines.join('\n'), 'utf8');
         execSync(
-          `edge-tts --voice "${voice}" --rate="${rate}" -f "${txtFile}" --write-media "${rawMp3}" --write-subtitles "${rawVtt}"`,
+          `edge-tts --voice "${voice}" --rate="${rate}" --pitch="${pitch}" -f "${txtFile}" --write-media "${rawMp3}" --write-subtitles "${rawVtt}"`,
           { stdio: 'ignore' }
         );
 
