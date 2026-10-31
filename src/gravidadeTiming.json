@@ -1,0 +1,89 @@
+{
+  "totalDuration": 71,
+  "beats": [
+    {
+      "id": 0,
+      "text": "Imagine você caminhando tranquilamente por um parque bonito em uma manhã de sol.",
+      "start": 0,
+      "end": 5.37,
+      "duration": 5.32
+    },
+    {
+      "id": 1,
+      "text": "Mas do nada, uma anomalia cósmica desliga a gravidade da Terra por apenas cinco segundos.",
+      "start": 5.37,
+      "end": 11.66,
+      "duration": 6.29
+    },
+    {
+      "id": 2,
+      "text": "No primeiro segundo, o café na sua mão e as folhas do chão começam a flutuar no ar.",
+      "start": 11.66,
+      "end": 17.46,
+      "duration": 5.8
+    },
+    {
+      "id": 3,
+      "text": "No segundo seguinte, seus pés perdem o chão e você começa a subir sem conseguir se segurar.",
+      "start": 17.46,
+      "end": 23.58,
+      "duration": 6.12
+    },
+    {
+      "id": 4,
+      "text": "Como a Terra gira a mil e seiscentos quilômetros por hora, tudo o que não está preso decola para o alto.",
+      "start": 23.58,
+      "end": 29.85,
+      "duration": 6.26
+    },
+    {
+      "id": 5,
+      "text": "Bancos de praça, hidrantes e carros flutuam como se estivessem no meio do espaço sideral.",
+      "start": 29.85,
+      "end": 35.93,
+      "duration": 6.08
+    },
+    {
+      "id": 6,
+      "text": "A atmosfera também começaria a escapar, criando uma queda violenta na pressão do ar.",
+      "start": 35.93,
+      "end": 41.73,
+      "duration": 5.8
+    },
+    {
+      "id": 7,
+      "text": "Você flutua a vários metros de altura, vendo o chão se afastar sob os seus pés.",
+      "start": 41.73,
+      "end": 47.28,
+      "duration": 5.55
+    },
+    {
+      "id": 8,
+      "text": "Mas a contagem regressiva chega ao fim, e de repente a gravidade é religada com força total!",
+      "start": 47.28,
+      "end": 53.72,
+      "duration": 6.44
+    },
+    {
+      "id": 9,
+      "text": "Tudo o que subiu desaba em queda livre acelerada de volta em direção ao solo.",
+      "start": 53.72,
+      "end": 58.88,
+      "duration": 5.15
+    },
+    {
+      "id": 10,
+      "text": "Você despenca em direção à grama macia, fazendo um pouso desajeitado mas escapando com vida!",
+      "start": 58.88,
+      "end": 65.37,
+      "duration": 6.49
+    },
+    {
+      "id": 11,
+      "text": "Esse é o perigo da gravidade: cinco segundos desligada causariam o caos no planeta. Você teria coragem de encarar?",
+      "start": 65.37,
+      "end": 71,
+      "duration": 5.54
+    }
+  ]
+}
