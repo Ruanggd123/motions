@@ -631,7 +631,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // TTS CONTÍNUO COM PAD ANALÓGICO E MASTERING
+  // TTS CONTÍNUO COM PAD ANALÓGICO E MASTERING (VOZ NATURAL ANTONIONEURAL PURA)
   if (req.method === 'POST' && req.url === '/api/tts-continuous') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
@@ -640,8 +640,9 @@ const server = http.createServer(async (req, res) => {
         const {
           lines,
           voice = 'pt-BR-AntonioNeural',
-          rate = '-1%',
-          pitch = '-24Hz',
+          rate = '-2%',
+          pitch = '+0Hz',
+          useClonedFilter = false,
           outWav = 'output/master_audio.wav',
           outMp3 = 'output/master_audio.mp3'
         } = JSON.parse(body);
@@ -684,11 +685,16 @@ const server = http.createServer(async (req, res) => {
 
         execSync(`"${FFMPEG}" -y -i "${rawMp3}" -ar 44100 -ac 1 -f wav "${rawWav}"`, { stdio: 'ignore' });
 
-        const morphedWav = path.join(TMP_DIR, `cont_${id}_morphed.wav`);
-        applyUserVoiceCloneFilter(rawWav, morphedWav);
+        let audioToMaster = rawWav;
+        let morphedWav = null;
+        if (useClonedFilter) {
+          morphedWav = path.join(TMP_DIR, `cont_${id}_morphed.wav`);
+          applyUserVoiceCloneFilter(rawWav, morphedWav);
+          audioToMaster = morphedWav;
+        }
 
         fs.mkdirSync(path.dirname(outWav), { recursive: true });
-        applyVoiceStudioAnalogMaster(morphedWav, outWav, totalDuration);
+        applyVoiceStudioAnalogMaster(audioToMaster, outWav, totalDuration);
         execSync(`"${FFMPEG}" -y -i "${outWav}" -b:a 192k "${outMp3}"`, { stdio: 'ignore' });
 
         try {
@@ -696,13 +702,13 @@ const server = http.createServer(async (req, res) => {
           fs.unlinkSync(rawMp3);
           fs.unlinkSync(rawVtt);
           fs.unlinkSync(rawWav);
-          fs.unlinkSync(morphedWav);
+          if (morphedWav && fs.existsSync(morphedWav)) fs.unlinkSync(morphedWav);
         } catch {}
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           status: 'ok',
-          engine: fs.existsSync(CLONED_VOICE_WAV) ? 'VoiceStudio Cloned Voice (User Sample)' : 'VoiceStudio Continuous Neural v14',
+          engine: 'VoiceStudio Continuous Neural Master (pt-BR-AntonioNeural)',
           totalDuration,
           beats: timedBeats,
           outWav,
