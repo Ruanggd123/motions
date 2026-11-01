@@ -307,7 +307,7 @@ const htmlContent = `<!DOCTYPE html>
                 end: ${tb[0].end},
                 tag: "1. PASSEIO NA CIDADE",
                 dotColor: "#4ade80",
-                html: \`Imagine você <span class="kw-badge kw-green">CAMINHANDO TRANQUILAMENTE</span> por uma bela avenida em uma manhã de sol...\`,
+                html: \`Imagine você <span class="kw-badge kw-green">CAMINHANDO TRANQUILAMENTE</span> por um <span class="kw-badge kw-cyan">PARQUE BONITO</span> em uma manhã de sol...\`,
                 camPos: [1.6, 4.0, 7.2],
                 camLook: [0.0, 0.9, -0.3],
                 mode: "walking",
@@ -437,7 +437,7 @@ const htmlContent = `<!DOCTYPE html>
                 end: ${tb[10].end},
                 tag: "11. POUSO NA CIDADE",
                 dotColor: "#4ade80",
-                html: \`Você despenca na <span class="kw-badge kw-green">CALÇADA DA PRAÇA</span>, fazendo um pouso desajeitado mas <span class="kw-badge kw-white">ESCAPANDO COM VIDA</span>!\`,
+                html: \`Você despenca em direção à <span class="kw-badge kw-green">GRAMA MACIA</span>, fazendo um pouso desajeitado mas <span class="kw-badge kw-white">ESCAPANDO COM VIDA</span>!\`,
                 camPos: [1.4, 3.8, 7.2],
                 camLook: [0.0, 0.9, -0.3],
                 mode: "springLanding",
@@ -650,7 +650,13 @@ const htmlContent = `<!DOCTYPE html>
         /*************************************************************************
          * 5. LOOP DE CONTROLE E REPRODUÇÃO DETERMINÍSTICA
          *************************************************************************/
-        let isPlaying = !isCaptureMode;
+        // Começa pausado: navegadores bloqueiam áudio sem clique. O 1º clique dá PLAY com voz.
+        let isPlaying = false;
+        if (!isCaptureMode) {
+            document.getElementById('center-play-btn').classList.remove('hidden-btn');
+            document.getElementById('play-icon').classList.remove('hidden');
+            document.getElementById('pause-icon').classList.add('hidden');
+        }
         let isMuted = false;
         let currentTime = 0;
         let lastFrameTime = performance.now();
@@ -706,12 +712,7 @@ const htmlContent = `<!DOCTYPE html>
             evaluateSceneAtTime(t, true);
         };
 
-        window.addEventListener('pointerdown', () => {
-            if (isPlaying && masterAudio.paused && !isMuted) {
-                masterAudio.currentTime = currentTime;
-                masterAudio.play().catch(() => {});
-            }
-        }, { once: true });
+
 
         function smootherstep(t) {
             t = Math.max(0, Math.min(1, t));
@@ -839,6 +840,28 @@ const htmlContent = `<!DOCTYPE html>
             // 5.2 ANIMAÇÃO DO PERSONAGEM E DOS ELEMENTOS
             hero.squashPivot.scale.set(1, 1, 1);
             hero.squashPivot.rotation.set(0, 0, 0);
+            // Reset completo de pose/props a cada frame (evita poses "vazando" entre cenas)
+            hero.leftLeg.hipPivot.rotation.set(0, 0, 0);
+            hero.rightLeg.hipPivot.rotation.set(0, 0, 0);
+            hero.leftLeg.kneePivot.rotation.set(0, 0, 0);
+            hero.rightLeg.kneePivot.rotation.set(0, 0, 0);
+            hero.leftArm.elbowPivot.rotation.set(0, 0, 0);
+            hero.rightArm.elbowPivot.rotation.set(0, 0, 0);
+            hero.headGroup.rotation.set(0, 0, 0);
+            city.yellowTaxi.rotation.set(0, 0, 0);
+            city.benchGroup.rotation.set(0, -0.25, 0);
+            city.hydrantGroup.rotation.set(0, 0, 0);
+            city.redCar.position.set(1.95, 0, 2.15);
+            city.redCar.rotation.set(0, Math.PI, 0);
+            shockRing.material.opacity = 0.0;
+            if (mode === 'personFloating' || isCosmic) {
+                const lift = mode === 'personFloating' ? 0.35 : 1.0;
+                city.redCar.position.set(2.3, lift + 0.6 + Math.cos(t * 1.2) * 0.15, -1.6);
+                city.redCar.rotation.set(t * 0.1, Math.PI + t * 0.15, Math.sin(t * 0.8) * 0.3);
+            } else if (mode === 'fallingFast' || mode === 'gravitySnap') {
+                const fp = Math.min(1.0, timeInBeat / beatDuration);
+                city.redCar.position.set(1.95, lerpNum(1.4, 0, fp), 2.15);
+            }
 
             if (mode === 'walking') {
                 hero.setEmotion('calm');
