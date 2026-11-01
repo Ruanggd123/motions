@@ -1,0 +1,47 @@
+{
+  "totalDuration": 38,
+  "beats": [
+    {
+      "id": 0,
+      "text": "Por que um soco no queixo apaga uma pessoa instantaneamente?",
+      "start": 0,
+      "end": 4.09,
+      "duration": 4.04
+    },
+    {
+      "id": 1,
+      "text": "Um soco reto no meio do rosto apenas empurra a cabeça para trás, e os músculos fortes do pescoço absorvem o impacto.",
+      "start": 4.09,
+      "end": 12.29,
+      "duration": 8.2
+    },
+    {
+      "id": 2,
+      "text": "Já o gancho no queixo atinge a ponta da mandíbula, exatamente no ponto mais distante do eixo da coluna.",
+      "start": 12.29,
+      "end": 19.07,
+      "duration": 6.78
+    },
+    {
+      "id": 3,
+      "text": "A cabeça não recua: ela gira com um torque violento a mais de quarenta radianos por segundo!",
+      "start": 19.07,
+      "end": 25.4,
+      "duration": 6.34
+    },
+    {
+      "id": 4,
+      "text": "O cérebro colide contra a parede do crânio e o tronco encefálico sofre uma torção extrema, desligando o sistema nervoso na hora.",
+      "start": 25.4,
+      "end": 33.56,
+      "duration": 8.16
+    },
+    {
+      "id": 5,
+      "text": "O corpo desliga como um disjuntor e desaba no chão. Proteger o queixo salva vidas. Você sabia dessa física?",
+      "start": 33.56,
+      "end": 38,
+      "duration": 3.91
+    }
+  ]
+}

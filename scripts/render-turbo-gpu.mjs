@@ -1,6 +1,6 @@
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import { copyFileSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, basename } from 'node:path';
 import { spawn } from 'node:child_process';
 import os from 'node:os';
 import ffmpegPath from 'ffmpeg-static';
@@ -183,7 +183,8 @@ async function main() {
     });
 
     console.log(`✅ Vídeo MP4 finalizado: ${outMp4}`);
-    const downloadsMp4 = 'C:/Users/Ruan Gomes/Downloads/e_se_a_gravidade_desligasse_animacao_vertical_3d.mp4';
+    const slug = basename(outMp4, '.mp4').replace(/^video-/, '');
+    const downloadsMp4 = `C:/Users/Ruan Gomes/Downloads/${slug.replace(/-/g, '_')}_animacao_vertical_3d.mp4`;
     try {
       copyFileSync(outMp4, downloadsMp4);
       console.log(`✅ Cópia salva em Downloads: ${downloadsMp4}`);
