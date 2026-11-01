@@ -1,14 +1,10 @@
 {
   "name": "Voz do Usuário (Ruan)",
   "filename": "user_cloned_voice.wav",
-  "savedAt": "2026-10-31T22:29:08.594Z",
-  "analyzedAt": "2026-10-31T23:10:29.000Z",
-  "durationSeconds": 9.06,
-  "pitchMedianHz": 107.6,
-  "pitchRangeHz": "99.1 - 120.8 Hz",
-  "vocalClassification": "Barítono / Baixo Quente e Encorpado",
-  "recommendedBaseVoice": "pt-BR-AntonioNeural",
-  "calibratedPitchOffset": "-24Hz",
-  "calibratedRateOffset": "-1%",
-  "analogPadVolume": "-16dB"
+  "savedAt": "2026-11-01T00:03:14.514Z",
+  "pitchHz": 128,
+  "estimatedGender": "Masculino / Barítono Natural",
+  "recommendedVoice": "pt-BR-AntonioNeural",
+  "rateOffset": "+0%",
+  "pitchOffset": "+0Hz"
 }

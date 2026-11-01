@@ -1095,7 +1095,7 @@ const htmlContent = `<!DOCTYPE html>
 
             const mode = activeBeat.mode;
 
-            // Transição Ambiental (Parque Ensolarado -> Espaço Cósmico -> Reentrada)
+            // Transição Ambiental Dramática (Quadro 1 ao 6: Parque -> Quadro 7 e 8: Espaço e Vácuo Cósmico -> Quadro 9 e 10: Gravidade e Reentrada de Plasma -> Quadro 11: Impacto -> Quadro 12: Pôr do Sol Dourado)
             earthGroup.rotation.y = t * 0.04;
             const isCosmic = (mode === 'fullZeroG' || mode === 'vacuumPanic' || mode === 'apexHeight' || mode === 'risingFast');
 
@@ -1103,23 +1103,38 @@ const htmlContent = `<!DOCTYPE html>
                 spaceGroup.visible = true;
                 const cosmicIntensity = mode === 'risingFast' ? u : (mode === 'apexHeight' ? 1.0 : 0.92);
 
-                // Céu Preto Estrelado Cósmico
-                const skyR = 0.75 * (1 - cosmicIntensity) + 0.01 * cosmicIntensity;
-                const skyG = 0.88 * (1 - cosmicIntensity) + 0.015 * cosmicIntensity;
-                const skyB = 0.97 * (1 - cosmicIntensity) + 0.04 * cosmicIntensity;
-                scene.background.setRGB(skyR, skyG, skyB);
-                scene.fog.color.setRGB(skyR, skyG, skyB);
+                if (mode === 'vacuumPanic') {
+                    // QUADRO 7: O VÁCUO DA ATMOSFERA ESCAPANDO (Tons violeta/índigo de descompressão)
+                    const skyR = 0.04 * (1 - u) + 0.01 * u;
+                    const skyG = 0.08 * (1 - u) + 0.015 * u;
+                    const skyB = 0.28 * (1 - u) + 0.06 * u;
+                    scene.background.setRGB(skyR, skyG, skyB);
+                    scene.fog.color.setRGB(skyR, skyG, skyB);
+                    hemiLight.color.setHex(0x818cf8);
+                } else if (mode === 'apexHeight') {
+                    // QUADRO 8: ÁPICE ESPACIAL - PROFUNDO BREU CÓSMICO E TERRA CURVA GIGANTE
+                    scene.background.setRGB(0.005, 0.008, 0.02);
+                    scene.fog.color.setRGB(0.005, 0.008, 0.02);
+                    hemiLight.color.setHex(0x38bdf8);
+                } else {
+                    const skyR = 0.75 * (1 - cosmicIntensity) + 0.01 * cosmicIntensity;
+                    const skyG = 0.88 * (1 - cosmicIntensity) + 0.015 * cosmicIntensity;
+                    const skyB = 0.97 * (1 - cosmicIntensity) + 0.04 * cosmicIntensity;
+                    scene.background.setRGB(skyR, skyG, skyB);
+                    scene.fog.color.setRGB(skyR, skyG, skyB);
+                    hemiLight.color.setHex(0xffffff);
+                }
+
                 scene.fog.near = 14 * (1 - cosmicIntensity) + 45 * cosmicIntensity;
                 scene.fog.far = 32 * (1 - cosmicIntensity) + 90 * cosmicIntensity;
                 renderer.setClearColor(scene.background, 1.0);
-
                 viewport.style.backgroundColor = '#020617';
 
                 starMat.opacity = cosmicIntensity * 0.98;
 
-                // Iluminação Espacial Dramática (Contraste Alto)
-                hemiLight.intensity = 0.95 * (1 - cosmicIntensity) + 0.20 * cosmicIntensity;
-                sunLight.intensity = 1.55 * (1 - cosmicIntensity) + 2.2 * cosmicIntensity;
+                // Iluminação Espacial Dramática
+                hemiLight.intensity = 0.95 * (1 - cosmicIntensity) + 0.22 * cosmicIntensity;
+                sunLight.intensity = 1.55 * (1 - cosmicIntensity) + 2.4 * cosmicIntensity;
                 sunLight.color.setRGB(
                     1.0 * (1 - cosmicIntensity) + 0.85 * cosmicIntensity,
                     0.97 * (1 - cosmicIntensity) + 0.92 * cosmicIntensity,
@@ -1131,15 +1146,27 @@ const htmlContent = `<!DOCTYPE html>
                 earthGroup.position.y = -22 + cosmicIntensity * 6.5;
                 windMat.opacity = 0.0;
             } else if (mode === 'gravitySnap' || mode === 'fallingFast') {
+                // QUADRO 9 E 10: QUEDA LIVRE & REENTRADA ATMOSFÉRICA INCANDESCENTE
                 spaceGroup.visible = true;
                 const fallProgress = timeInBeat / 3.8;
                 const returnRatio = Math.max(0, 1.0 - fallProgress);
 
-                scene.background.setRGB(
-                    0.01 * returnRatio + 0.75 * (1 - returnRatio),
-                    0.015 * returnRatio + 0.88 * (1 - returnRatio),
-                    0.04 * returnRatio + 0.97 * (1 - returnRatio)
-                );
+                if (mode === 'fallingFast') {
+                    // Plasma de reentrada: céu queima em tom alaranjado-dourado
+                    const fireR = 0.95 * Math.sin(fallProgress * Math.PI) + 0.75 * (1 - returnRatio);
+                    const fireG = 0.45 * Math.sin(fallProgress * Math.PI) + 0.88 * (1 - returnRatio);
+                    const fireB = 0.15 * Math.sin(fallProgress * Math.PI) + 0.97 * (1 - returnRatio);
+                    scene.background.setRGB(Math.min(1, fireR), Math.min(1, fireG), Math.min(1, fireB));
+                    windMat.color.setHex(0xffaa44); // Linhas de fogo supersônico
+                } else {
+                    scene.background.setRGB(
+                        0.01 * returnRatio + 0.75 * (1 - returnRatio),
+                        0.015 * returnRatio + 0.88 * (1 - returnRatio),
+                        0.04 * returnRatio + 0.97 * (1 - returnRatio)
+                    );
+                    windMat.color.setHex(0xffffff);
+                }
+
                 scene.fog.color.copy(scene.background);
                 renderer.setClearColor(scene.background, 1.0);
                 starMat.opacity = returnRatio * 0.6;
@@ -1149,14 +1176,40 @@ const htmlContent = `<!DOCTYPE html>
                 sunLight.intensity = 2.2 * returnRatio + 1.55 * (1 - returnRatio);
 
                 // Linhas de Vento da Queda
-                windMat.opacity = Math.sin(Math.min(1.0, fallProgress) * Math.PI) * 0.85;
+                windMat.opacity = Math.sin(Math.min(1.0, fallProgress) * Math.PI) * 0.95;
                 const pos = windGeo.attributes.position.array;
                 for (let i = 1; i < pos.length; i += 3) {
-                    pos[i] += 0.45;
+                    pos[i] += 0.55;
                     if (pos[i] > 8.0) pos[i] = 0.0;
                 }
                 windGeo.attributes.position.needsUpdate = true;
+            } else if (mode === 'celebrate') {
+                // QUADRO 12: PÔR DO SOL DOURADO / GOLDEN HOUR DE ALÍVIO PÓS-CATÁSTROFE
+                spaceGroup.visible = false;
+                starMat.opacity = 0.0;
+                windMat.opacity = 0.0;
+                parkGroup.position.y = 0;
+
+                // Céu Gradiente Quente Âmbar / Rosa Sunset
+                const sunsetR = 0.96;
+                const sunsetG = 0.58;
+                const sunsetB = 0.35;
+                scene.background.setRGB(sunsetR, sunsetG, sunsetB);
+                scene.fog.color.setRGB(sunsetR, sunsetG, sunsetB);
+                scene.fog.near = 10;
+                scene.fog.far = 30;
+                renderer.setClearColor(scene.background, 1.0);
+                viewport.style.backgroundColor = '#ea580c';
+
+                // Luz solar dourada rasante de fim de tarde
+                hemiLight.intensity = 0.75;
+                hemiLight.color.setHex(0xfef08a);
+                hemiLight.groundColor.setHex(0x78350f);
+                sunLight.intensity = 2.6;
+                sunLight.color.setHex(0xfbbf24);
+                sunLight.position.set(-4.0, 2.0, 3.5);
             } else {
+                // QUADRO 1 A 3 E POUSO: PARQUE ENSOLARADO FRESCO
                 spaceGroup.visible = false;
                 starMat.opacity = 0.0;
                 windMat.opacity = 0.0;
@@ -1170,8 +1223,11 @@ const htmlContent = `<!DOCTYPE html>
 
                 viewport.style.backgroundColor = '#bfe0f7';
                 hemiLight.intensity = 0.95;
+                hemiLight.color.setHex(0xffffff);
+                hemiLight.groundColor.setHex(0x334155);
                 sunLight.intensity = 1.55;
                 sunLight.color.setHex(0xfff7ed);
+                sunLight.position.set(3.5, 6.0, 4.0);
             }
 
             // ESTADOS DO PERSONAGEM
