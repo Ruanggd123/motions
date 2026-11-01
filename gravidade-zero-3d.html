@@ -2363,14 +2363,21 @@ function createCityDiorama(THREE) {
                 hero.setEmotion('happy');
                 hero.root.position.set(0, 0, -0.6);
 
-                hero.leftArm.shoulderPivot.rotation.set(0.1, 0, -0.2);
-                hero.rightArm.shoulderPivot.rotation.set(0.1, 0, -1.6 + Math.sin(t * 8.0) * 0.22);
-                hero.rightArm.elbowPivot.rotation.x = -0.5;
-                hero.headGroup.rotation.set(0, Math.sin(t * 2.0) * 0.1, 0);
+                // Braço Esquerdo (Mão Livre): Aceno humano perfeito e carismático (antebraço para cima acenando)
+                hero.leftArm.shoulderPivot.rotation.set(0.15, 0, -1.45);
+                hero.leftArm.elbowPivot.rotation.set(-0.15, 0, -1.35 + Math.sin(t * 8.0) * 0.28);
+
+                // Braço Direito (Caneca de Café): Segura a caneca de café com firmeza e orgulho na frente da cintura
+                hero.rightArm.shoulderPivot.rotation.set(0.20, 0, -0.28);
+                hero.rightArm.elbowPivot.rotation.set(-1.10, 0.35, 0);
+
+                // Cabeça com leve inclinação expressiva
+                hero.headGroup.rotation.set(0.04, Math.sin(t * 2.0) * 0.08, 0.06);
 
                 city.yellowTaxi.position.set(-1.85, 0, 1.65);
                 city.redCar.position.set(1.95, 0, 2.15);
                 city.benchGroup.position.set(1.45, 0, -0.85);
+                city.hydrantGroup.position.set(-1.45, 0, 0.15);
             }
 
             // 5.3 ATUALIZAÇÃO DOS PINS 3D NO FRAME
