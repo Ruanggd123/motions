@@ -183,6 +183,13 @@ async function main() {
     });
 
     console.log(`✅ Vídeo MP4 finalizado: ${outMp4}`);
+    const downloadsMp4 = 'C:/Users/Ruan Gomes/Downloads/e_se_a_gravidade_desligasse_animacao_vertical_3d.mp4';
+    try {
+      copyFileSync(outMp4, downloadsMp4);
+      console.log(`✅ Cópia salva em Downloads: ${downloadsMp4}`);
+    } catch (e) {
+      console.warn('Não foi possível copiar para Downloads:', e.message);
+    }
     if (artifactMp4) {
       copyFileSync(outMp4, artifactMp4);
       console.log(`✅ Cópia salva nos artefatos: ${artifactMp4}`);
