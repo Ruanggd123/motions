@@ -9,6 +9,7 @@
       this.width = width;
       this.height = height;
       this.world = world;
+      this.defaultWorld = world;
 
       this.fx = 960;
       this.fy = 540;
@@ -33,6 +34,30 @@
     /** Dispara um tremor de tela baseado em trauma com decaimento exponencial. */
     shake(intensity = 0.5) {
       this.trauma = Math.min(1.0, this.trauma + intensity);
+    }
+
+    /**
+     * Define um novo espaço de mundo (ex.: trocar da portaria para o interior da guarita).
+     * Sem argumento, volta ao mundo padrão. Use antes de chamar cut() em cada troca de plano.
+     */
+    setWorld(world) {
+      this.world = world || this.defaultWorld;
+      this._clamp();
+    }
+
+    /**
+     * Enquadramento que preenche a tela sem deixar faixa morta em NENHUM plano.
+     * Calcula o zoom mínimo a partir da caixa visível desejada, então trava a
+     * câmera exatamente nos limites do mundo — nunca há borda preta no 9:16.
+     * @param {number} cx centro horizontal desejado
+     * @param {number} cy centro vertical desejado
+     * @param {{x0:number,x1:number,y0:number,y1:number}} box retângulo do mundo que DEVE preencher o quadro
+     */
+    frameBox(cx, cy, box) {
+      const w = Math.max(1, box.x1 - box.x0);
+      const h = Math.max(1, box.y1 - box.y0);
+      const zoom = Math.max(this.width / w, this.height / h);
+      return { x: cx, y: cy, zoom };
     }
 
     /** Corte seco (troca de plano, como em edição de cinema). */

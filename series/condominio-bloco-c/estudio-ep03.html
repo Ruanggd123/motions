@@ -427,7 +427,7 @@
 
     <div class="card">
       <h2>🎭 Elenco Multi-Voz Oficial</h2>
-      <p>🎙️ <b>Narrador:</b> Ruan (Voz Real do Usuário)</p>
+      <p>🎙️ <b>Narrador:</b> Voz Cinematográfica (Off-Screen)</p>
       <p>🙋 <b>Você:</b> William Multilingual (Jovem Morador)</p>
       <p>👴 <b>Seu Valdir:</b> Brian Multilingual (Porteiro)</p>
       <p>🚴 <b>Lucas:</b> Remy Multilingual (Entregador Jovem)</p>
@@ -455,6 +455,8 @@
   <script src="./characters/SeuValdirPorteiro.js"></script>
   <script src="./characters/LucasEntregador.js"></script>
   <script src="./scenarios/PortariaBlocoC.js"></script>
+  <script src="./scenarios/ExteriorCondominio.js"></script>
+  <script src="./scenarios/InteriorGuaritaLateral.js"></script>
   <script src="./engine/CameraRig2D.js"></script>
 
   <script>
@@ -466,8 +468,10 @@
     const T = window.CENA03_TIMELINE || { duration: 99.9, decision_start: 83.4, dialogues: [] };
 
     const scenario = new window.StudioScenarios.PortariaBlocoC({ fogDensity: 0.92, streetBlackout: true });
+    const exteriorScenario = new window.StudioEngine.ExteriorCondominio({ fogDensity: 0.7, streetBlackout: false, spotlightOn: false });
+    const interiorLateral = new window.StudioEngine.InteriorGuaritaLateral({ alarmActive: false, spotlightOn: false, blackout: false });
     const voce = new window.StudioCharacters.VoceMorador({ x: 200, y: 445, scale: 0.95, emotion: 'tense', pose: 'phone_look' });
-    const valdir = new window.StudioCharacters.SeuValdirPorteiro({ x: 330, y: 445, scale: 0.95, emotion: 'worried', pose: 'hands_desk' });
+    const valdir = new window.StudioCharacters.SeuValdirPorteiro({ x: 330, y: 465, scale: 0.95, emotion: 'worried', pose: 'hands_desk' });
     const lucas = new window.StudioCharacters.LucasEntregador({ x: 80, y: 445, scale: 0.94, emotion: 'panicked', pose: 'bang_gate' });
     const cam = new window.StudioEngine.CameraRig2D(W, H);
 
@@ -798,6 +802,50 @@
 
       ctx.save();
 
+      // Moto de entrega do Lucas caída na calçada molhada do lado de fora (detalhe narrativo de profundidade)
+      const bikeX = 15;
+      const bikeY = 475;
+      ctx.save();
+      ctx.translate(bikeX, bikeY);
+      ctx.rotate(0.28);
+
+      // Rodas e chassi tombado
+      ctx.fillStyle = '#090d16';
+      ctx.beginPath();
+      ctx.arc(-22, 10, 13, 0, Math.PI * 2);
+      ctx.arc(24, 8, 13, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-22, 10);
+      ctx.lineTo(2, -5);
+      ctx.lineTo(24, 8);
+      ctx.stroke();
+
+      // Mochila térmica vermelha de entregador jogada no asfalto
+      ctx.fillStyle = '#b91c1c';
+      ctx.beginPath();
+      ctx.roundRect(-8, -15, 18, 17, 3);
+      ctx.fill();
+      ctx.strokeStyle = '#fca5a5';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Farol da moto piscando fraco na névoa molhada
+      const bikeFlicker = Math.sin(t * 18) > -0.2 ? 0.65 : 0.2;
+      const bikeGrad = ctx.createRadialGradient(26, 6, 2, 70, 14, 85);
+      bikeGrad.addColorStop(0, `rgba(254, 240, 138, ${bikeFlicker})`);
+      bikeGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
+      ctx.fillStyle = bikeGrad;
+      ctx.beginPath();
+      ctx.moveTo(26, 6);
+      ctx.lineTo(95, -18);
+      ctx.lineTo(105, 32);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
       // Animação de pancada rítmica do Lucas contra o vidro
       const bangWave = Math.sin(t * 11.5);
       const lungeOffset = Math.max(0, bangWave) * 5.5;
@@ -856,24 +904,32 @@
 
       // Vapor de condensação da respiração desesperada no vidro
       const breathPulse = 0.35 + Math.sin(t * 7) * 0.18;
-      const breathGrad = ctx.createRadialGradient(lucas.x + 20, lucas.y - 45, 2, lucas.x + 20, lucas.y - 45, 24);
+      const breathGrad = ctx.createRadialGradient(lucas.x + 20, lucas.y - 45, 2, lucas.x + 20, lucas.y - 45, 26);
       breathGrad.addColorStop(0, `rgba(241, 245, 249, ${breathPulse})`);
+      breathGrad.addColorStop(0.65, `rgba(226, 232, 240, ${breathPulse * 0.4})`);
       breathGrad.addColorStop(1, 'rgba(241, 245, 249, 0)');
       ctx.fillStyle = breathGrad;
       ctx.beginPath();
-      ctx.arc(lucas.x + 20, lucas.y - 45, 24, 0, Math.PI * 2);
+      ctx.arc(lucas.x + 20, lucas.y - 45, 26, 0, Math.PI * 2);
       ctx.fill();
 
-      // Posição das mãos batendo no vidro blindado
+      // Posição das mãos batendo no vidro blindado com condensação nos pontos de contato
       const handX1 = 100;
       const handY1 = lucas.y - 32;
       const handX2 = 114;
       const handY2 = lucas.y - 22;
 
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.34)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.42)';
       ctx.beginPath();
-      ctx.ellipse(handX1, handY1, 6.5, 9.5, 0.2, 0, Math.PI * 2);
-      ctx.ellipse(handX2, handY2, 6.5, 9.5, -0.2, 0, Math.PI * 2);
+      ctx.ellipse(handX1, handY1, 7.0, 10.0, 0.2, 0, Math.PI * 2);
+      ctx.ellipse(handX2, handY2, 7.0, 10.0, -0.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Manchas de condensação escorrendo no vidro blindado
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+      ctx.beginPath();
+      ctx.arc(handX1, handY1 + 14, 3.5, 0, Math.PI * 2);
+      ctx.arc(handX2, handY2 + 16, 4.0, 0, Math.PI * 2);
       ctx.fill();
 
       // ONDAS DE CHOQUE CONCÊNTRICAS NO VIDRO A CADA PANCADA DO LUCAS
@@ -891,7 +947,69 @@
       ctx.restore();
     }
 
-    // 4. FEIXE DE HOLOFOTE VOLUMÉTRICO 1000W COM GOD-RAYS E LENS FLARE
+    // 3.5. INTERFONE PREDIAL DA DONA CAMILA (APT 402) NA PAREDE DA GUARITA
+    function drawIntercomBox(ctx) {
+      ctx.save();
+      const icX = 158;
+      const icY = 328;
+      const icW = 26;
+      const icH = 40;
+
+      // Base do interfone predial (baquelite cinza escuro industrial)
+      ctx.fillStyle = '#1e293b';
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.roundRect(icX, icY, icW, icH, 3);
+      ctx.fill();
+      ctx.stroke();
+
+      // Plaqueta de identificação
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(icX + 3, icY + 4, icW - 6, 7);
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '700 4.5px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('APT 402', icX + icW * 0.5, icY + 9);
+
+      // Grade do alto-falante (furos horizontais)
+      ctx.strokeStyle = '#090d16';
+      ctx.lineWidth = 1.0;
+      for (let gy = icY + 14; gy <= icY + 26; gy += 3) {
+        ctx.beginPath();
+        ctx.moveTo(icX + 5, gy);
+        ctx.lineTo(icX + icW - 5, gy);
+        ctx.stroke();
+      }
+
+      // LED de chamada / emergência
+      const isCamilaSpeaking = (getActiveSpeaker(t) === 'camila');
+      const ledColor = isCamilaSpeaking ? '#ef4444' : '#10b981';
+      const ledGlow = isCamilaSpeaking ? (0.6 + Math.sin(t * 18) * 0.4) : 0.8;
+      ctx.fillStyle = isCamilaSpeaking ? `rgba(239, 68, 68, ${ledGlow})` : '#10b981';
+      ctx.shadowColor = isCamilaSpeaking ? '#ef4444' : '#10b981';
+      ctx.shadowBlur = isCamilaSpeaking ? 10 : 4;
+      ctx.beginPath();
+      ctx.arc(icX + icW * 0.5, icY + 33, 2.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Ondas sonoras de estática propagando quando Camila fala
+      if (isCamilaSpeaking) {
+        for (let ring = 0; ring < 3; ring++) {
+          const phase = ((t * 3.5 + ring * 0.33) % 1);
+          const rAlpha = (1 - phase) * 0.75;
+          ctx.strokeStyle = `rgba(239, 68, 68, ${rAlpha})`;
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(icX + icW * 0.5, icY + 20, 6 + phase * 22, -0.7, 0.7);
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
+
+    // 4. FEIXE DE HOLOFOTE VOLUMÉTRICO 1000W EXTERNO (Apontado para a Rua na Neblina, NUNCA na cara dos personagens)
     function drawSpotlightBeam(ctx) {
       if (!spotlightActive || cctvActive) return;
 
@@ -900,31 +1018,32 @@
       const ignitionBoost = timeSinceOn < 0.45 ? (1 - timeSinceOn / 0.45) * 0.6 : 0;
       const overloadFlicker = (t >= 44.0 && Math.sin(t * 28) > 0.75) ? 0.45 : 1.0;
 
-      const originX = 342;
-      const originY = 382;
-      const sweepY = Math.sin(t * 1.3) * 45;
-      const targetX = -180;
-      const targetY = 480 + sweepY;
+      // Ponto de montagem no suporte externo do telhado da guarita, acima da janela blindada
+      const originX = 118;
+      const originY = 242;
+      const sweepY = Math.sin(t * 1.3) * 55;
+      const targetX = -280;
+      const targetY = 510 + sweepY;
 
       ctx.globalCompositeOperation = 'screen';
 
-      // Camada 1: Halo externo difuso na neblina
-      const outerGrad = ctx.createRadialGradient(originX, originY, 10, originX - 380, originY + 60, 760);
-      outerGrad.addColorStop(0, `rgba(255, 255, 255, ${0.95 * overloadFlicker})`);
-      outerGrad.addColorStop(0.22, `rgba(254, 240, 138, ${0.62 * overloadFlicker})`);
-      outerGrad.addColorStop(0.55, `rgba(56, 189, 248, ${0.34 * overloadFlicker})`);
+      // Camada 1: Halo externo difuso na neblina lá fora na rua
+      const outerGrad = ctx.createRadialGradient(originX, originY, 10, targetX + 120, targetY, 680);
+      outerGrad.addColorStop(0, `rgba(255, 255, 255, ${0.92 * overloadFlicker})`);
+      outerGrad.addColorStop(0.25, `rgba(254, 240, 138, ${0.58 * overloadFlicker})`);
+      outerGrad.addColorStop(0.6, `rgba(56, 189, 248, ${0.30 * overloadFlicker})`);
       outerGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
       ctx.fillStyle = outerGrad;
       ctx.beginPath();
-      ctx.moveTo(originX, originY - 18);
-      ctx.lineTo(targetX, targetY - 220);
-      ctx.lineTo(targetX, targetY + 270);
-      ctx.lineTo(originX, originY + 26);
+      ctx.moveTo(originX, originY - 14);
+      ctx.lineTo(targetX, targetY - 240);
+      ctx.lineTo(targetX, targetY + 280);
+      ctx.lineTo(originX, originY + 20);
       ctx.closePath();
       ctx.fill();
 
-      // Camada 2: Núcleo de alta intensidade de 1000W (God-Ray Central)
+      // Camada 2: Núcleo de alta intensidade de 1000W (God-Ray Central cortando a rua)
       const coreGrad = ctx.createLinearGradient(originX, originY, targetX, targetY);
       coreGrad.addColorStop(0, `rgba(255, 255, 255, ${(0.95 + ignitionBoost) * overloadFlicker})`);
       coreGrad.addColorStop(0.35, `rgba(254, 249, 195, ${0.65 * overloadFlicker})`);
@@ -933,36 +1052,36 @@
 
       ctx.fillStyle = coreGrad;
       ctx.beginPath();
-      ctx.moveTo(originX, originY - 7);
-      ctx.lineTo(targetX, targetY - 85);
-      ctx.lineTo(targetX, targetY + 105);
-      ctx.lineTo(originX, originY + 9);
+      ctx.moveTo(originX, originY - 6);
+      ctx.lineTo(targetX, targetY - 90);
+      ctx.lineTo(targetX, targetY + 110);
+      ctx.lineTo(originX, originY + 8);
       ctx.closePath();
       ctx.fill();
 
-      // Camada 3: Lens Flare Anamórfico na Lente do Farol Tático
-      const flareGrad = ctx.createRadialGradient(originX, originY, 2, originX, originY, 75 + ignitionBoost * 90);
+      // Camada 3: Lente do farol externo no suporte alto da parede
+      const flareGrad = ctx.createRadialGradient(originX, originY, 2, originX, originY, 38 + ignitionBoost * 45);
       flareGrad.addColorStop(0, '#ffffff');
       flareGrad.addColorStop(0.3, 'rgba(253, 224, 71, 0.85)');
       flareGrad.addColorStop(0.65, 'rgba(56, 189, 248, 0.35)');
       flareGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = flareGrad;
       ctx.beginPath();
-      ctx.arc(originX, originY, 75 + ignitionBoost * 90, 0, Math.PI * 2);
+      ctx.arc(originX, originY, 38 + ignitionBoost * 45, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = `rgba(125, 211, 252, ${0.75 * overloadFlicker})`;
+      ctx.fillStyle = `rgba(125, 211, 252, ${0.65 * overloadFlicker})`;
       ctx.beginPath();
-      ctx.ellipse(originX, originY, 140 + ignitionBoost * 120, 3.5, 0, 0, Math.PI * 2);
+      ctx.ellipse(originX, originY, 65 + ignitionBoost * 50, 2.5, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Camada 4: Partículas volumétricas de poeira e gotículas suspensas no feixe
-      for (let i = 0; i < 48; i++) {
-        const distFrac = ((i * 0.021 + t * 0.08) % 1);
-        const px = originX - distFrac * 460 + Math.sin(t * 3.5 + i) * 10;
-        const spread = 18 + distFrac * 150;
+      // Camada 4: Partículas volumétricas de chuva e gotículas iluminadas no feixe da rua
+      for (let i = 0; i < 42; i++) {
+        const distFrac = ((i * 0.024 + t * 0.09) % 1);
+        const px = originX - distFrac * 380 + Math.sin(t * 3.5 + i) * 8;
+        const spread = 16 + distFrac * 140;
         const py = originY + (sweepY * distFrac) + Math.cos(t * 2.4 + i * 1.7) * spread;
-        const pSize = 1.0 + (i % 3) * 0.75;
+        const pSize = 1.0 + (i % 3) * 0.7;
         const pAlpha = (1 - distFrac * 0.7) * (0.45 + 0.4 * Math.sin(t * 8 + i));
 
         ctx.fillStyle = i % 3 === 0
@@ -971,6 +1090,25 @@
         ctx.beginPath();
         ctx.arc(px, py, pSize, 0, Math.PI * 2);
         ctx.fill();
+      }
+
+      // Camada 5: Reflexo Volumétrico no Asfalto Molhado da Rua Externa
+      const floorReflX = -50;
+      const floorReflY = 515;
+      const floorGrad = ctx.createRadialGradient(floorReflX, floorReflY, 5, floorReflX, floorReflY, 130);
+      floorGrad.addColorStop(0, `rgba(254, 240, 138, ${0.45 * overloadFlicker})`);
+      floorGrad.addColorStop(0.5, `rgba(56, 189, 248, ${0.2 * overloadFlicker})`);
+      floorGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = floorGrad;
+      ctx.beginPath();
+      ctx.ellipse(floorReflX, floorReflY, 120, 22, -0.08, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Flash de ignição suave na neblina nos primeiros 160ms do holofote de 1000W
+      if (timeSinceOn < 0.16) {
+        const flashAlpha = (1 - timeSinceOn / 0.16) * 0.45;
+        ctx.fillStyle = `rgba(224, 242, 254, ${flashAlpha})`;
+        ctx.fillRect(-200, -200, 1480, 2320);
       }
 
       ctx.restore();
@@ -1355,7 +1493,9 @@
       ctx.restore();
     }
 
-    // 9. DIREÇÃO DE CÂMERA 2.5D COM RESPIRAÇÃO ORGÂNICA E TREMOR DE IMPACTO
+    // 9. DIREÇÃO DE CÂMERA CINEMATOGRÁFICA UNIFICADA (Espaço Contínuo + Profundidade 2.5D Real)
+    let activeScenario = 'portaria';
+
     function directScene(time) {
       if (time >= 0.2 && time <= 6.6) {
         ugcBadge.classList.add('active');
@@ -1364,7 +1504,7 @@
       }
 
       spotlightActive = (time >= SPOTLIGHT_START);
-      cctvActive = (time >= CCTV_START && time <= CCTV_END);
+      cctvActive = (time >= 28.8 && time < 35.5);
 
       if (time >= DECISION_START) {
         decisionOverlay.style.display = 'flex';
@@ -1376,66 +1516,118 @@
         decisionOverlay.style.display = 'none';
       }
 
-      const swayX = Math.sin(time * 1.7) * 4.5;
-      const swayY = Math.cos(time * 2.1) * 3.0;
+      // Micro-balanço orgânico de câmera de respiração (cinematografia tática)
+      const swayX = Math.sin(time * 1.5) * 4.0;
+      const swayY = Math.cos(time * 1.8) * 2.8;
 
-      if (time >= LUCAS_START && time < 46.5) {
+      // Tremores de pancada no vidro quando Lucas bate (36.7s a 44.5s)
+      if (time >= LUCAS_START && time < 44.5) {
         const bangCycle = Math.floor(time * 1.83);
         if (bangCycle !== lastBangCycle) {
           lastBangCycle = bangCycle;
-          cam.shake(0.28);
+          cam.shake(0.35);
         }
       }
 
+      // COREOGRAFIA DE CÂMERA & PERSONAGENS (11 PLANOS CINEMATOGRÁFICOS VIVOS EM SINCRONIA COM O ROTEIRO)
       if (cctvActive) {
-        // CFTV Tela Cheia
+        activeScenario = 'cctv';
       } else if (time < 6.8) {
-        cam.panTo(260 + swayX, 410 + swayY, 2.85, 0.25);
+        // PLANO 1 (0.0s - 6.8s): PROVA SOCIAL & ESTABELECIMENTO DO MISTÉRIO (Plano Geral da Portaria no nevoeiro)
+        activeScenario = 'portaria';
+        cam.panTo(220 + swayX * 0.4, 385 + swayY * 0.4, 2.1, 0.4);
         voce.emotion = 'tense';
         voce.pose = 'phone_look';
         valdir.emotion = 'worried';
         valdir.pose = 'hands_desk';
         scenario.alarmActive = false;
-      } else if (time < 13.6) {
-        cam.panTo(235 + swayX, 405 + swayY, 3.05, 0.25);
+      } else if (time < 13.7) {
+        // PLANO 2 (6.8s - 13.7s): VOCÊ COMANDA O HOLOFOTE (Plano Médio 2-shot dinâmico dentro da guarita)
+        activeScenario = 'portaria';
+        cam.panTo(265 + swayX * 0.6, 415 + swayY * 0.6, 2.85, 0.35);
         voce.emotion = 'determined';
         voce.pose = 'pointing';
         valdir.emotion = 'serious';
-      } else if (time < 21.2) {
-        cam.panTo(315 + swayX, 398 + swayY, 3.3, 0.25);
+        valdir.pose = 'hands_desk';
+      } else if (time < 21.4) {
+        // PLANO 3 (13.7s - 21.4s): SEU VALDIR ACIONA O REATOR AUXILIAR & IGNIÇÃO DO FAROL EXTERNO
+        activeScenario = 'portaria';
+        cam.panTo(325 + swayX * 0.5, 415 + swayY * 0.5, 2.95, 0.3);
         valdir.pose = 'holding_spotlight';
         valdir.emotion = 'focused';
         voce.pose = 'step_back';
-        if (Math.abs(time - SPOTLIGHT_START) < 0.08) cam.shake(0.45);
-      } else if (time < 28.7) {
-        cam.panTo(250 + swayX, 408 + swayY, 2.85, 0.25);
+        voce.emotion = 'tense';
+        if (Math.abs(time - SPOTLIGHT_START) < 0.14) cam.shake(0.48);
+      } else if (time < 25.4) {
+        // PLANO 4A (21.4s - 25.4s): O FEIXE DE 1000W CORTA A RUA NA NEBLINA (Câmera foca a rua lá fora)
+        activeScenario = 'portaria';
+        cam.panTo(95 + swayX * 0.8, 410 + swayY * 0.8, 2.65, 0.4);
+        valdir.emotion = 'focused';
         voce.emotion = 'shocked';
+      } else if (time < 28.8) {
+        // PLANO 4B (25.4s - 28.8s): PUSH-IN DRAMÁTICO PARA A TELA DO MONITOR CFTV ("Mas o que a câmera 2 revela...")
+        activeScenario = 'portaria';
+        cam.panTo(252 + swayX * 0.2, 290 + swayY * 0.2, 3.8, 0.45);
+        valdir.emotion = 'worried';
+        voce.emotion = 'shocked';
+      } else if (time < 35.5) {
+        // PLANO 5A (28.8s - 35.5s): CFTV CAM 02 FULLSCREEN (A criatura de 2.20m correndo da sombra colossal)
+        activeScenario = 'cctv';
+      } else if (time < 36.6) {
+        // PLANO 5B (35.5s - 36.6s): CORTE RÁPIDO PARA O ROSTO APRESURADO DO SEU VALDIR EM CHOQUE
+        activeScenario = 'portaria';
+        cam.panTo(330, 415, 3.4, 0.15);
         valdir.emotion = 'panicked';
-      } else if (time < 46.5) {
-        cam.panTo(135 + swayX, 405 + swayY, 2.95, 0.3);
+      } else if (time < 44.2) {
+        // PLANO 6 (36.6s - 44.2s): LUCAS ESPANCANDO O VIDRO BLINDADO (Câmera colada no vidro trincado)
+        activeScenario = 'portaria';
+        cam.panTo(115 + swayX * 0.5, 415 + swayY * 0.5, 3.3, 0.3);
         lucas.pose = 'bang_gate';
         lucas.emotion = 'terrified';
         voce.emotion = 'shocked';
+        voce.pose = 'gesturing_urgent';
         valdir.emotion = 'panicked';
-      } else if (time < 53.6) {
-        cam.panTo(245 + swayX, 408 + swayY, 2.75, 0.25);
-        scenario.alarmActive = true;
-      } else if (time < 62.3) {
-        cam.panTo(190 + swayX, 405 + swayY, 3.1, 0.25);
+        valdir.pose = 'holding_switch';
+      } else if (time < 51.4) {
+        // PLANO 7 (44.2s - 51.4s): DONA CAMILA NO INTERFONE PREDIAL (Foco no interfone chiando com LED vermelho)
+        activeScenario = 'portaria';
+        cam.panTo(185 + swayX * 0.5, 385 + swayY * 0.5, 3.0, 0.3);
         voce.emotion = 'panicked';
         voce.pose = 'gesturing_urgent';
-        scenario.alarmActive = true;
-      } else if (time < 72.5) {
-        cam.panTo(318 + swayX, 402 + swayY, 3.25, 0.25);
-        valdir.pose = 'holding_switch';
         valdir.emotion = 'tense';
+        valdir.pose = 'hands_desk';
         scenario.alarmActive = true;
-      } else if (time < DECISION_START) {
-        cam.panTo(235 + swayX, 408 + swayY, 2.75, 0.2);
-        cam.shake(0.22);
+      } else if (time < 60.0) {
+        // PLANO 8 (51.4s - 60.0s): VOCÊ IMPLORA PARA SALVAR O LUCAS (Você em direção aos 3 ferrolhos)
+        activeScenario = 'portaria';
+        cam.panTo(165 + swayX * 0.6, 420 + swayY * 0.6, 2.9, 0.35);
+        voce.emotion = 'shocked';
+        voce.pose = 'pointing';
+        valdir.emotion = 'serious';
+        valdir.pose = 'holding_switch';
+        scenario.alarmActive = true;
+      } else if (time < 70.4) {
+        // PLANO 9 (60.0s - 70.4s): SEU VALDIR NO DISJUNTOR DE 10.000V (Plano holandês tenso com faíscas)
+        activeScenario = 'portaria';
+        cam.panTo(315 + swayX * 0.6, 415 + swayY * 0.6, 2.85, 0.3);
+        valdir.pose = 'holding_switch';
+        valdir.emotion = 'panicked';
+        voce.pose = 'step_back';
+        voce.emotion = 'panicked';
+        scenario.alarmActive = true;
+        if (Math.sin(time * 8.5) > 0.75) cam.shake(0.14);
+      } else if (time < 81.1) {
+        // PLANO 10 (70.4s - 81.1s): O GRANDE DILEMA (Dolly out lento mostrando porta, Lucas e 10kV)
+        activeScenario = 'portaria';
+        cam.panTo(225 + swayX * 0.3, 400 + swayY * 0.3, 2.2, 0.25);
+        voce.emotion = 'panicked';
+        valdir.emotion = 'panicked';
         scenario.alarmActive = true;
       } else {
-        cam.panTo(250 + swayX, 410 + swayY, 2.65, 0.2);
+        // PLANO 11 (81.1s - 97.6s): VOCÊ DECIDE O FIM (Overlay interativo com contagem regressiva)
+        activeScenario = 'portaria';
+        cam.panTo(225 + swayX * 0.2, 405 + swayY * 0.2, 2.1, 0.2);
+        scenario.alarmActive = true;
       }
     }
 
@@ -1480,39 +1672,23 @@
       if (cctvActive) {
         drawCCTVFullscreen(ctx);
       } else {
+        // Atualiza a física de câmera e portaria unificada
         scenario.update(1 / 60);
         cam.update(1 / 60);
         cam.beginFrame(ctx);
 
-        // Camada 1: Fundo da Rua Chuvosa e Neblina
+        // CENÁRIO PORTARIA MASTER UNIFICADO (PROFUNDIDADE 2.5D REAL + CONTINUIDADE TOTAL)
         scenario.drawBackground(ctx, 0);
-
-        // Camada 2: Piso de Porcelanato Polido e Tapete
         scenario.drawFloor(ctx);
-
-        // Camada 3: Lucas do lado de fora + Tentáculos e Ondas de Impacto
         drawLucasOutside(ctx);
-
-        // Camada 4: Paredes, Guarita, Monitores CFTV e Eclusa
         scenario.drawMidground(ctx);
-
-        // Camada 5: Personagens dentro da Guarita
+        drawIntercomBox(ctx);
         valdir.draw(ctx);
         voce.draw(ctx);
-
-        // Camada 6: Batente Metálico, 3 Ferrolhos e Faíscas Elétricas de 10kV
         drawDoorLockSparksAndRadioWaves(ctx);
-
-        // Camada 7: Vidro da Janela e Balcão da Guarita
         scenario.drawGuaritaFore(ctx);
-
-        // Camada 8: Feixe de Luz Volumétrico 1000W com God-Rays e Lens Flare
         drawSpotlightBeam(ctx);
-
-        // Camada 9: Rachaduras no Vidro Blindado
         drawGlassCracksWorld(ctx);
-
-        // Camada 10: Iluminação de Alarme e Primeiro Plano
         scenario.drawForeground(ctx);
 
         cam.endFrame(ctx);

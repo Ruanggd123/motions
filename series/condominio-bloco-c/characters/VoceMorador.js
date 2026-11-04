@@ -22,7 +22,7 @@
       this.flipX = options.flipX || false;
 
       this.emotion = options.emotion || 'tense'; // 'neutral' | 'tense' | 'shocked' | 'scared' | 'command'
-      this.pose = options.pose || 'phone_look';  // 'idle' | 'phone_look' | 'key_ready' | 'step_back'
+      this.pose = options.pose || 'phone_look';  // 'idle' | 'phone_look' | 'key_ready' | 'step_back' | 'pointing' | 'holding_spotlight' | 'gesturing_urgent'
       this.viewMode = options.viewMode || 'auto'; // 'auto' | 'profile' | 'front'
 
       // Motor de Locomoção (Walk Cycle) e Detecção Automática de Direção (dx)
@@ -442,33 +442,37 @@
       ctx.ellipse(-2.5, -7, 2.4, 3.8, 0.08, 0, Math.PI * 2);
       ctx.fill();
 
-      // Olho em Perfil — Redesenhado com proporção natural e formato amendoado anatômico
+      // Olho em Perfil — Redesenhado com proporção natural e formato amendoado anatômico com dilatação reativa
+      const isShock = this.emotion === 'shocked' || this.emotion === 'scared' || this.emotion === 'tense';
       if (!this.isBlinking) {
+        const eyeWiden = isShock ? 1.28 : 1.0;
+        const eyeJitter = isShock ? Math.sin(this.time * 28) * 0.3 : 0;
+
         // Esclera com formato amendoado suave (não triangular)
         ctx.fillStyle = '#f8fafc';
         ctx.beginPath();
-        ctx.ellipse(9.5, -11.5, 3.8, 2.6, 0.08, 0, Math.PI * 2);
+        ctx.ellipse(9.5 + eyeJitter, -11.5, 3.8 * eyeWiden, 2.6 * eyeWiden, 0.08, 0, Math.PI * 2);
         ctx.fill();
 
         // Íris castanha posicionada olhando levemente para baixo/celular
         ctx.fillStyle = '#5c3317';
         ctx.beginPath();
-        ctx.arc(10.2, -11.2, 2.0, 0, Math.PI * 2);
+        ctx.arc(10.2 + eyeJitter, -11.2, isShock ? 2.3 : 2.0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Pupila preta centralizada na íris
+        // Pupila preta dilatada sob susto
         ctx.fillStyle = '#0f0f0f';
         ctx.beginPath();
-        ctx.arc(10.2, -11.2, 1.1, 0, Math.PI * 2);
+        ctx.arc(10.2 + eyeJitter, -11.2, isShock ? 1.45 : 1.1, 0, Math.PI * 2);
         ctx.fill();
 
         // Brilho especular duplo (realismo natural)
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(9.4, -12.0, 0.9, 0, Math.PI * 2);
+        ctx.arc(9.4 + eyeJitter, -12.0, 0.9, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(11.0, -10.6, 0.45, 0, Math.PI * 2);
+        ctx.arc(11.0 + eyeJitter, -10.6, 0.45, 0, Math.PI * 2);
         ctx.fill();
 
         // Linha superior da pálpebra (define o olho sem parecer estranho)
@@ -476,15 +480,15 @@
         ctx.lineWidth = 1.6;
         ctx.lineCap = 'round';
         ctx.beginPath();
-        ctx.ellipse(9.5, -11.5, 3.8, 2.6, 0.08, Math.PI + 0.2, -0.2);
+        ctx.ellipse(9.5 + eyeJitter, -11.5, 3.8 * eyeWiden, 2.6 * eyeWiden, 0.08, Math.PI + 0.2, -0.2);
         ctx.stroke();
 
         // Cílios sutis no canto externo
         ctx.strokeStyle = '#2a1a0e';
         ctx.lineWidth = 1.0;
         ctx.beginPath();
-        ctx.moveTo(13.0, -12.2);
-        ctx.lineTo(13.8, -12.8);
+        ctx.moveTo(13.0 + eyeJitter, -12.2);
+        ctx.lineTo(13.8 + eyeJitter, -12.8);
         ctx.stroke();
       } else {
         // Pálpebra fechada com curva suave natural
@@ -497,14 +501,28 @@
         ctx.stroke();
       }
 
-      // Sobrancelha expressiva jovem
+      // Sobrancelha expressiva jovem reativa ao susto
       ctx.strokeStyle = '#1e1b2e';
-      ctx.lineWidth = 2.0;
+      ctx.lineWidth = 2.2;
       ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.moveTo(6, -17);
-      ctx.quadraticCurveTo(9.5, -18.5, 13.5, -16);
+      if (isShock) {
+        ctx.moveTo(5.5, -18.5);
+        ctx.quadraticCurveTo(9.5, -21.0, 14.0, -17.0);
+      } else {
+        ctx.moveTo(6, -17);
+        ctx.quadraticCurveTo(9.5, -18.5, 13.5, -16);
+      }
       ctx.stroke();
+
+      // Gota de suor frio escorrendo na têmpora sob pânico
+      if (isShock) {
+        const dropY = -20 + ((this.time * 18) % 16);
+        ctx.fillStyle = 'rgba(224, 242, 254, 0.75)';
+        ctx.beginPath();
+        ctx.ellipse(3, dropY, 1.1, 2.2, 0.1, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       // Boca Dinâmica em Perfil (Natural e Contida — Zero distorção)
       if (this.mouthOpen > 0.06) {
@@ -918,6 +936,14 @@
       if (this.pose === 'key_ready') {
         leftUpperAngle = -0.45;
         leftForeAngle = -0.65;
+      } else if (this.pose === 'holding_spotlight') {
+        // Mão de apoio no corpo do farol tático
+        leftUpperAngle = -0.52;
+        leftForeAngle = -1.18;
+      } else if (this.pose === 'gesturing_urgent') {
+        // Gesto de urgência — mão aberta na altura do ombro
+        leftUpperAngle = -0.92 + Math.sin(this.time * 5.2) * 0.07;
+        leftForeAngle = -0.58;
       }
       this._drawArticulatedArm(ctx, leftUpperAngle, leftForeAngle, false);
       ctx.restore();
@@ -946,6 +972,14 @@
         const armBob = this.isWalking ? Math.sin(this.walkCycle) * 0.05 : 0;
         rightUpperAngle = 0.32 + armBob;
         rightForeAngle = 2.15 - armBob * 0.4;
+      } else if (this.pose === 'pointing') {
+        // Ordena a Seu Valdir: braço estendido apontando a eclusa
+        rightUpperAngle = -1.42;
+        rightForeAngle = -0.12;
+      } else if (this.pose === 'holding_spotlight') {
+        // Segura o farol tático com as duas mãos na altura do peito
+        rightUpperAngle = -0.62;
+        rightForeAngle = -1.32;
       } else if (this.pose === 'step_back') {
         rightUpperAngle = 0.12;
         rightForeAngle = 1.15;
@@ -1336,7 +1370,7 @@
       if (this.emotion === 'shocked' || this.emotion === 'scared') {
         ctx.moveTo(-14, -64); ctx.quadraticCurveTo(-8, -70, -3, -66);
         ctx.moveTo(3, -66); ctx.quadraticCurveTo(8, -70, 14, -64);
-      } else if (this.emotion === 'command') {
+      } else if (this.emotion === 'command' || this.emotion === 'determined') {
         ctx.moveTo(-14, -66); ctx.lineTo(-3, -63);
         ctx.moveTo(3, -63); ctx.lineTo(14, -66);
       } else {

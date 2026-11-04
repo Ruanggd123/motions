@@ -23,8 +23,8 @@
       this.flipX = options.flipX || false;
 
       // Estados de Animação e Postura
-      this.emotion = options.emotion || 'worried'; // 'neutral' | 'worried' | 'panicked' | 'serious'
-      this.pose = options.pose || 'radio_talk';    // 'idle' | 'radio_talk' | 'point_monitors' | 'hands_desk'
+      this.emotion = options.emotion || 'worried'; // 'neutral' | 'worried' | 'panicked' | 'serious' | 'focused' | 'command'
+      this.pose = options.pose || 'radio_talk';    // 'idle' | 'radio_talk' | 'point_monitors' | 'hands_desk' | 'holding_spotlight' | 'holding_switch'
       this.viewMode = options.viewMode || 'auto'; // 'auto' | 'profile' | 'front'
 
       // Motor de Locomoção (Walk Cycle) e Detecção Automática de Direção (dx)
@@ -378,20 +378,32 @@
       ctx.fill();
       ctx.stroke();
 
-      // Olho maduro atento por trás da lente
+      // Olho maduro atento por trás da lente com dilatação reativa
+      const isPanic = this.emotion === 'panicked' || this.emotion === 'worried';
       if (!this.isBlinking) {
+        const eyeWiden = isPanic ? 1.3 : 1.0;
+        const eyeJitter = isPanic ? Math.sin(this.time * 26) * 0.35 : 0;
+
         ctx.fillStyle = '#f8fafc';
         ctx.beginPath();
-        ctx.arc(10.5, -11, 2.4, 0, Math.PI * 2);
+        ctx.ellipse(10.5 + eyeJitter, -11, 2.5 * eyeWiden, 2.0 * eyeWiden, 0, 0, Math.PI * 2);
         ctx.fill();
+
         ctx.fillStyle = '#451a03';
         ctx.beginPath();
-        ctx.arc(11.2, -11, 1.4, 0, Math.PI * 2);
+        ctx.arc(11.2 + eyeJitter, -11, isPanic ? 1.7 : 1.4, 0, Math.PI * 2);
         ctx.fill();
+
+        // Pupila dilatada no pânico
+        ctx.fillStyle = '#0a0a0a';
+        ctx.beginPath();
+        ctx.arc(11.2 + eyeJitter, -11, isPanic ? 1.15 : 0.8, 0, Math.PI * 2);
+        ctx.fill();
+
         // Brilho no olhar
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(10.8, -11.8, 0.6, 0, Math.PI * 2);
+        ctx.arc(10.7 + eyeJitter, -11.8, 0.65, 0, Math.PI * 2);
         ctx.fill();
       } else {
         ctx.strokeStyle = '#451a03';
@@ -402,17 +414,41 @@
         ctx.stroke();
       }
 
-      // Sobrancelha grisalha expressiva
+      // Sobrancelha grisalha expressiva reativa e rugas de tensão na testa
       ctx.strokeStyle = '#cbd5e1';
       ctx.lineWidth = 2.4;
       ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.moveTo(7, -16);
-      ctx.quadraticCurveTo(10.5, -18, 14, -15.5);
+      if (isPanic) {
+        ctx.moveTo(6.5, -18);
+        ctx.quadraticCurveTo(10.0, -21.5, 14.5, -16.5);
+      } else {
+        ctx.moveTo(7, -16);
+        ctx.quadraticCurveTo(10.5, -18, 14, -15.5);
+      }
       ctx.stroke();
 
-      // Bigode Grisalho Cheio em Perfil (com sincronização de fala)
-      const mustY = -6.5 - this.mouthOpen * 1.0;
+      // Rugas de expressão na testa sob preocupação extrema
+      if (isPanic) {
+        ctx.strokeStyle = 'rgba(74, 38, 16, 0.45)';
+        ctx.lineWidth = 1.0;
+        ctx.beginPath();
+        ctx.moveTo(4, -26);
+        ctx.quadraticCurveTo(9, -27.5, 12, -25.5);
+        ctx.moveTo(5, -29);
+        ctx.quadraticCurveTo(8.5, -30.5, 11, -29);
+        ctx.stroke();
+
+        // Gota de suor frio escorrendo na têmpora
+        const dropY = -22 + ((this.time * 16) % 15);
+        ctx.fillStyle = 'rgba(224, 242, 254, 0.72)';
+        ctx.beginPath();
+        ctx.ellipse(3, dropY, 1.1, 2.2, 0.1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Bigode Grisalho Cheio em Perfil (com sincronização de fala orgânica)
+      const mustY = -6.5 - this.mouthOpen * 1.2;
       ctx.fillStyle = '#cbd5e1';
       ctx.beginPath();
       ctx.moveTo(11.5, mustY);
@@ -421,12 +457,30 @@
       ctx.closePath();
       ctx.fill();
 
-      // Boca (visema quando fala no rádio)
-      if (this.mouthOpen > 0.08) {
-        ctx.fillStyle = '#3a0f0f';
+      // Boca Expressiva (dentes e língua visíveis no alerta do rádio)
+      if (this.mouthOpen > 0.05) {
+        const mo = Math.min(1.0, this.mouthOpen);
+        ctx.save();
+        ctx.translate(13.0, -3.2);
+
+        const mw = 2.8 + mo * 3.2;
+        const mh = 1.8 + mo * 4.2;
+        ctx.fillStyle = '#3a0808';
         ctx.beginPath();
-        ctx.arc(12.5, -3.5, 2.2 * this.mouthOpen, 0, Math.PI * 2);
+        ctx.ellipse(0, 0, mw, mh, 0.1, 0, Math.PI * 2);
         ctx.fill();
+
+        // Dentes superiores
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(-mw * 0.65, -mh * 0.9, mw * 1.3, mh * 0.4);
+
+        // Língua
+        ctx.fillStyle = '#dc2626';
+        ctx.beginPath();
+        ctx.ellipse(0, mh * 0.35, mw * 0.5, mh * 0.35, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
       }
 
       ctx.restore(); // Fim Cabeça
@@ -729,6 +783,14 @@
       } else if (this.pose === 'hands_desk') {
         leftUpperAngle = -0.08;
         leftForeAngle = -0.72;
+      } else if (this.pose === 'holding_spotlight') {
+        // Mão esquerda firme no corpo do farol de mil watts
+        leftUpperAngle = -0.60;
+        leftForeAngle = -1.22;
+      } else if (this.pose === 'holding_switch') {
+        // Mão esquerda apoiada na alavanca do quadro de alta tensão
+        leftUpperAngle = -0.28;
+        leftForeAngle = -1.02;
       } else if (this.pose === 'radio_talk') {
         // Mão esquerda descansando no balcão da guarita
         leftUpperAngle = -0.12;
@@ -758,6 +820,12 @@
         this._drawRadioTalkArm(ctx);
       } else if (this.pose === 'point_monitors') {
         this._drawRadioTalkArm(ctx, true);
+      } else if (this.pose === 'holding_spotlight') {
+        // Braço dianteiro sustentando o farol de mil watts contra o peito
+        this._drawArticulatedArm(ctx, -0.66, -1.24, true, false, false);
+      } else if (this.pose === 'holding_switch') {
+        // Braço dianteiro avançando para a chave geral de 10kV
+        this._drawArticulatedArm(ctx, -1.34, -0.34, true, false, true);
       } else {
         this._drawDeskArm(ctx);
       }
@@ -1318,7 +1386,8 @@
 
       // Olhos expressivos atrás das lentes
       const isPanicked = this.emotion === 'panicked';
-      const eyeH = isPanicked ? 5.2 : 3.8;
+      const isFocused = this.emotion === 'focused' || this.emotion === 'serious';
+      const eyeH = isPanicked ? 5.2 : (isFocused ? 2.9 : 3.8);
 
       if (!this.isBlinking) {
         [-9, 9].forEach(ex => {
@@ -1386,6 +1455,10 @@
       if (this.emotion === 'worried' || this.emotion === 'panicked') {
         ctx.moveTo(-15, -65); ctx.quadraticCurveTo(-9, -69, -3, -67);
         ctx.moveTo(3, -67); ctx.quadraticCurveTo(9, -69, 15, -65);
+      } else if (this.emotion === 'command') {
+        // 18 anos de portaria: sobrancelhas baixas e decididas
+        ctx.moveTo(-15, -64); ctx.lineTo(-4, -67);
+        ctx.moveTo(4, -67); ctx.lineTo(15, -64);
       } else {
         ctx.moveTo(-15, -66); ctx.lineTo(-4, -65);
         ctx.moveTo(4, -65); ctx.lineTo(15, -66);

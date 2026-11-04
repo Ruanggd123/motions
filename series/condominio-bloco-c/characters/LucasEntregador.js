@@ -23,7 +23,7 @@
       this.flipX = options.flipX || false;
 
       this.emotion = options.emotion || 'desperate'; // 'neutral' | 'tired' | 'desperate' | 'terrified'
-      this.pose = options.pose || 'hold_bag';        // 'hold_bag' | 'bang_gate' | 'look_back'
+      this.pose = options.pose || 'hold_bag';        // 'hold_bag' | 'bang_gate' | 'look_back' | 'hands_glass' | 'cover_eyes'
       this.viewMode = options.viewMode || 'auto';   // 'auto' | 'profile' | 'front'
       this.helmetVisorUp = options.helmetVisorUp !== false;
 
@@ -256,22 +256,25 @@
 
       ctx.restore();
 
-      // 3. TRONCO DA JAQUETA DE MOTOBOY PRETA E VERMELHA COM REFLETIVOS
+      // 3. TRONCO DA JAQUETA DE MOTOBOY (Respiração Ofegante + Tremor de Pânico + Balanço Idle)
+      const breathChest = this.chestExpand || 0;
+      const idleShift = this.idleWeightShift || 0;
+      const tremor = this.panicTremor || 0;
       ctx.save();
-      ctx.translate(0, hipBob);
-      ctx.rotate(torsoTilt);
+      ctx.translate(idleShift + tremor * 0.3, hipBob - (this.shoulderRise || 0) * 0.3);
+      ctx.rotate(torsoTilt + (this.headShake || 0));
 
-      // Corpo da Jaqueta Impermeável
+      // Corpo da Jaqueta Impermeável com expansão torácica na respiração ofegante
       const jacketGrad = ctx.createLinearGradient(-16, -22, 16, 58);
       jacketGrad.addColorStop(0, '#18181b');
       jacketGrad.addColorStop(0.35, '#dc2626');
       jacketGrad.addColorStop(0.85, '#09090b');
       ctx.fillStyle = jacketGrad;
       ctx.beginPath();
-      ctx.moveTo(-15, -20);
-      ctx.bezierCurveTo(-19, 0, -17, 35, -13, 58);
-      ctx.lineTo(14, 58);
-      ctx.bezierCurveTo(17, 35, 17, 0, 14, -18);
+      ctx.moveTo(-15 - breathChest * 0.3, -20);
+      ctx.bezierCurveTo(-19 - breathChest * 0.2, 0, -17 - breathChest * 0.1, 35, -13 - breathChest * 0.08, 58);
+      ctx.lineTo(14 + breathChest * 0.08, 58);
+      ctx.bezierCurveTo(17 + breathChest * 0.1, 35, 17 + breathChest * 0.2, 0, 14 + breathChest * 0.3, -18);
       ctx.closePath();
       ctx.fill();
 
@@ -363,33 +366,101 @@
         ctx.restore();
       }
 
-      // Olho expressivo focado
+      // Olho expressivo hiper-reativo (dilatação no pânico e arregalar)
       if (!this.isBlinking) {
+        const isPanic = this.emotion === 'terrified' || this.emotion === 'desperate';
+        const eyeWiden = isPanic ? 1.35 : 1.0;
+        const eyeJitter = isPanic ? Math.sin(this.time * 32) * 0.4 : 0;
+
+        // Esclera branca
         ctx.fillStyle = '#f8fafc';
         ctx.beginPath();
-        ctx.moveTo(8.5, -13);
-        ctx.lineTo(13.5, -11);
-        ctx.lineTo(9.5, -8.5);
-        ctx.closePath();
+        ctx.ellipse(11.0 + eyeJitter, -10.8, 3.2 * eyeWiden, 2.2 * eyeWiden, 0.1, 0, Math.PI * 2);
         ctx.fill();
 
+        // Leve rubor avermelhado nos cantos da esclera sob pânico
+        if (isPanic) {
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.35)';
+          ctx.beginPath();
+          ctx.arc(8.5 + eyeJitter, -11.0, 1.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Íris castanha
         ctx.fillStyle = '#451a03';
         ctx.beginPath();
-        ctx.arc(11.2, -10.8, 1.8, 0, Math.PI * 2);
+        ctx.arc(11.2 + eyeJitter, -10.8, isPanic ? 2.0 : 1.6, 0, Math.PI * 2);
         ctx.fill();
 
+        // Pupila preta dilatada de terror
+        ctx.fillStyle = '#0a0a0a';
+        ctx.beginPath();
+        ctx.arc(11.2 + eyeJitter, -10.8, isPanic ? 1.4 : 0.9, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Brilho especular dramático no olhar
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(10.8, -11.5, 0.7, 0, Math.PI * 2);
+        ctx.arc(10.6 + eyeJitter, -11.6, 0.85, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // Boca (visema quando fala)
-      if (this.mouthOpen > 0.08) {
-        ctx.fillStyle = '#3a0f0f';
+      // Sobrancelha arqueada e franzida de puro desespero
+      const isPanic = this.emotion === 'terrified' || this.emotion === 'desperate';
+      ctx.strokeStyle = '#18181b';
+      ctx.lineWidth = 2.2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      if (isPanic) {
+        ctx.moveTo(7.5, -15.5);
+        ctx.quadraticCurveTo(10.5, -19.5, 14.5, -14.0);
+      } else {
+        ctx.moveTo(8.0, -16.0);
+        ctx.quadraticCurveTo(11.0, -17.5, 14.0, -15.5);
+      }
+      ctx.stroke();
+
+      // Gotas de suor frio e chuva escorrendo na têmpora e bochecha
+      if (isPanic) {
+        const dropY1 = -16 + ((this.time * 22) % 18);
+        const dropY2 = -10 + ((this.time * 17 + 6) % 16);
+        ctx.fillStyle = 'rgba(224, 242, 254, 0.78)';
         ctx.beginPath();
-        ctx.arc(12.5, -4.5, 2.2 * this.mouthOpen, 0, Math.PI * 2);
+        ctx.ellipse(5.5, dropY1, 1.1, 2.2, 0.1, 0, Math.PI * 2);
+        ctx.ellipse(9.5, dropY2, 0.9, 1.8, 0.05, 0, Math.PI * 2);
         ctx.fill();
+      }
+
+      // Boca Expressiva de Súplica e Grito (dentes e língua visíveis no desespero)
+      if (this.mouthOpen > 0.05) {
+        const mo = Math.min(1.0, this.mouthOpen);
+        ctx.save();
+        ctx.translate(13.2, -3.5);
+
+        // Cavidade bucal
+        const mw = 3.2 + mo * 3.8;
+        const mh = 2.2 + mo * 5.2;
+        ctx.fillStyle = '#3a0808';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, mw, mh, 0.1, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Dentes superiores brancos
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(-mw * 0.7, -mh * 0.9, mw * 1.4, mh * 0.38);
+
+        // Dentes inferiores se boca bem aberta
+        if (mo > 0.45) {
+          ctx.fillRect(-mw * 0.5, mh * 0.55, mw * 1.0, mh * 0.32);
+        }
+
+        // Língua avermelhada
+        ctx.fillStyle = '#dc2626';
+        ctx.beginPath();
+        ctx.ellipse(0, mh * 0.35, mw * 0.55, mh * 0.35, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
       }
 
       ctx.restore(); // Fim Cabeça
@@ -645,6 +716,16 @@
       if (this.pose === 'bang_gate') {
         leftUpperAngle = -0.75 + (this.isWalking ? 0 : Math.sin(this.time * 6) * 0.08);
         leftForeAngle = -0.85;
+      } else if (this.pose === 'hands_glass') {
+        // Palmas abertas pressionando o vidro blindado da guarita
+        leftUpperAngle = -0.55;
+        leftForeAngle = -1.42;
+      } else if (this.pose === 'look_back') {
+        leftUpperAngle = -0.18;
+        leftForeAngle = -0.62;
+      } else if (this.pose === 'cover_eyes') {
+        leftUpperAngle = -0.92;
+        leftForeAngle = -1.52;
       }
       this._drawArticulatedArm(ctx, leftUpperAngle, leftForeAngle, false);
       ctx.restore();
@@ -675,6 +756,15 @@
       } else if (this.pose === 'bang_gate') {
         rightUpperAngle = -0.85;
         rightForeAngle = -0.65;
+      } else if (this.pose === 'hands_glass') {
+        rightUpperAngle = -0.72;
+        rightForeAngle = -1.28;
+      } else if (this.pose === 'look_back') {
+        rightUpperAngle = 0.34;
+        rightForeAngle = 0.52;
+      } else if (this.pose === 'cover_eyes') {
+        rightUpperAngle = -1.02;
+        rightForeAngle = -1.44;
       }
       this._drawArticulatedArm(ctx, rightUpperAngle, rightForeAngle, true);
       ctx.restore();
