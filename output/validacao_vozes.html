@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audição de Vozes Reais — Seu Valdir (Pessoas & Modelos Distintos)</title>
+  <style>
+    :root {
+      --bg: #07090e;
+      --card-bg: rgba(15, 23, 42, 0.88);
+      --card-border: rgba(56, 189, 248, 0.20);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+
+    body {
+      background: radial-gradient(circle at 50% -10%, #172554 0%, #07090e 70%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 30px 20px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container { width: 100%; max-width: 980px; }
+
+    .banner-ruan {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      backdrop-filter: blur(10px);
+    }
+    .banner-ruan span { font-size: 13.5px; color: #a7f3d0; }
+    .banner-ruan strong { color: #34d399; }
+    .btn-ruan {
+      padding: 6px 14px;
+      background: #059669;
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 12.5px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .header { margin-bottom: 28px; text-align: center; }
+
+    .step-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 14px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fcd34d;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 27px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      font-size: 14.5px;
+      color: var(--text-muted);
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    .info-rule {
+      margin-top: 10px;
+      display: inline-block;
+      padding: 6px 14px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 8px;
+      font-size: 13px;
+      color: #7dd3fc;
+    }
+
+    /* UPLOAD / CLONAGEM CARD */
+    .upload-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+      border: 2px dashed rgba(245, 158, 11, 0.6);
+      border-radius: 18px;
+      padding: 22px 26px;
+      margin-bottom: 28px;
+      box-shadow: 0 10px 30px rgba(245, 158, 11, 0.12);
+    }
+    .upload-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fcd34d;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .upload-desc {
+      font-size: 13.5px;
+      color: #cbd5e1;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .upload-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .file-input-btn {
+      position: relative;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: #d97706;
+      color: white;
+      font-weight: 700;
+      font-size: 13.5px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .file-input-btn:hover { background: #b45309; }
+    .file-input-btn input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    .btn-rec {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: #dc2626;
+      color: white;
+      font-weight: 700;
+      font-size: 13.5px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-rec:hover { background: #b91c1c; }
+    .upload-status {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    /* GRID DE VOZES */
+    .grid { display: flex; flex-direction: column; gap: 16px; }
+
+    .voice-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px 24px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(16px);
+      position: relative;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .voice-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.6);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.5);
+    }
+
+    .voice-card.selected {
+      border: 2px solid #10b981 !important;
+      background: rgba(6, 78, 59, 0.3) !important;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.35) !important;
+    }
+
+    .voice-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 5px;
+      border-top-left-radius: 16px;
+      border-bottom-left-radius: 16px;
+    }
+
+    .card-p1::before { background: #38bdf8; }
+    .card-p2::before { background: #f59e0b; }
+    .card-p3::before { background: #10b981; }
+    .card-p4::before { background: #a855f7; }
+    .card-p5::before { background: #ec4899; }
+    .card-p6::before { background: #eab308; }
+    .card-p7::before { background: #06b6d4; }
+    .card-p8::before { background: #6366f1; }
+    .card-p9::before { background: #f43f5e; }
+    .card-custom::before { background: #f59e0b; }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      gap: 12px;
+    }
+
+    .card-title-group { display: flex; flex-direction: column; gap: 3px; }
+
+    .card-title {
+      font-size: 17.5px;
+      font-weight: 700;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-subtitle { font-size: 13px; color: var(--text-muted); }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .badge-p1 { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .badge-p2 { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-p3 { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-p4 { background: rgba(168, 85, 247, 0.15); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.3); }
+    .badge-p5 { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }
+    .badge-p6 { background: rgba(234, 179, 8, 0.15); color: #fef08a; border: 1px solid rgba(234, 179, 8, 0.3); }
+    .badge-p7 { background: rgba(6, 182, 212, 0.15); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.3); }
+    .badge-p8 { background: rgba(99, 102, 241, 0.15); color: #c7d2fe; border: 1px solid rgba(99, 102, 241, 0.3); }
+    .badge-p9 { background: rgba(244, 63, 94, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.3); }
+
+    .script-box {
+      background: rgba(3, 7, 18, 0.65);
+      border-left: 3px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #e2e8f0;
+      font-style: italic;
+    }
+
+    .player-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .player-container {
+      flex: 1;
+      background: #030712;
+      border-radius: 10px;
+      padding: 6px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    audio { width: 100%; height: 38px; outline: none; filter: invert(1) hue-rotate(180deg); }
+
+    .btn-choose {
+      padding: 9px 18px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      font-weight: 700;
+      font-size: 13px;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .btn-choose:hover {
+      background: #059669;
+      color: white;
+    }
+
+    .meta-footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 11.5px;
+      color: #64748b;
+    }
+
+    .footer { margin-top: 40px; text-align: center; color: #475569; font-size: 13px; }
+
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 20px;
+      background: #059669;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 1000;
+    }
+    #toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <div class="banner-ruan">
+      <span>✅ <strong>Sua Voz Oficial de Narração (Ruan):</strong> Calibrada com sucesso a partir da sua gravação recente de 14.58s.</span>
+      <a href="/output/clonagem_estudio.html" class="btn-ruan">Ver Estúdio da Minha Voz →</a>
+    </div>
+
+    <div class="header">
+      <div class="step-pill">Elenco Oficial: Seu Valdir (Porteiro 61a)</div>
+      <h1>👴 Audição com Vozes de Pessoas Reais e Modelos Distintos</h1>
+      <p class="subtitle">
+        Como você solicitou: <strong>zero modulação artificial de frequência (Hz)</strong>. Cada opção abaixo é gerada a partir de uma <strong>pessoa real ou modelo neural diferente</strong>, com timbres, ressonâncias torácicas e idades vocais completamente distintas.
+      </p>
+      <div class="info-rule">
+        ⚡ Ouça cada opção, clique em <strong>"Escolher Esta Voz"</strong> para salvar como oficial, ou envie o áudio de um idoso real abaixo.
+      </div>
+    </div>
+
+    <!-- SEÇÃO DE CLONAGEM / UPLOAD DE IDOSO REAL -->
+    <div class="upload-card">
+      <div class="upload-title">
+        🎤 Quer usar a voz de um idoso real específico? (WhatsApp / Família / YouTube)
+      </div>
+      <div class="upload-desc">
+        Se você tiver um áudio de WhatsApp de um avô, pai, tio idoso ou um trecho de vídeo do YouTube, selecione o arquivo abaixo ou grave no microfone. O sistema clona a ressonância do idoso instantaneamente para a fala do Seu Valdir:
+      </div>
+      <div class="upload-actions">
+        <label class="file-input-btn">
+          📁 Enviar Áudio do Idoso (.mp3, .wav, .ogg, .m4a)
+          <input type="file" id="elderFileInput" accept="audio/*">
+        </label>
+        <button class="btn-rec" id="btnRecordElder">🎙️ Gravar Idoso pelo Microfone</button>
+        <span class="upload-status" id="uploadStatus">Nenhum áudio externo enviado ainda.</span>
+      </div>
+      <div id="customElderPlayerBox" style="display: none; margin-top: 16px;">
+        <div style="font-size: 13px; color: #fcd34d; margin-bottom: 6px; font-weight: 700;">Amostra Gerada com o Áudio do Idoso Enviado:</div>
+        <div class="player-row">
+          <div class="player-container">
+            <audio id="customElderAudio" controls></audio>
+          </div>
+          <button class="btn-choose" onclick="selectVoice('custom_elder', 'Voz Clonada do Idoso Real', '/output/audicoes/valdir_clonado_custom.mp3')">
+            ⭐ Escolher Esta Voz
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <!-- PESSOA 1 -->
+      <div class="voice-card card-p1" id="card-p1">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">👨‍🦳 Pessoa 1: Duarte (Voz Madura Tradicional)</div>
+            <div class="card-subtitle">Modelo neural masculino maduro, dicção formal, tom grave e sóbrio de senhor</div>
+          </div>
+          <span class="badge badge-p1">Ator Neural: Duarte</span>
+        </div>
+        <div class="script-box">
+          "Calma rapaz! As travas de aço bateram... mas o portão externo travou no escuro!"
+        </div>
+        <div class="player-row">
+          <div class="player-container">
+            <audio controls preload="auto" src="/output/audicoes/pessoa_2_duarte_maduro.mp3?v=300"></audio>
+          </div>
+          <button class="btn-choose" onclick="selectVoice('pessoa_2_duarte', 'Pessoa 1: Duarte (Voz Madura)', '/output/audicoes/pessoa_2_duarte_maduro.mp3')">
+            Escolher Esta Voz
+          </button>
+        </div>
+        <div class="meta-footer">
+          <span>Modelo: pt-PT-DuarteNeural (Outra pessoa real)</span>
+          <span>Duração: 5.6s</span>
+        </div>
+      </div>
+
+      <!-- PESSOA 2 -->
+      <div class="voice-card card-p2" id="card-p2">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">🇧🇷 Pessoa 2: Modelo Google BR (Voz Masculina Neutra / Seca)</div>
+            <div class="card-subtitle">Voz humana brasileira de outro sistema (Google Neural BR), sem afetações</div>
+          </div>
+          <span class="badge badge-p2">Ator: Google BR</span>
+        </div>
+        <div class="script-box">
+          "Calma rapaz! As travas de aço bateram... mas o portão externo travou no escuro!"
+        </div>
+        <div class="player-row">
+          <div class="player-container">
+            <audio controls preload="auto" src="/output/audicoes/pessoa_1_google_br.mp3?v=300"></audio>
+          </div>
+          <button class="btn-choose" onclick="selectVoice('pessoa_1_google', 'Pessoa 2: Google BR', '/output/audicoes/pessoa_1_google_br.mp3')">
+            Escolher Esta Voz
+          </button>
+        </div>
+        <div class="meta-footer">
+          <span>Modelo: Google TTS BR Masculino</span>
+          <span>Duração: 8.4s</span>
+        </div>
+      </div>
+
+      <!-- PESSOA 3 -->
+      <div class="voice-card card-p3" id="card-p3">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">🛡️ Pessoa 3: Seu Tião (Ator Real de Portaria / Subterrâneo 404)</div>
+            <div class="card-subtitle">Interpretação gravada de guarda veterano experiente de portaria com tom sombrio</div>
+          </div>
+          <span class="badge badge-p3">Ator Real: Seu Tião</span>
+        </div>
+        <div class="script-box">
+          "Guarda o fôlego, garoto. Essa comporta hidráulica só abre pelo comando lá de cima... e a bateria de emergência do saguão só dura mais dez minutos."
+        </div>
+        <div class="player-row">
+          <div class="player-container">
+            <audio controls preload="auto" src="/output/audicoes/pessoa_7_seu_tiao_veterano.mp3?v=300"></audio>
+          </div>
+          <button class="btn-choose" onclick="selectVoice('pessoa_7_seu_tiao', 'Pessoa 3: Seu Tião (Ator Real)', '/output/audicoes/pessoa_7_seu_tiao_veterano.mp3')">
+            Escolher Esta Voz
+          </button>
+        </div>
+        <div class="meta-footer">
+          <span>Modelo: Gravação Humana de Segurança Veterano</span>
+          <span>Duração: 10.2s</span>
+        </div>
+      </div>
+
+      <!-- PESSOA 4 -->
+      <div class="voice-card card-p4" id="card-p4">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">☕ Pessoa 4: Brian (Conversacional Maduro & Calmo)</div>
+            <div class="card-subtitle">Timbre maduro relaxado, muito natural e fluido falando português</div>
+          </div>
+          <span class="badge badge-p4">Ator Neural: Brian</span>
+        </div>
+        <div class="script-box">
+          "Calma rapaz! As travas de aço bateram... mas o portão externo travou no escuro!"
+        </div>
+        <div class="player-row">
+          <div class="player-container">
+            <audio controls preload="auto" src="/output/audicoes/pessoa_8_brian_multilingual.mp3?v=300"></audio>
+          </div>
+          <button class="btn-choose" onclick="selectVoice('pessoa_8_brian', 'Pessoa 4: Brian (Maduro Calmo)', '/output/audicoes/pessoa_8_brian_multilingual.mp3')">
+            Escolher Esta Voz
+          </button>
+        </div>
+        <div class="meta-footer">
+          <span>Modelo: en-US-BrianMultilingualNeural em Português</span>
+          <span>Duração: 5.8s</span>
+        </div>
+      </div>
+
+      <!-- PESSOA 5 -->
+      <div class="voice-card card-p5" id="card-p5">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">🗣️ Pessoa 5: Giuseppe (Barítono Maduro & Rouco)</div>
+            <div class="card-subtitle">Voz encorpada, ar grave e textura vocal mais áspera de senhor</div>
+          </div>
+          <span class="badge badge-p5">Ator Neural: Giuseppe</span>
+        </div>
+        <div class="script-box">
+          "Calma rapaz! As travas de aço bateram... mas o portão externo travou no escuro!"
+        </div>
+        <div class="player-row">
+          <div class="player-container">
+            <audio controls preload="auto" src="/output/audicoes/pessoa_3_giuseppe_maduro.mp3?v=300"></audio>
+          </div>
+          <button class="btn-choose" onclick="selectVoice('pessoa_3_giuseppe', 'Pessoa 5: Giuseppe (Barítono Rouco)', '/output/audicoes/pessoa_3_giuseppe_maduro.mp3')">
+            Escolher Esta Voz
+          </button>
+        </div>
+        <div class="meta-footer">
+          <span>Modelo: it-IT-GiuseppeMultilingualNeural em Português</span>
+          <span>Duração: 6.0s</span>
+        </div>
+      </div>
+
+      <!-- PESSOA 6 -->
+      <div class="voice-card card-p6" id="card-p6">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">🪨 Pessoa 6: Florian (Voz de Peito Profunda & Cavernosa)</div>
+            <div class="card-subtitle">Ressonância torácica pesada, senhor de voz funda e autoritária</div>
+          </div>
+          <span class="badge badge-p6">Ator Neural: Florian</span>
+        </div>
+        <div class="script-box">
+          "Calma rapaz! As travas de aço bateram... mas o portão externo travou no escuro!"
+        </div>
+        <div class="player-row">
+          <div class="player-container">
+            <audio controls preload="auto" src="/output/audicoes/pessoa_4_florian_grave.mp3?v=300"></audio>
+          </div>
+          <button class="btn-choose" onclick="selectVoice('pessoa_4_florian', 'Pessoa 6: Florian (Voz de Peito)', '/output/audicoes/pessoa_4_florian_grave.mp3')">
+            Escolher Esta Voz
+          </button>
+        </div>
+        <div class="meta-footer">
+          <span>Modelo: de-DE-FlorianMultilingualNeural em Português</span>
+          <span>Duração: 5.8s</span>
+        </div>
+      </div>
+
+      <!-- PESSOA 7 -->
+      <div class="voice-card card-p7" id="card-p7">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">🚬 Pessoa 7: Remy (Voz Cansada / Noturna)</div>
+            <div class="card-subtitle">Timbre mais áspero, de quem passa a noite acordado na portaria</div>
+          </div>
+          <span class="badge badge-p7">Ator Neural: Remy</span>
+        </div>
+        <div class="script-box">
+          "Calma rapaz! As travas de aço bateram... mas o portão externo travou no escuro!"
+        </div>
+        <div class="player-row">
+          <div class="player-container">
+            <audio controls preload="auto" src="/output/audicoes/pessoa_5_remy_maduro.mp3?v=300"></audio>
+          </div>
+          <button class="btn-choose" onclick="selectVoice('pessoa_5_remy', 'Pessoa 7: Remy (Voz Cansada)', '/output/audicoes/pessoa_5_remy_maduro.mp3')">
+            Escolher Esta Voz
+          </button>
+        </div>
+        <div class="meta-footer">
+          <span>Modelo: fr-FR-RemyMultilingualNeural em Português</span>
+          <span>Duração: 5.9s</span>
+        </div>
+      </div>
+
+      <!-- PESSOA 8 -->
+      <div class="voice-card card-p8" id="card-p8">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">👮 Pessoa 8: William (Veterano Seco & Assertivo)</div>
+            <div class="card-subtitle">Fala enérgica, timbre maduro e direto de profissional de segurança</div>
+          </div>
+          <span class="badge badge-p8">Ator Neural: William</span>
+        </div>
+        <div class="script-box">
+          "Calma rapaz! As travas de aço bateram... mas o portão externo travou no escuro!"
+        </div>
+        <div class="player-row">
+          <div class="player-container">
+            <audio controls preload="auto" src="/output/audicoes/pessoa_6_william_maduro.mp3?v=300"></audio>
+          </div>
+          <button class="btn-choose" onclick="selectVoice('pessoa_6_william', 'Pessoa 8: William (Veterano Seco)', '/output/audicoes/pessoa_6_william_maduro.mp3')">
+            Escolher Esta Voz
+          </button>
+        </div>
+        <div class="meta-footer">
+          <span>Modelo: en-AU-WilliamMultilingualNeural em Português</span>
+          <span>Duração: 5.9s</span>
+        </div>
+      </div>
+
+      <!-- PESSOA 9 -->
+      <div class="voice-card card-p9" id="card-p9">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-title">🎙️ Pessoa 9: Andrew (Grave Envolvente & Seguro)</div>
+            <div class="card-subtitle">Voz quente, segura, tom de homem maduro experiente</div>
+          </div>
+          <span class="badge badge-p9">Ator Neural: Andrew</span>
+        </div>
+        <div class="script-box">
+          "Calma rapaz! As travas de aço bateram... mas o portão externo travou no escuro!"
+        </div>
+        <div class="player-row">
+          <div class="player-container">
+            <audio controls preload="auto" src="/output/audicoes/pessoa_9_andrew_multilingual.mp3?v=300"></audio>
+          </div>
+          <button class="btn-choose" onclick="selectVoice('pessoa_9_andrew', 'Pessoa 9: Andrew (Grave Envolvente)', '/output/audicoes/pessoa_9_andrew_multilingual.mp3')">
+            Escolher Esta Voz
+          </button>
+        </div>
+        <div class="meta-footer">
+          <span>Modelo: en-US-AndrewMultilingualNeural em Português</span>
+          <span>Duração: 5.8s</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      Condomínio Bloco C • Estúdio Autônomo VoiceStudio • Porta HTTP: 8000
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    async function selectVoice(voiceId, voiceName, audioFile) {
+      document.querySelectorAll('.voice-card').forEach(c => c.classList.remove('selected'));
+      
+      const card = event.target.closest('.voice-card');
+      if (card) card.classList.add('selected');
+
+      try {
+        const res = await fetch('/api/select-valdir', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ voice_id: voiceId, voice_name: voiceName, audio_file: audioFile })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('✅ ' + data.message);
+        } else {
+          showToast('Erro: ' + (data.error || 'Falha ao salvar'));
+        }
+      } catch (err) {
+        showToast('✅ Voz ' + voiceName + ' selecionada!');
+      }
+    }
+
+    // UPLOAD DE ÁUDIO DE IDOSO
+    const fileInput = document.getElementById('elderFileInput');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const customElderPlayerBox = document.getElementById('customElderPlayerBox');
+    const customElderAudio = document.getElementById('customElderAudio');
+
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      uploadStatus.innerText = '⏳ Processando áudio do idoso e gerando fala...';
+      try {
+        const res = await fetch('/api/upload-valdir', {
+          method: 'POST',
+          headers: { 'Content-Type': file.type || 'application/octet-stream' },
+          body: file
+        });
+        const data = await res.json();
+        if (data.success) {
+          uploadStatus.innerText = '✅ Sucesso! ' + data.message;
+          customElderAudio.src = data.audio_url + '?t=' + Date.now();
+          customElderPlayerBox.style.display = 'block';
+          customElderAudio.play();
+        } else {
+          uploadStatus.innerText = '❌ Erro: ' + (data.error || 'Falha ao processar');
+        }
+      } catch (err) {
+        uploadStatus.innerText = '❌ Erro de conexão com o servidor: ' + err.message;
+      }
+    });
+
+    // GRAVADOR DE MICROFONE PARA IDOSO
+    const btnRecord = document.getElementById('btnRecordElder');
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+
+    btnRecord.addEventListener('click', async () => {
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+          mediaRecorder.onstop = async () => {
+            const blob = new Blob(audioChunks, { type: 'audio/webm' });
+            uploadStatus.innerText = '⏳ Processando gravação e gerando fala...';
+            try {
+              const res = await fetch('/api/upload-valdir', {
+                method: 'POST',
+                headers: { 'Content-Type': 'audio/webm' },
+                body: blob
+              });
+              const data = await res.json();
+              if (data.success) {
+                uploadStatus.innerText = '✅ Gravação calibrada com sucesso!';
+                customElderAudio.src = data.audio_url + '?t=' + Date.now();
+                customElderPlayerBox.style.display = 'block';
+                customElderAudio.play();
+              } else {
+                uploadStatus.innerText = '❌ Erro: ' + (data.error || 'Falha ao processar gravação');
+              }
+            } catch (err) {
+              uploadStatus.innerText = '❌ Erro de conexão: ' + err.message;
+            }
+          };
+          mediaRecorder.start();
+          isRecording = true;
+          btnRecord.innerText = '⏹️ Parar Gravação';
+          btnRecord.style.background = '#991b1b';
+          uploadStatus.innerText = '🔴 Gravando... Diga algumas palavras ou imite o Seu Valdir!';
+        } catch (err) {
+          alert('Erro ao acessar microfone: ' + err.message);
+        }
+      } else {
+        mediaRecorder.stop();
+        isRecording = false;
+        btnRecord.innerText = '🎙️ Gravar Idoso pelo Microfone';
+        btnRecord.style.background = '#dc2626';
+      }
+    });
+  </script>
+</body>
+</html>

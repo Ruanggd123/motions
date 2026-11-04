@@ -492,8 +492,8 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // PÁGINA WEB DO ESTÚDIO DE CLONAGEM
-  if (req.method === 'GET' && (req.url === '/' || req.url === '/clone')) {
+  // PÁGINA WEB DO ESTÚDIO DE CLONAGEM (VOICESTUDIO)
+  if (req.method === 'GET' && (req.url === '/clone' || req.url === '/voicestudio')) {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(getCloneWebPageHtml());
     return;
@@ -674,13 +674,13 @@ const server = http.createServer(async (req, res) => {
         const timedBeats = lines.map((lineText, i) => {
           const c = cues[i] || { start: i * 5, end: (i + 1) * 5 };
           const start = i === 0 ? 0.0 : Math.round(c.start * 100) / 100;
-          const nextStart = i < cues.length - 1 ? cues[i + 1].start : c.end + 1.0;
+          const nextStart = i < cues.length - 1 ? cues[i + 1].start : (c.end + 2.2);
           const end = Math.round(nextStart * 100) / 100;
           const duration = Math.round((c.end - c.start) * 100) / 100;
           return { id: i, text: lineText, start, end, duration };
         });
 
-        const totalDuration = Math.ceil(timedBeats[timedBeats.length - 1].end);
+        const totalDuration = Math.ceil(timedBeats[timedBeats.length - 1].end + 0.5);
         timedBeats[timedBeats.length - 1].end = totalDuration;
 
         execSync(`"${FFMPEG}" -y -i "${rawMp3}" -ar 44100 -ac 1 -f wav "${rawWav}"`, { stdio: 'ignore' });
@@ -720,6 +720,57 @@ const server = http.createServer(async (req, res) => {
       }
     });
     return;
+  }
+
+  // SERVIÇO DE ARQUIVOS ESTÁTICOS COM SUPORTE A RANGE 206 (VÍDEOS, ÁUDIOS, PROJETOS)
+  let reqPath = decodeURI(req.url.split('?')[0]);
+  if (reqPath === '/' || reqPath === '') {
+    reqPath = '/hub-projetos.html';
+  }
+  const filePath = path.join(process.cwd(), reqPath.replace(/^\//, ''));
+  if (fs.existsSync(filePath) && !fs.statSync(filePath).isDirectory()) {
+    const mime = {
+      '.html': 'text/html; charset=utf-8',
+      '.js': 'application/javascript; charset=utf-8',
+      '.css': 'text/css; charset=utf-8',
+      '.mp3': 'audio/mpeg',
+      '.wav': 'audio/wav',
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.svg': 'image/svg+xml',
+      '.mp4': 'video/mp4',
+      '.json': 'application/json'
+    };
+    const stat = fs.statSync(filePath);
+    const ext = path.extname(filePath).toLowerCase();
+    const contentType = mime[ext] || 'application/octet-stream';
+    const range = req.headers.range;
+
+    if (range) {
+      const parts = range.replace(/bytes=/, '').split('-');
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : stat.size - 1;
+      const chunksize = end - start + 1;
+      res.writeHead(206, {
+        'Content-Range': `bytes ${start}-${end}/${stat.size}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunksize,
+        'Content-Type': contentType,
+        'Access-Control-Allow-Origin': '*'
+      });
+      fs.createReadStream(filePath, { start, end }).pipe(res);
+      return;
+    } else {
+      res.writeHead(200, {
+        'Content-Length': stat.size,
+        'Content-Type': contentType,
+        'Accept-Ranges': 'bytes',
+        'Access-Control-Allow-Origin': '*'
+      });
+      fs.createReadStream(filePath).pipe(res);
+      return;
+    }
   }
 
   res.writeHead(404);

@@ -1,0 +1,89 @@
+{
+  "totalDuration": 65,
+  "beats": [
+    {
+      "id": 0,
+      "text": "Você acha que cinco segundos sem oxigênio não é nada porque aguenta prender a respiração? Você não duraria nem o primeiro segundo!",
+      "start": 0,
+      "end": 5.42,
+      "duration": 5.37
+    },
+    {
+      "id": 1,
+      "text": "No exato instante que o oxigênio some, o céu azul vira uma escuridão total do espaço em pleno meio-dia!",
+      "start": 5.42,
+      "end": 8.43,
+      "duration": 3.01
+    },
+    {
+      "id": 2,
+      "text": "A pressão atmosférica despenca vinte e um por cento de golpe e os seus dois tímpanos estouram com o estalo do vácuo!",
+      "start": 8.43,
+      "end": 15.25,
+      "duration": 6.82
+    },
+    {
+      "id": 3,
+      "text": "O oxigênio é o ligante do cimento: sem ele, todos os prédios, pontes e viadutos esfarelam em nuvens de pó!",
+      "start": 15.25,
+      "end": 21.98,
+      "duration": 6.73
+    },
+    {
+      "id": 4,
+      "text": "Todos os motores a combustão morrem na hora. Carros travam no seco e aviões no céu despencam em queda livre!",
+      "start": 21.98,
+      "end": 29.5,
+      "duration": 7.52
+    },
+    {
+      "id": 5,
+      "text": "A camada de ozônio é oxigênio puro. Sem ela, a radiação ultravioleta do Sol frita a sua pele em chamas invisíveis!",
+      "start": 29.5,
+      "end": 32.64,
+      "duration": 3.14
+    },
+    {
+      "id": 6,
+      "text": "A água dos rios e oceanos perde o oxigênio e vira hidrogênio, expandindo em uma muralha gigante de gás no horizonte!",
+      "start": 32.64,
+      "end": 37.01,
+      "duration": 4.37
+    },
+    {
+      "id": 7,
+      "text": "Metais sem a película de oxigênio colidem e se fundem instantaneamente ao menor toque, grudando como solda a quente!",
+      "start": 37.01,
+      "end": 40.01,
+      "duration": 3
+    },
+    {
+      "id": 8,
+      "text": "Quarenta e cinco por cento da crosta da Terra é oxigênio. O chão sólido simplesmente desaparece sob as suas botas!",
+      "start": 40.01,
+      "end": 45.6,
+      "duration": 5.58
+    },
+    {
+      "id": 9,
+      "text": "Você entra em queda livre rumo ao manto de magma fervente do planeta, caindo a centenas de quilômetros por hora no abismo!",
+      "start": 45.6,
+      "end": 52.76,
+      "duration": 7.17
+    },
+    {
+      "id": 10,
+      "text": "Os cinco segundos acabam! O oxigênio reaparece numa onda de choque estrondosa que comprime o ar como mil bombas atômicas!",
+      "start": 52.76,
+      "end": 60.06,
+      "duration": 7.3
+    },
+    {
+      "id": 11,
+      "text": "A Terra sobreviveu por um milagre, mas nada mais é igual. Você aguentaria esses cinco segundos? Comenta aí!",
+      "start": 60.06,
+      "end": 65,
+      "duration": 3.75
+    }
+  ]
+}

@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Episódio 03 (9:16 Vertical) — O Feixe na Neblina | Condomínio Solaris: Bloco C</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #04070e;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      overflow: hidden;
+    }
+    .phone {
+      height: calc(100vh - 40px);
+      aspect-ratio: 9 / 16;
+      border-radius: 26px;
+      overflow: hidden;
+      border: 2px solid rgba(56, 189, 248, 0.35);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 40px rgba(56, 189, 248, 0.15);
+      position: relative;
+      background: #000;
+      container-type: inline-size;
+    }
+    body.render-mode {
+      padding: 0 !important;
+      margin: 0 !important;
+      gap: 0 !important;
+      justify-content: flex-start !important;
+      align-items: flex-start !important;
+      background: #000 !important;
+      width: 1080px !important;
+      height: 1920px !important;
+    }
+    body.render-mode .phone {
+      width: 1080px !important;
+      height: 1920px !important;
+      border-radius: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      aspect-ratio: auto !important;
+    }
+    body.render-mode .panel { display: none !important; }
+
+    canvas { width: 100%; height: 100%; display: block; cursor: pointer; }
+
+    /* BANNER DE PROVA SOCIAL - COMENTÁRIOS DO YOUTUBE */
+    .comments-ugc-badge {
+      position: absolute;
+      top: 6cqw;
+      left: 50%;
+      transform: translateX(-50%) translateY(-25px) scale(0.94);
+      width: 90cqw;
+      background: rgba(8, 14, 26, 0.96);
+      border: 0.5cqw solid #38bdf8;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 45px rgba(56, 189, 248, 0.4);
+      border-radius: 3cqw;
+      padding: 3cqw 3.5cqw;
+      display: flex;
+      flex-direction: column;
+      gap: 2cqw;
+      z-index: 45;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(16px);
+    }
+    .comments-ugc-badge.active {
+      transform: translateX(-50%) translateY(0) scale(1);
+      opacity: 1;
+    }
+    .ugc-badge-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 2.2cqw;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1cqw;
+      color: #38bdf8;
+    }
+    .ugc-badge-title {
+      font-size: 3.4cqw;
+      font-weight: 900;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 1.2cqw;
+      line-height: 1.2;
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+    }
+    .ugc-img-wrap {
+      width: 100%;
+      border-radius: 2cqw;
+      overflow: hidden;
+      border: 0.3cqw solid rgba(255, 255, 255, 0.15);
+      background: #111827;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+    }
+    .ugc-img-wrap img {
+      width: 100%;
+      height: auto;
+      max-height: 52cqw;
+      object-fit: contain;
+      display: block;
+    }
+    .ugc-callout {
+      font-size: 2.2cqw;
+      font-weight: 700;
+      color: #cbd5e1;
+      background: rgba(56, 189, 248, 0.14);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 1.2cqw 2cqw;
+      border-radius: 1.5cqw;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* OVERLAY DECISÃO: VOCÊ DECIDE O FIM */
+    .decision-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(10, 15, 30, 0.92), rgba(2, 6, 23, 0.98));
+      backdrop-filter: blur(16px);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 5cqw 4cqw;
+      z-index: 50;
+      text-align: center;
+      box-sizing: border-box;
+      animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes pulseCard {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.015); }
+    }
+    .decision-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 1cqw;
+      padding: 0.8cqw 2.5cqw;
+      border-radius: 999px;
+      font-size: 2.4cqw;
+      font-weight: 800;
+      letter-spacing: 0.15cqw;
+      text-transform: uppercase;
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.2);
+      border: 0.3cqw solid rgba(239, 68, 68, 0.6);
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+      margin-bottom: 2cqw;
+    }
+    .simple-question-title {
+      font-size: 5.2cqw;
+      font-weight: 900;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: -0.05cqw;
+      line-height: 1.15;
+      margin-bottom: 1.2cqw;
+      text-shadow: 0 4px 25px rgba(0, 0, 0, 0.8);
+    }
+    .simple-question-sub {
+      font-size: 2.6cqw;
+      font-weight: 600;
+      color: #94a3b8;
+      max-width: 80cqw;
+      line-height: 1.35;
+      margin-bottom: 2.5cqw;
+    }
+    .timer-bar-wrap {
+      width: 100%;
+      max-width: 82cqw;
+      height: 1.5cqw;
+      background: rgba(148, 163, 184, 0.2);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 1cqw auto 1.8cqw;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .timer-bar-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #38bdf8, #f59e0b, #ef4444);
+      transform-origin: left;
+      transition: width 0.1s linear;
+    }
+    .countdown-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.8cqw;
+      font-weight: 800;
+      color: #fde047;
+      margin-bottom: 3.5cqw;
+      display: inline-block;
+      text-shadow: 0 0 18px rgba(253, 224, 71, 0.6);
+    }
+    .choice-card {
+      width: 100%;
+      max-width: 84cqw;
+      border-radius: 3.2cqw;
+      padding: 2.5cqw 3cqw;
+      margin-bottom: 2.2cqw;
+      display: flex;
+      align-items: center;
+      gap: 2.8cqw;
+      background: rgba(15, 23, 42, 0.92);
+      border: 0.4cqw solid;
+      text-align: left;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+      position: relative;
+      animation: pulseCard 2.4s infinite ease-in-out;
+    }
+    .choice-card.card-1 {
+      border-color: #38bdf8;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(15, 23, 42, 0.98) 100%);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 25px rgba(56, 189, 248, 0.2);
+    }
+    .choice-card.card-2 {
+      border-color: #f59e0b;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(15, 23, 42, 0.98) 100%);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 25px rgba(245, 158, 11, 0.2);
+      animation-delay: 1.2s;
+    }
+    .choice-emoji-box {
+      width: 11cqw;
+      height: 11cqw;
+      border-radius: 2.5cqw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5.5cqw;
+      flex-shrink: 0;
+      background: rgba(0, 0, 0, 0.65);
+      border: 0.2cqw solid rgba(255, 255, 255, 0.18);
+    }
+    .choice-info { flex: 1; }
+    .choice-title {
+      font-size: 3.2cqw;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+    .choice-desc {
+      font-size: 2.2cqw;
+      color: #cbd5e1;
+      line-height: 1.35;
+      margin-top: 0.5cqw;
+    }
+    .choice-action-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8cqw;
+      font-size: 2.1cqw;
+      font-weight: 800;
+      padding: 0.6cqw 1.8cqw;
+      border-radius: 1.2cqw;
+      margin-top: 1.2cqw;
+      text-transform: uppercase;
+      letter-spacing: 0.05cqw;
+    }
+    .card-1 .choice-action-pill {
+      background: rgba(56, 189, 248, 0.28);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.55);
+    }
+    .card-2 .choice-action-pill {
+      background: rgba(245, 158, 11, 0.28);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.55);
+    }
+    .simple-footer-hint {
+      font-size: 2.3cqw;
+      font-weight: 800;
+      color: #cbd5e1;
+      margin-top: 2cqw;
+      padding: 1.5cqw 3cqw;
+      background: rgba(2, 6, 23, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 2cqw;
+    }
+
+    /* PAINEL LATERAL DE CONTROLE */
+    .panel {
+      width: 360px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      padding-right: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .panel::-webkit-scrollbar { width: 5px; }
+    .panel::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.25); border-radius: 999px; }
+    .panel::-webkit-scrollbar-track { background: transparent; }
+    .card {
+      background: #0b111e;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+    .card h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #38bdf8;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .row { display: flex; gap: 8px; }
+    button {
+      flex: 1;
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+      font-weight: 700;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+    button:hover { border-color: #38bdf8; }
+    button.primary { background: #10b981; color: #022c22; border-color: #34d399; }
+    .track {
+      height: 8px;
+      background: #020617;
+      border-radius: 999px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+    .fill { height: 100%; width: 0; background: linear-gradient(90deg, #38bdf8, #3b82f6); }
+    .time { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #38bdf8; margin-top: 6px; }
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+    <canvas id="stage" width="1080" height="1920"></canvas>
+
+    <!-- PROVA SOCIAL: COMENTÁRIOS DO EPISÓDIO 02 -->
+    <div class="comments-ugc-badge" id="ugcBadge">
+      <div class="ugc-badge-header">
+        <span>🏆 Escolha da Comunidade (Ep. 02)</span>
+        <span style="color: #fde047; font-weight: 900;">★ 67% DOS VOTOS</span>
+      </div>
+      <div class="ugc-badge-title">
+        <span>🔦 ACENDER O HOLOFOTE DE 1000W</span>
+      </div>
+      <div class="ugc-img-wrap">
+        <img src="./assets/comentarios_ep02.png" alt="Comentários dos Inscritos" id="ugcImg" />
+      </div>
+      <div class="ugc-callout">
+        <span>👑 Vencedores: <b>@Melissa_12ofc</b> e <b>@Dark_Editorofc1</b></span>
+        <span style="color: #38bdf8;">Comente no final para entrar no Ep 04 💬</span>
+      </div>
+    </div>
+
+    <!-- OVERLAY INTERATIVO: VOCÊ DECIDE O FIM -->
+    <div class="decision-overlay" id="decisionOverlay">
+      <div class="decision-badge">🚨 O Destino do Condomínio Está em Suas Mãos</div>
+      <h2 class="simple-question-title">O QUE VOCÊ FAZ AGORA?</h2>
+      <p class="simple-question-sub">A sombra avança na rua e o entregador está implorando no vidro.</p>
+
+      <div class="timer-bar-wrap">
+        <div class="timer-bar-fill" id="timerFill"></div>
+      </div>
+      <div class="countdown-pill" id="countdownPill">⏳ 16.5s PARA DECIDIR</div>
+
+      <!-- OPÇÃO 1 -->
+      <div class="choice-card card-1">
+        <div class="choice-emoji-box">🚪</div>
+        <div class="choice-info">
+          <div class="choice-title">OPÇÃO 1: ABRIR A PORTA DA GUARITA</div>
+          <div class="choice-desc">Destravar a porta lateral para salvar o entregador Lucas antes que a sombra o alcance.</div>
+          <div class="choice-action-pill">Comente 🚪 para salvar o entregador</div>
+        </div>
+      </div>
+
+      <!-- OPÇÃO 2 -->
+      <div class="choice-card card-2">
+        <div class="choice-emoji-box">⚡</div>
+        <div class="choice-info">
+          <div class="choice-title">OPÇÃO 2: ATIVAR CERCA DE 10 MIL VOLTS</div>
+          <div class="choice-desc">Descarregar choque de alta voltagem na eclusa para afastar a criatura e conter a invasão.</div>
+          <div class="choice-action-pill">Comente ⚡ para eletrocutar o portão</div>
+        </div>
+      </div>
+
+      <div class="simple-footer-hint">
+        💬 QUAL A SUA ESCOLHA? Comente 🚪 ou ⚡ — os votos definem o Episódio 4!
+      </div>
+    </div>
+  </div>
+
+  <!-- PAINEL DE CONTROLE LATERAL -->
+  <div class="panel">
+    <div class="card">
+      <h2>🎬 Episódio 03: "O Feixe na Neblina"</h2>
+      <p><b>Duração:</b> <span id="panelDuration">99.9s</span> (VFX Remasterizado 60fps)</p>
+      <p><b>Continuidade:</b> Votos reais de @Melissa_12ofc e @Dark_Editorofc1</p>
+      <div class="row" style="margin-top: 10px;">
+        <button id="btnPlay" class="primary">▶ Reproduzir</button>
+        <button id="btnRestart">↺ Reiniciar</button>
+      </div>
+      <div style="margin-top: 12px;">
+        <div class="track" id="track"><div class="fill" id="fill"></div></div>
+        <div class="time" id="time">00.0s / 99.9s</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🎭 Elenco Multi-Voz Oficial</h2>
+      <p>🎙️ <b>Narrador:</b> Ruan (Voz Real do Usuário)</p>
+      <p>🙋 <b>Você:</b> William Multilingual (Jovem Morador)</p>
+      <p>👴 <b>Seu Valdir:</b> Brian Multilingual (Porteiro)</p>
+      <p>🚴 <b>Lucas:</b> Remy Multilingual (Entregador Jovem)</p>
+      <p>👩 <b>Dona Camila:</b> Thalita (Interfone 304 DSP)</p>
+    </div>
+
+    <div class="card">
+      <h2>⏱️ Saltos da Cena</h2>
+      <div style="display:flex; flex-direction:column; gap:4px;" id="cueButtons">
+        <button onclick="seekTo(0.5)">00s • 🏆 Comentários Reais (@Melissa/@Dark)</button>
+        <button onclick="seekTo(13.8)">14s • 🔦 Ignição do Holofote 1000W</button>
+        <button onclick="seekTo(28.9)">29s • 📹 CCTV CAM 02: Criatura & Massa Negra</button>
+        <button onclick="seekTo(36.7)">37s • 🚴 Lucas Espancando o Vidro Blindado</button>
+        <button onclick="seekTo(46.7)">47s • 👩 Dona Camila no Interfone (DSP)</button>
+        <button onclick="seekTo(62.5)">62s • ⚡ Sobrecarga & Cerca de 10kV</button>
+        <button onclick="seekTo(83.4)">83s • 🗳️ Você Decide o Fim (16.5s)</button>
+      </div>
+    </div>
+  </div>
+
+  <audio id="audio" src="./audio/cena03_mix.mp3" preload="auto"></audio>
+
+  <script src="./audio/cena03_timeline.js"></script>
+  <script src="./characters/VoceMorador.js"></script>
+  <script src="./characters/SeuValdirPorteiro.js"></script>
+  <script src="./characters/LucasEntregador.js"></script>
+  <script src="./scenarios/PortariaBlocoC.js"></script>
+  <script src="./engine/CameraRig2D.js"></script>
+
+  <script>
+    const W = 1080;
+    const H = 1920;
+    const canvas = document.getElementById('stage');
+    const ctx = canvas.getContext('2d');
+    const audio = document.getElementById('audio');
+    const T = window.CENA03_TIMELINE || { duration: 99.9, decision_start: 83.4, dialogues: [] };
+
+    const scenario = new window.StudioScenarios.PortariaBlocoC({ fogDensity: 0.92, streetBlackout: true });
+    const voce = new window.StudioCharacters.VoceMorador({ x: 200, y: 445, scale: 0.95, emotion: 'tense', pose: 'phone_look' });
+    const valdir = new window.StudioCharacters.SeuValdirPorteiro({ x: 330, y: 445, scale: 0.95, emotion: 'worried', pose: 'hands_desk' });
+    const lucas = new window.StudioCharacters.LucasEntregador({ x: 80, y: 445, scale: 0.94, emotion: 'panicked', pose: 'bang_gate' });
+    const cam = new window.StudioEngine.CameraRig2D(W, H);
+
+    window.voce = voce;
+    window.valdir = valdir;
+    window.lucas = lucas;
+    window.scenario = scenario;
+    window.cam = cam;
+
+    const TOTAL_DURATION = T.duration || 99.94;
+    const DECISION_START = T.decision_start || 83.44;
+    const SPOTLIGHT_START = T.spotlight_start || 14.8;
+    const CCTV_START = T.cctv_start || 28.8;
+    const CCTV_END = T.cctv_end || 36.4;
+    const LUCAS_START = T.lucas_start || 36.7;
+
+    let playing = false;
+    let t = 0.0;
+    let cctvActive = false;
+    let spotlightActive = false;
+    let lastBangCycle = -1;
+
+    // Elementos DOM
+    const ugcBadge = document.getElementById('ugcBadge');
+    const decisionOverlay = document.getElementById('decisionOverlay');
+    const timerFill = document.getElementById('timerFill');
+    const countdownPill = document.getElementById('countdownPill');
+    const fill = document.getElementById('fill');
+    const timeDisplay = document.getElementById('time');
+    const btnPlay = document.getElementById('btnPlay');
+    const btnRestart = document.getElementById('btnRestart');
+    const track = document.getElementById('track');
+    document.getElementById('panelDuration').innerText = `${TOTAL_DURATION.toFixed(1)}s`;
+
+    function seekTo(sec) {
+      audio.currentTime = sec;
+      t = sec;
+      if (!playing) renderFrame();
+    }
+    window.seekTo = seekTo;
+
+    btnPlay.addEventListener('click', () => {
+      if (playing) {
+        audio.pause();
+        playing = false;
+        btnPlay.innerText = '▶ Reproduzir';
+      } else {
+        audio.play();
+        playing = true;
+        btnPlay.innerText = '⏸ Pausar';
+        loop();
+      }
+    });
+
+    btnRestart.addEventListener('click', () => {
+      seekTo(0);
+      if (!playing) {
+        audio.play();
+        playing = true;
+        btnPlay.innerText = '⏸ Pausar';
+        loop();
+      }
+    });
+
+    track.addEventListener('click', (e) => {
+      const rect = track.getBoundingClientRect();
+      const pct = (e.clientX - rect.left) / rect.width;
+      seekTo(pct * TOTAL_DURATION);
+    });
+
+    function getActiveSpeaker(time) {
+      if (!T || !T.dialogues) return null;
+      for (const d of T.dialogues) {
+        if (time >= d.start && time < d.start + d.duration) {
+          return d.speaker;
+        }
+      }
+      return null;
+    }
+
+    // 1. BATENTE METÁLICO, 3 FERROLHOS, ARCOS ELÉTRICOS DE 10kV E RÁDIO HT
+    function drawDoorLockSparksAndRadioWaves(ctx) {
+      ctx.save();
+      const doorX = 66;
+      const doorY = 248;
+      const doorW = 52;
+      const doorH = 264;
+
+      // Fumaça abissal preta vazando pelas frestas da porta lateral quando Lucas está lá fora
+      if (t >= LUCAS_START) {
+        for (let i = 0; i < 6; i++) {
+          const wy = doorY + 40 + i * 38 + Math.sin(t * 3 + i) * 6;
+          const wLen = 28 + Math.sin(t * 4.5 + i * 1.7) * 14;
+          const smokeGrad = ctx.createRadialGradient(doorX + doorW, wy, 2, doorX + doorW + wLen * 0.5, wy, wLen);
+          smokeGrad.addColorStop(0, 'rgba(2, 6, 23, 0.85)');
+          smokeGrad.addColorStop(0.5, 'rgba(15, 23, 42, 0.45)');
+          smokeGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.fillStyle = smokeGrad;
+          ctx.beginPath();
+          ctx.ellipse(doorX + doorW + wLen * 0.3, wy, wLen, 12, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Chapa de aço pesada do batente da porta lateral da guarita
+      const jambGrad = ctx.createLinearGradient(doorX, doorY, doorX + doorW, doorY);
+      jambGrad.addColorStop(0, '#070b14');
+      jambGrad.addColorStop(0.35, '#1e293b');
+      jambGrad.addColorStop(0.7, '#334155');
+      jambGrad.addColorStop(1, '#0f172a');
+      ctx.fillStyle = jambGrad;
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.roundRect(doorX, doorY, doorW, doorH, 5);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(doorX + 3, doorY + 3, doorW - 6, doorH - 6);
+
+      // Rebites industriais
+      ctx.fillStyle = '#94a3b8';
+      for (const ry of [258, 335, 415, 498]) {
+        ctx.beginPath();
+        ctx.arc(doorX + 8, ry, 2.5, 0, Math.PI * 2);
+        ctx.arc(doorX + doorW - 8, ry, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Painel de Status Tático dos Ferrolhos
+      ctx.fillStyle = '#050811';
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.roundRect(doorX + 6, doorY + 10, doorW - 12, 28, 4);
+      ctx.fill();
+      ctx.stroke();
+
+      // Vibração mecânica nos ferrolhos quando Lucas bate na porta
+      const impactVib = (t >= LUCAS_START) ? Math.max(0, Math.sin(t * 11.5)) * 1.8 : 0;
+
+      const bolts = [{ y: 295 }, { y: 375 }, { y: 455 }];
+      bolts.forEach((bolt, idx) => {
+        ctx.fillStyle = '#1e293b';
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(doorX + 6, bolt.y - 14, 38, 28, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#cbd5e1';
+        ctx.fillRect(doorX + 9, bolt.y - 11, 2.5, 2.5);
+        ctx.fillRect(doorX + 9, bolt.y + 8.5, 2.5, 2.5);
+
+        const boltLen = 46;
+        const boltGrad = ctx.createLinearGradient(doorX - 12, bolt.y, doorX + 36, bolt.y);
+        boltGrad.addColorStop(0, '#475569');
+        boltGrad.addColorStop(0.25, '#94a3b8');
+        boltGrad.addColorStop(0.65, '#f1f5f9');
+        boltGrad.addColorStop(1, '#334155');
+        ctx.fillStyle = boltGrad;
+        ctx.strokeStyle = '#f8fafc';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.roundRect(doorX + 22 - boltLen + impactVib, bolt.y - 7, boltLen, 14, 3);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(doorX + 8 + impactVib, bolt.y - 10, 5, 20);
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillRect(doorX + 9 + impactVib, bolt.y - 10, 2, 20);
+
+        const ledX = doorX + 11 + idx * 11;
+        ctx.fillStyle = '#ef4444';
+        ctx.shadowColor = '#ef4444';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(ledX, doorY + 20, 2.8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      ctx.fillStyle = '#fca5a5';
+      ctx.font = '700 7px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('3/3 TRAVADO', doorX + doorW * 0.5, doorY + 33);
+      ctx.restore();
+
+      // 2. Quadro da Cerca de 10.000V e Cabo Sobrecarregado soltando Faíscas Azuis (Clímax >= 44s)
+      if (t >= 44.0) {
+        ctx.save();
+        const boxX = 368;
+        const boxY = 395;
+
+        // Caixa do Disjuntor de Alta Tensão 10kV na Guarita
+        ctx.fillStyle = '#0f172a';
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.roundRect(boxX, boxY, 34, 46, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#f59e0b';
+        ctx.font = '800 6.5px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚡10kV', boxX + 17, boxY + 13);
+
+        // Chave Alavanca Vermelha
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(boxX + 17, boxY + 28);
+        ctx.lineTo(boxX + 26, boxY + 18 + Math.sin(t * 20) * 1.5);
+        ctx.stroke();
+
+        // Faíscas e Arcos Voltaicos de Sobrecarga no Cabo do Holofote / Cerca
+        const sparkBurst = Math.sin(t * 17) > -0.2;
+        if (sparkBurst) {
+          const sx = 352;
+          const sy = 432;
+
+          // Brilho azul-elétrico intenso
+          const arcGlow = ctx.createRadialGradient(sx, sy, 2, sx, sy, 58);
+          arcGlow.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+          arcGlow.addColorStop(0.35, 'rgba(56, 189, 248, 0.65)');
+          arcGlow.addColorStop(1, 'rgba(56, 189, 248, 0)');
+          ctx.fillStyle = arcGlow;
+          ctx.beginPath();
+          ctx.arc(sx, sy, 58, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Raios elétricos ramificados
+          ctx.strokeStyle = '#e0f2fe';
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 10;
+          ctx.lineWidth = 1.6;
+          for (let k = 0; k < 7; k++) {
+            const ang = (k / 7) * Math.PI * 2 + t * 35;
+            const len = 10 + ((t * 90 + k * 7) % 24);
+            const mx = sx + Math.cos(ang + 0.3) * (len * 0.5);
+            const my = sy + Math.sin(ang - 0.3) * (len * 0.5);
+            const ex = sx + Math.cos(ang) * len;
+            const ey = sy + Math.sin(ang) * len + 6;
+            ctx.beginPath();
+            ctx.moveTo(sx, sy);
+            ctx.lineTo(mx, my);
+            ctx.lineTo(ex, ey);
+            ctx.stroke();
+          }
+          ctx.shadowBlur = 0;
+        }
+        ctx.restore();
+      }
+
+      // 3. Ondas de Rádio HT quando Seu Valdir fala
+      let activeSpk = getActiveSpeaker(t);
+      if (activeSpk === 'valdir') {
+        ctx.save();
+        const rx = valdir.x + 23;
+        const ry = valdir.y - 42;
+        const txPulse = 0.6 + Math.sin(t * 16) * 0.4;
+        ctx.fillStyle = `rgba(245, 158, 11, ${txPulse})`;
+        ctx.shadowColor = '#f59e0b';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(rx, ry, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Anéis de onda de rádio propagando
+        for (let w = 0; w < 2; w++) {
+          const wPhase = ((t * 2.5 + w * 0.5) % 1);
+          ctx.strokeStyle = `rgba(245, 158, 11, ${(1 - wPhase) * 0.6})`;
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.arc(rx, ry, 4 + wPhase * 18, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
+
+    // 2. RACHADURAS NO VIDRO BLINDADO + ONDAS DE IMPACTO
+    function drawGlassCracksWorld(ctx) {
+      const impactGlow = (t >= LUCAS_START) ? Math.max(0, Math.sin(t * 11.5)) : 0;
+
+      const drawWeb = (cx, cy, radius, branches, seed) => {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.strokeStyle = impactGlow > 0.6
+          ? `rgba(255, 255, 255, ${0.95})`
+          : 'rgba(226, 232, 240, 0.88)';
+        ctx.shadowColor = impactGlow > 0.6 ? '#fde047' : '#38bdf8';
+        ctx.shadowBlur = 6 + impactGlow * 8;
+        ctx.lineWidth = 1.6 + impactGlow * 0.6;
+        for (let i = 0; i < branches; i++) {
+          const a = (i / branches) * Math.PI * 2 + seed;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          const x1 = Math.cos(a) * (radius * 0.45);
+          const y1 = Math.sin(a) * (radius * 0.45);
+          const x2 = Math.cos(a + 0.12) * radius;
+          const y2 = Math.sin(a - 0.12) * radius;
+          ctx.lineTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+        }
+        for (const rFrac of [0.28, 0.58, 0.85]) {
+          ctx.beginPath();
+          ctx.arc(0, 0, radius * rFrac, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      };
+
+      drawWeb(165, 345, 34, 7, 0.2);
+      drawWeb(235, 325, 44, 9, 0.7);
+      drawWeb(200, 365, 58, 11, 1.3);
+    }
+
+    // 3. LUCAS BATENDO NO VIDRO COM ONDAS DE CHOQUE E TENTÁCULOS DE SOMBRA
+    function drawLucasOutside(ctx) {
+      if (t < LUCAS_START) return;
+
+      ctx.save();
+
+      // Animação de pancada rítmica do Lucas contra o vidro
+      const bangWave = Math.sin(t * 11.5);
+      const lungeOffset = Math.max(0, bangWave) * 5.5;
+      lucas.x = 80 + lungeOffset;
+
+      // Massa negra colossal e tentáculos avançando atrás do Lucas
+      const fogBehindX = lucas.x - 42;
+      const fogBehindY = lucas.y - 45;
+      const shadowGrad = ctx.createRadialGradient(fogBehindX, fogBehindY, 8, fogBehindX, fogBehindY, 145);
+      shadowGrad.addColorStop(0, 'rgba(0, 0, 0, 0.98)');
+      shadowGrad.addColorStop(0.55, 'rgba(9, 13, 26, 0.88)');
+      shadowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = shadowGrad;
+      ctx.beginPath();
+      ctx.ellipse(fogBehindX, fogBehindY, 105, 160, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Tentáculos sombrios serpenteando em direção ao Lucas
+      ctx.strokeStyle = 'rgba(2, 6, 23, 0.92)';
+      ctx.lineCap = 'round';
+      for (let ten = 0; ten < 5; ten++) {
+        ctx.lineWidth = 10 - ten * 1.2;
+        const ty = lucas.y - 110 + ten * 28;
+        const reach = 25 + Math.sin(t * 5 + ten * 1.4) * 18;
+        ctx.beginPath();
+        ctx.moveTo(lucas.x - 95, ty);
+        ctx.quadraticCurveTo(
+          lucas.x - 50,
+          ty + Math.cos(t * 6 + ten) * 16,
+          lucas.x - 15 + reach * 0.4,
+          ty + Math.sin(t * 7 + ten) * 10
+        );
+        ctx.stroke();
+      }
+
+      // Múltiplos olhos carmesins brilhando na escuridão atrás do Lucas
+      const eyePairs = [
+        { dx: -68, dy: -66, s: 2.8 },
+        { dx: -48, dy: -92, s: 2.0 },
+        { dx: -78, dy: -28, s: 2.2 }
+      ];
+      eyePairs.forEach((ep, idx) => {
+        const eyeGlow = 0.55 + Math.sin(t * 9 + idx * 2) * 0.45;
+        ctx.fillStyle = `rgba(239, 68, 68, ${eyeGlow})`;
+        ctx.shadowColor = '#ef4444';
+        ctx.shadowBlur = 14;
+        ctx.beginPath();
+        ctx.arc(lucas.x + ep.dx, lucas.y + ep.dy, ep.s, 0, Math.PI * 2);
+        ctx.arc(lucas.x + ep.dx + 11, lucas.y + ep.dy - 1, ep.s, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.shadowBlur = 0;
+
+      // Desenha o personagem Lucas
+      lucas.draw(ctx);
+
+      // Vapor de condensação da respiração desesperada no vidro
+      const breathPulse = 0.35 + Math.sin(t * 7) * 0.18;
+      const breathGrad = ctx.createRadialGradient(lucas.x + 20, lucas.y - 45, 2, lucas.x + 20, lucas.y - 45, 24);
+      breathGrad.addColorStop(0, `rgba(241, 245, 249, ${breathPulse})`);
+      breathGrad.addColorStop(1, 'rgba(241, 245, 249, 0)');
+      ctx.fillStyle = breathGrad;
+      ctx.beginPath();
+      ctx.arc(lucas.x + 20, lucas.y - 45, 24, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Posição das mãos batendo no vidro blindado
+      const handX1 = 100;
+      const handY1 = lucas.y - 32;
+      const handX2 = 114;
+      const handY2 = lucas.y - 22;
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.34)';
+      ctx.beginPath();
+      ctx.ellipse(handX1, handY1, 6.5, 9.5, 0.2, 0, Math.PI * 2);
+      ctx.ellipse(handX2, handY2, 6.5, 9.5, -0.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // ONDAS DE CHOQUE CONCÊNTRICAS NO VIDRO A CADA PANCADA DO LUCAS
+      const shockPhase = (t * 1.83) % 1;
+      for (let ring = 0; ring < 2; ring++) {
+        const rp = (shockPhase + ring * 0.5) % 1;
+        const rAlpha = (1 - rp) * 0.55;
+        ctx.strokeStyle = `rgba(186, 230, 253, ${rAlpha})`;
+        ctx.lineWidth = 2.2 * (1 - rp);
+        ctx.beginPath();
+        ctx.arc((handX1 + handX2) * 0.5, (handY1 + handY2) * 0.5, 6 + rp * 48, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    // 4. FEIXE DE HOLOFOTE VOLUMÉTRICO 1000W COM GOD-RAYS E LENS FLARE
+    function drawSpotlightBeam(ctx) {
+      if (!spotlightActive || cctvActive) return;
+
+      ctx.save();
+      const timeSinceOn = Math.max(0, t - SPOTLIGHT_START);
+      const ignitionBoost = timeSinceOn < 0.45 ? (1 - timeSinceOn / 0.45) * 0.6 : 0;
+      const overloadFlicker = (t >= 44.0 && Math.sin(t * 28) > 0.75) ? 0.45 : 1.0;
+
+      const originX = 342;
+      const originY = 382;
+      const sweepY = Math.sin(t * 1.3) * 45;
+      const targetX = -180;
+      const targetY = 480 + sweepY;
+
+      ctx.globalCompositeOperation = 'screen';
+
+      // Camada 1: Halo externo difuso na neblina
+      const outerGrad = ctx.createRadialGradient(originX, originY, 10, originX - 380, originY + 60, 760);
+      outerGrad.addColorStop(0, `rgba(255, 255, 255, ${0.95 * overloadFlicker})`);
+      outerGrad.addColorStop(0.22, `rgba(254, 240, 138, ${0.62 * overloadFlicker})`);
+      outerGrad.addColorStop(0.55, `rgba(56, 189, 248, ${0.34 * overloadFlicker})`);
+      outerGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+      ctx.fillStyle = outerGrad;
+      ctx.beginPath();
+      ctx.moveTo(originX, originY - 18);
+      ctx.lineTo(targetX, targetY - 220);
+      ctx.lineTo(targetX, targetY + 270);
+      ctx.lineTo(originX, originY + 26);
+      ctx.closePath();
+      ctx.fill();
+
+      // Camada 2: Núcleo de alta intensidade de 1000W (God-Ray Central)
+      const coreGrad = ctx.createLinearGradient(originX, originY, targetX, targetY);
+      coreGrad.addColorStop(0, `rgba(255, 255, 255, ${(0.95 + ignitionBoost) * overloadFlicker})`);
+      coreGrad.addColorStop(0.35, `rgba(254, 249, 195, ${0.65 * overloadFlicker})`);
+      coreGrad.addColorStop(0.75, `rgba(125, 211, 252, ${0.25 * overloadFlicker})`);
+      coreGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+
+      ctx.fillStyle = coreGrad;
+      ctx.beginPath();
+      ctx.moveTo(originX, originY - 7);
+      ctx.lineTo(targetX, targetY - 85);
+      ctx.lineTo(targetX, targetY + 105);
+      ctx.lineTo(originX, originY + 9);
+      ctx.closePath();
+      ctx.fill();
+
+      // Camada 3: Lens Flare Anamórfico na Lente do Farol Tático
+      const flareGrad = ctx.createRadialGradient(originX, originY, 2, originX, originY, 75 + ignitionBoost * 90);
+      flareGrad.addColorStop(0, '#ffffff');
+      flareGrad.addColorStop(0.3, 'rgba(253, 224, 71, 0.85)');
+      flareGrad.addColorStop(0.65, 'rgba(56, 189, 248, 0.35)');
+      flareGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = flareGrad;
+      ctx.beginPath();
+      ctx.arc(originX, originY, 75 + ignitionBoost * 90, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = `rgba(125, 211, 252, ${0.75 * overloadFlicker})`;
+      ctx.beginPath();
+      ctx.ellipse(originX, originY, 140 + ignitionBoost * 120, 3.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Camada 4: Partículas volumétricas de poeira e gotículas suspensas no feixe
+      for (let i = 0; i < 48; i++) {
+        const distFrac = ((i * 0.021 + t * 0.08) % 1);
+        const px = originX - distFrac * 460 + Math.sin(t * 3.5 + i) * 10;
+        const spread = 18 + distFrac * 150;
+        const py = originY + (sweepY * distFrac) + Math.cos(t * 2.4 + i * 1.7) * spread;
+        const pSize = 1.0 + (i % 3) * 0.75;
+        const pAlpha = (1 - distFrac * 0.7) * (0.45 + 0.4 * Math.sin(t * 8 + i));
+
+        ctx.fillStyle = i % 3 === 0
+          ? `rgba(254, 240, 138, ${pAlpha})`
+          : `rgba(224, 242, 254, ${pAlpha})`;
+        ctx.beginPath();
+        ctx.arc(px, py, pSize, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    // 5. CFTV CAM 02 EM TELA CHEIA: A CRIATURA DE 2.20M FUGINDO DA MASSA NEGRA COLOSSAL
+    function drawCCTVFullscreen(ctx) {
+      ctx.save();
+
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
+      skyGrad.addColorStop(0, '#010307');
+      skyGrad.addColorStop(0.5, '#040917');
+      skyGrad.addColorStop(1, '#02040a');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // A MASSA NEGRA COLOSSAL ENGOLINDO A RUA E OS POSTES AO FUNDO
+      const massAdvance = Math.min(1, Math.max(0, (t - CCTV_START) / Math.max(1, CCTV_END - CCTV_START)));
+      const wallY = H * 0.34 + massAdvance * 110;
+
+      const voidGrad = ctx.createLinearGradient(0, 0, 0, wallY + 320);
+      voidGrad.addColorStop(0, '#000000');
+      voidGrad.addColorStop(0.75, 'rgba(2, 4, 12, 0.98)');
+      voidGrad.addColorStop(1, 'rgba(2, 6, 23, 0)');
+      ctx.fillStyle = voidGrad;
+      ctx.fillRect(0, 0, W, wallY + 320);
+
+      ctx.fillStyle = '#010206';
+      for (let i = 0; i < 9; i++) {
+        const tx = (i / 8) * W + Math.sin(t * 2.5 + i) * 45;
+        const ty = wallY + 120 + Math.cos(t * 3.2 + i * 1.4) * 55;
+        const radX = 95 + (i % 3) * 35;
+        const radY = 190 + Math.sin(t * 4 + i) * 45;
+        ctx.beginPath();
+        ctx.ellipse(tx, ty, radX, radY, Math.sin(t * 1.8 + i) * 0.25, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      for (let e = 0; e < 6; e++) {
+        const ex = 220 + e * 130 + Math.sin(t * 2 + e) * 20;
+        const ey = wallY - 20 + (e % 3) * 55;
+        const blink = Math.max(0, Math.sin(t * 4.5 + e * 1.9));
+        if (blink > 0.2) {
+          ctx.fillStyle = `rgba(239, 68, 68, ${blink * 0.75})`;
+          ctx.shadowColor = '#ef4444';
+          ctx.shadowBlur = 18;
+          ctx.beginPath();
+          ctx.ellipse(ex, ey, 14, 5 * blink, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.shadowBlur = 0;
+
+      // FEIXE VOLUMÉTRICO DO HOLOFOTE DE 1000W ATINGINDO A ECLUSA EM CHEIO
+      const spotGrad = ctx.createRadialGradient(W * 0.5, H * 0.54, 30, W * 0.5, H * 0.54, 620);
+      spotGrad.addColorStop(0, 'rgba(255, 255, 255, 0.96)');
+      spotGrad.addColorStop(0.25, 'rgba(254, 249, 195, 0.72)');
+      spotGrad.addColorStop(0.58, 'rgba(56, 189, 248, 0.35)');
+      spotGrad.addColorStop(1, 'rgba(2, 6, 23, 0)');
+      ctx.fillStyle = spotGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // A CRIATURA DE 2.20M EM PÂNICO, OFUSCADA PELA LUZ E OLHANDO PARA TRÁS
+      const cx = W * 0.5 + Math.sin(t * 14) * 4;
+      const cy = H * 0.58;
+      const breath = Math.sin(t * 6) * 8;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      ctx.fillStyle = '#070d19';
+      ctx.strokeStyle = '#7dd3fc';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.ellipse(0, 20, 155 + breath, 250, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(186, 230, 253, 0.45)';
+      ctx.lineWidth = 4;
+      for (let r = -2; r <= 2; r++) {
+        ctx.beginPath();
+        ctx.arc(r * 36, 10 + Math.abs(r) * 14, 55, Math.PI * 0.2, Math.PI * 0.8);
+        ctx.stroke();
+      }
+
+      const headShake = Math.sin(t * 9) * 0.08;
+      ctx.save();
+      ctx.translate(0, -195 + breath * 0.5);
+      ctx.rotate(headShake);
+
+      ctx.fillStyle = '#030712';
+      ctx.strokeStyle = '#bae6fd';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 68, 86, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ef4444';
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = 30;
+      ctx.beginPath();
+      ctx.ellipse(-26, -14, 14, 10, -0.15, 0, Math.PI * 2);
+      ctx.ellipse(26, -14, 14, 10, 0.15, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(-26, -14, 3.5, 0, Math.PI * 2);
+      ctx.arc(26, -14, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#450a0a';
+      ctx.beginPath();
+      ctx.roundRect(-30, 26, 60, 32 + Math.sin(t * 18) * 6, 8);
+      ctx.fill();
+
+      ctx.fillStyle = '#f8fafc';
+      for (let f = -4; f <= 4; f++) {
+        ctx.beginPath();
+        ctx.moveTo(f * 6.5 - 3, 26);
+        ctx.lineTo(f * 6.5, 38);
+        ctx.lineTo(f * 6.5 + 3, 26);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+
+      const armGuard = Math.sin(t * 7) * 10;
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#e0f2fe';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.ellipse(-95, -135 + armGuard, 42, 135, -0.55, 0, Math.PI * 2);
+      ctx.ellipse(95, -135 - armGuard, 42, 135, 0.55, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.restore();
+
+      // PORTÃO DE FERRO FORJADO DA ECLUSA EM PRIMEIRO PLANO
+      for (let bx = 95; bx < W - 80; bx += 78) {
+        const bend = (bx > 350 && bx < 730) ? Math.sin(t * 16) * 4 : 0;
+        const barGrad = ctx.createLinearGradient(bx - 10, 0, bx + 10, 0);
+        barGrad.addColorStop(0, '#090e1a');
+        barGrad.addColorStop(0.5, '#475569');
+        barGrad.addColorStop(1, '#090e1a');
+        ctx.fillStyle = barGrad;
+        ctx.fillRect(bx - 9 + bend, 0, 18, H);
+      }
+
+      [H * 0.36, H * 0.68].forEach(ty => {
+        ctx.fillStyle = '#0f172a';
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 3;
+        ctx.fillRect(0, ty - 14, W, 28);
+        ctx.strokeRect(0, ty - 14, W, 28);
+      });
+
+      const boxX = W * 0.5 - 290;
+      const boxY = H * 0.36;
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([18, 10]);
+      ctx.strokeRect(boxX, boxY, 580, 520);
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = 'rgba(2, 6, 23, 0.86)';
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(45, 55, W - 90, 155, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ef4444';
+      ctx.font = '800 30px "JetBrains Mono", monospace';
+      ctx.fillText('🔴 REC • CFTV CAM 02 (ECLUSA EXTERNA)', 75, 100);
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '700 23px "JetBrains Mono", monospace';
+      ctx.fillText('🔦 HOLOFOTE 1000W: ENTIDADE OFUSCADA NA GRADE', 75, 142);
+      ctx.fillStyle = '#fde047';
+      ctx.fillText('⚠️ ALERTA CRÍTICO: MASSA NEGRA ENGOLINDO A RUA ATRÁS!', 75, 182);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      for (let y = 0; y < H; y += 6) {
+        ctx.fillRect(0, y, W, 2);
+      }
+      if (Math.sin(t * 19) > 0.82) {
+        const gy = (t * 900) % H;
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+        ctx.fillRect(0, gy, W, 18);
+      }
+
+      ctx.restore();
+    }
+
+    // 6. POP-UP DE CHAMADA DO INTERFONE (DONA CAMILA - APT 304) E EFEITO DE ALARME
+    function drawIntercomAndEmergencyOverlay(ctx) {
+      if (cctvActive || t >= DECISION_START) return;
+
+      const activeSpk = getActiveSpeaker(t);
+
+      if (scenario.alarmActive) {
+        const alarmPulse = Math.max(0, Math.sin(t * 7.5)) * 0.22;
+        const redEdge = ctx.createRadialGradient(W * 0.5, H * 0.5, W * 0.25, W * 0.5, H * 0.5, W * 0.85);
+        redEdge.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        redEdge.addColorStop(1, `rgba(239, 68, 68, ${alarmPulse})`);
+        ctx.fillStyle = redEdge;
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      if (activeSpk === 'camila') {
+        ctx.save();
+        const cardW = 720;
+        const cardH = 110;
+        const cardX = (W - cardW) / 2;
+        const cardY = 175;
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+        ctx.strokeStyle = '#c084fc';
+        ctx.lineWidth = 3;
+        ctx.shadowColor = '#c084fc';
+        ctx.shadowBlur = 20;
+        ctx.beginPath();
+        ctx.roundRect(cardX, cardY, cardW, cardH, 18);
+        ctx.fill();
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#e9d5ff';
+        ctx.font = '800 22px "JetBrains Mono", monospace';
+        ctx.fillText('📞 INTERFONE • APT 304 (DONA CAMILA)', cardX + 28, cardY + 40);
+
+        ctx.fillStyle = '#fca5a5';
+        ctx.font = '700 18px "JetBrains Mono", monospace';
+        ctx.fillText('⚡ ALERTA: QUEDA DE FORÇA NO 3º ANDAR', cardX + 28, cardY + 75);
+
+        for (let b = 0; b < 12; b++) {
+          const bh = 12 + Math.abs(Math.sin(t * 22 + b * 0.9)) * 52;
+          const bx = cardX + cardW - 185 + b * 13;
+          const by = cardY + (cardH - bh) / 2;
+          ctx.fillStyle = '#c084fc';
+          ctx.beginPath();
+          ctx.roundRect(bx, by, 8, bh, 4);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+
+    // 7. HUD TÁTICO SUPERIOR
+    function drawTacticalHUD(ctx) {
+      if (t >= DECISION_START || cctvActive) return;
+
+      ctx.save();
+
+      // Badge 1: Relógio e Episódio
+      ctx.fillStyle = 'rgba(2, 6, 23, 0.88)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(60, 90, 280, 54, 14);
+      ctx.fill();
+      ctx.stroke();
+
+      const recPulse = 0.5 + Math.sin(t * 6) * 0.5;
+      ctx.fillStyle = `rgba(239, 68, 68, ${recPulse})`;
+      ctx.beginPath();
+      ctx.arc(88, 117, 7, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '700 22px "JetBrains Mono", monospace';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('TER 23:44 • EP 3', 108, 118);
+
+      // Badge 2: Integridade do Vidro Trincado
+      const glassPct = t >= LUCAS_START ? Math.max(26, 34 - Math.floor((t - LUCAS_START) * 0.2)) : 34;
+      ctx.fillStyle = 'rgba(127, 29, 29, 0.90)';
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(360, 90, 360, 54, 14);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#fee2e2';
+      ctx.font = '800 20px "JetBrains Mono", monospace';
+      ctx.fillText(`⚠️ VIDRO BLINDADO: ${glassPct}%`, 380, 118);
+
+      // Badge 3: 3 Ferrolhos Travados
+      ctx.fillStyle = 'rgba(6, 78, 59, 0.90)';
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(740, 90, 280, 54, 14);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ecfdf5';
+      ctx.font = '800 20px "JetBrains Mono", monospace';
+      ctx.fillText('🔒 3/3 FERROLHOS', 760, 118);
+
+      ctx.restore();
+    }
+
+    // 8. LEGENDAS DINÂMICAS COM EQUALIZADOR DE VOZ E BRILHO POR PERSONAGEM
+    function drawDynamicSubtitles(ctx) {
+      if (t >= DECISION_START) return;
+
+      let curDiag = null;
+      if (T && T.dialogues) {
+        for (const d of T.dialogues) {
+          if (t >= d.start && t < d.start + d.duration) {
+            curDiag = d;
+            break;
+          }
+        }
+      }
+      if (!curDiag) return;
+
+      ctx.save();
+      const pillY = 1535;
+      const pillW = 960;
+      const pillX = (W - pillW) / 2;
+      const pillH = 140;
+
+      let tagText = '🎙️ NARRADOR (RUAN)';
+      let tagColor = '#fbbf24';
+      if (curDiag.speaker === 'voce') {
+        tagText = '🙋 VOCÊ (MORADOR)';
+        tagColor = '#38bdf8';
+      } else if (curDiag.speaker === 'valdir') {
+        tagText = '👴 SEU VALDIR (PORTEIRO)';
+        tagColor = '#f59e0b';
+      } else if (curDiag.speaker === 'lucas') {
+        tagText = '🚴 LUCAS (ENTREGADOR - NO VIDRO)';
+        tagColor = '#ef4444';
+      } else if (curDiag.speaker === 'camila') {
+        tagText = '👩 DONA CAMILA (APT 304 - INTERFONE)';
+        tagColor = '#c084fc';
+      }
+
+      ctx.fillStyle = 'rgba(4, 7, 14, 0.94)';
+      ctx.strokeStyle = tagColor;
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = tagColor;
+      ctx.shadowBlur = 18;
+      ctx.beginPath();
+      ctx.roundRect(pillX, pillY, pillW, pillH, 22);
+      ctx.fill();
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      ctx.fillStyle = tagColor;
+      ctx.font = '800 22px "JetBrains Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillText(tagText, pillX + 28, pillY + 18);
+
+      for (let i = 0; i < 6; i++) {
+        const barH = 6 + Math.abs(Math.sin(t * 24 + i * 1.1)) * 16;
+        ctx.fillRect(pillX + pillW - 95 + i * 10, pillY + 34 - barH, 6, barH);
+      }
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '700 27px "Inter", sans-serif';
+      const text = `"${curDiag.text}"`;
+      if (text.length > 56) {
+        const splitIdx = text.lastIndexOf(' ', 54);
+        const l1 = text.substring(0, splitIdx);
+        const l2 = text.substring(splitIdx + 1);
+        ctx.fillText(l1, pillX + 28, pillY + 54);
+        ctx.fillText(l2, pillX + 28, pillY + 90);
+      } else {
+        ctx.fillText(text, pillX + 28, pillY + 66);
+      }
+
+      ctx.restore();
+    }
+
+    // 9. DIREÇÃO DE CÂMERA 2.5D COM RESPIRAÇÃO ORGÂNICA E TREMOR DE IMPACTO
+    function directScene(time) {
+      if (time >= 0.2 && time <= 6.6) {
+        ugcBadge.classList.add('active');
+      } else {
+        ugcBadge.classList.remove('active');
+      }
+
+      spotlightActive = (time >= SPOTLIGHT_START);
+      cctvActive = (time >= CCTV_START && time <= CCTV_END);
+
+      if (time >= DECISION_START) {
+        decisionOverlay.style.display = 'flex';
+        const rem = Math.max(0, TOTAL_DURATION - time);
+        const remPct = (rem / (TOTAL_DURATION - DECISION_START)) * 100;
+        timerFill.style.width = remPct + '%';
+        countdownPill.innerText = `⏳ ${rem.toFixed(1)}s PARA DECIDIR`;
+      } else {
+        decisionOverlay.style.display = 'none';
+      }
+
+      const swayX = Math.sin(time * 1.7) * 4.5;
+      const swayY = Math.cos(time * 2.1) * 3.0;
+
+      if (time >= LUCAS_START && time < 46.5) {
+        const bangCycle = Math.floor(time * 1.83);
+        if (bangCycle !== lastBangCycle) {
+          lastBangCycle = bangCycle;
+          cam.shake(0.28);
+        }
+      }
+
+      if (cctvActive) {
+        // CFTV Tela Cheia
+      } else if (time < 6.8) {
+        cam.panTo(260 + swayX, 410 + swayY, 2.85, 0.25);
+        voce.emotion = 'tense';
+        voce.pose = 'phone_look';
+        valdir.emotion = 'worried';
+        valdir.pose = 'hands_desk';
+        scenario.alarmActive = false;
+      } else if (time < 13.6) {
+        cam.panTo(235 + swayX, 405 + swayY, 3.05, 0.25);
+        voce.emotion = 'determined';
+        voce.pose = 'pointing';
+        valdir.emotion = 'serious';
+      } else if (time < 21.2) {
+        cam.panTo(315 + swayX, 398 + swayY, 3.3, 0.25);
+        valdir.pose = 'holding_spotlight';
+        valdir.emotion = 'focused';
+        voce.pose = 'step_back';
+        if (Math.abs(time - SPOTLIGHT_START) < 0.08) cam.shake(0.45);
+      } else if (time < 28.7) {
+        cam.panTo(250 + swayX, 408 + swayY, 2.85, 0.25);
+        voce.emotion = 'shocked';
+        valdir.emotion = 'panicked';
+      } else if (time < 46.5) {
+        cam.panTo(135 + swayX, 405 + swayY, 2.95, 0.3);
+        lucas.pose = 'bang_gate';
+        lucas.emotion = 'terrified';
+        voce.emotion = 'shocked';
+        valdir.emotion = 'panicked';
+      } else if (time < 53.6) {
+        cam.panTo(245 + swayX, 408 + swayY, 2.75, 0.25);
+        scenario.alarmActive = true;
+      } else if (time < 62.3) {
+        cam.panTo(190 + swayX, 405 + swayY, 3.1, 0.25);
+        voce.emotion = 'panicked';
+        voce.pose = 'gesturing_urgent';
+        scenario.alarmActive = true;
+      } else if (time < 72.5) {
+        cam.panTo(318 + swayX, 402 + swayY, 3.25, 0.25);
+        valdir.pose = 'holding_switch';
+        valdir.emotion = 'tense';
+        scenario.alarmActive = true;
+      } else if (time < DECISION_START) {
+        cam.panTo(235 + swayX, 408 + swayY, 2.75, 0.2);
+        cam.shake(0.22);
+        scenario.alarmActive = true;
+      } else {
+        cam.panTo(250 + swayX, 410 + swayY, 2.65, 0.2);
+      }
+    }
+
+    // 10. MOTOR DE RENDERIZAÇÃO PRINCIPAL (60 FPS)
+    function renderFrame() {
+      t = audio.currentTime;
+      directScene(t);
+
+      const pct = (t / TOTAL_DURATION) * 100;
+      fill.style.width = pct + '%';
+      timeDisplay.innerText = `${t.toFixed(1)}s / ${TOTAL_DURATION.toFixed(1)}s`;
+
+      let valdirMouth = 0;
+      let voceMouth = 0;
+      let lucasMouth = 0;
+
+      if (T && T.dialogues) {
+        for (const d of T.dialogues) {
+          if (t >= d.start && t < d.start + d.duration) {
+            const frameIdx = Math.floor((t - d.start) * 60);
+            let m = 0;
+            if (d.lip_sync && frameIdx >= 0 && frameIdx < d.lip_sync.length) {
+              m = d.lip_sync[frameIdx];
+            } else {
+              m = 0.35 + 0.35 * Math.sin(t * 18);
+            }
+
+            if (d.speaker === 'valdir') valdirMouth = m;
+            else if (d.speaker === 'voce') voceMouth = m;
+            else if (d.speaker === 'lucas') lucasMouth = m;
+            break;
+          }
+        }
+      }
+
+      valdir.update(1 / 60, valdirMouth, 0.5);
+      voce.update(1 / 60, voceMouth, 0.5);
+      lucas.update(1 / 60, lucasMouth);
+
+      ctx.clearRect(0, 0, W, H);
+
+      if (cctvActive) {
+        drawCCTVFullscreen(ctx);
+      } else {
+        scenario.update(1 / 60);
+        cam.update(1 / 60);
+        cam.beginFrame(ctx);
+
+        // Camada 1: Fundo da Rua Chuvosa e Neblina
+        scenario.drawBackground(ctx, 0);
+
+        // Camada 2: Piso de Porcelanato Polido e Tapete
+        scenario.drawFloor(ctx);
+
+        // Camada 3: Lucas do lado de fora + Tentáculos e Ondas de Impacto
+        drawLucasOutside(ctx);
+
+        // Camada 4: Paredes, Guarita, Monitores CFTV e Eclusa
+        scenario.drawMidground(ctx);
+
+        // Camada 5: Personagens dentro da Guarita
+        valdir.draw(ctx);
+        voce.draw(ctx);
+
+        // Camada 6: Batente Metálico, 3 Ferrolhos e Faíscas Elétricas de 10kV
+        drawDoorLockSparksAndRadioWaves(ctx);
+
+        // Camada 7: Vidro da Janela e Balcão da Guarita
+        scenario.drawGuaritaFore(ctx);
+
+        // Camada 8: Feixe de Luz Volumétrico 1000W com God-Rays e Lens Flare
+        drawSpotlightBeam(ctx);
+
+        // Camada 9: Rachaduras no Vidro Blindado
+        drawGlassCracksWorld(ctx);
+
+        // Camada 10: Iluminação de Alarme e Primeiro Plano
+        scenario.drawForeground(ctx);
+
+        cam.endFrame(ctx);
+      }
+
+      drawIntercomAndEmergencyOverlay(ctx);
+      drawTacticalHUD(ctx);
+      drawDynamicSubtitles(ctx);
+    }
+
+    function loop() {
+      if (!playing) return;
+      renderFrame();
+      if (t >= TOTAL_DURATION) {
+        playing = false;
+        btnPlay.innerText = '▶ Reproduzir';
+        return;
+      }
+      requestAnimationFrame(loop);
+    }
+
+    window.renderAt = function(sec) {
+      audio.currentTime = sec;
+      t = sec;
+      renderFrame();
+    };
+
+    if (new URLSearchParams(window.location.search).get('render') === '1') {
+      document.body.classList.add('render-mode');
+    }
+
+    window.addEventListener('load', () => {
+      renderFrame();
+    });
+  </script>
+</body>
+</html>

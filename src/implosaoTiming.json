@@ -1,0 +1,47 @@
+{
+  "totalDuration": 43,
+  "beats": [
+    {
+      "id": 0,
+      "text": "A 11 mil metros, descemos ao abismo onde a luz solar jamais chegou, e cada metro apaga um mundo inteiro.",
+      "start": 0,
+      "end": 7.25,
+      "duration": 7.2
+    },
+    {
+      "id": 1,
+      "text": "A coluna d’água comprime tudo com cerca de mil e cem atmosferas de pressão esmagadora.",
+      "start": 7.25,
+      "end": 12.72,
+      "duration": 5.47
+    },
+    {
+      "id": 2,
+      "text": "O raio-X revela o casco de titânio suportando aproximadamente uma tonelada de força por centímetro quadrado.",
+      "start": 12.72,
+      "end": 19.45,
+      "duration": 6.73
+    },
+    {
+      "id": 3,
+      "text": "Então, uma microfissura invisível cresce, o metal cede e a pressão externa invade em uma onda devastadora.",
+      "start": 19.45,
+      "end": 26.57,
+      "duration": 7.12
+    },
+    {
+      "id": 4,
+      "text": "Em cerca de vinte milissegundos, a implosão se propaga em velocidades supersônicas e pode aquecer o ar a milhares de graus.",
+      "start": 26.57,
+      "end": 34.08,
+      "duration": 7.51
+    },
+    {
+      "id": 5,
+      "text": "A estrutura colapsa e fragmenta-se quase instantaneamente; para quem está dentro, não há tempo para perceber dor.",
+      "start": 34.08,
+      "end": 43,
+      "duration": 7.08
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "character": "Seu Valdir (Porteiro 61a)",
+  "voice_id": "pessoa_8_brian",
+  "voice_name": "Brian (Multilingual Neural)",
+  "model": "en-US-BrianMultilingualNeural",
+  "status": "padrao_aprovado",
+  "audio_file": "/output/audicoes/valdir_oficial_escolhido.mp3"
+}

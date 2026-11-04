@@ -1,0 +1,47 @@
+{
+  "totalDuration": 45,
+  "beats": [
+    {
+      "id": 0,
+      "text": "Você sobreviveria se a Terra parasse de girar por apenas cinco segundos?",
+      "start": 0,
+      "end": 4.94,
+      "duration": 4.89
+    },
+    {
+      "id": 1,
+      "text": "Neste exato momento, você e tudo ao seu redor estão se movendo a mais de mil e seiscentos quilômetros por hora em direção ao leste.",
+      "start": 4.94,
+      "end": 12.95,
+      "duration": 8.01
+    },
+    {
+      "id": 2,
+      "text": "Se o planeta parasse de repente, a Primeira Lei de Newton entraria em ação: tudo seria arremessado horizontalmente em velocidade supersônica!",
+      "start": 12.95,
+      "end": 21.64,
+      "duration": 8.69
+    },
+    {
+      "id": 3,
+      "text": "A atmosfera continuaria girando, gerando ventos de quinhentos metros por segundo que varreriam cidades, enquanto os oceanos formariam megatsunamis.",
+      "start": 21.64,
+      "end": 30.88,
+      "duration": 9.24
+    },
+    {
+      "id": 4,
+      "text": "Cinco segundos depois, a Terra voltaria a girar com um solavanco tectônico brutal, gerando terremotos globais catastróficos.",
+      "start": 30.88,
+      "end": 39.17,
+      "duration": 8.3
+    },
+    {
+      "id": 5,
+      "text": "A rotação suave do nosso planeta é o escudo silencioso que nos mantém vivos. Você sabia que estamos voando tão rápido pelo espaço?",
+      "start": 39.17,
+      "end": 45,
+      "duration": 5.4
+    }
+  ]
+}

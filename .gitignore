@@ -8,6 +8,7 @@ remotion-video/out/
 
 # Sub-projects and external tools
 tools/
+voicestudio/
 
 # Temporary and cache files
 output/frames*
@@ -16,6 +17,28 @@ output/stills*
 *.log
 .DS_Store
 Thumbs.db
+
+# Virtual environments & Python cache
+.venv/
+*/.venv/
+__pycache__/
+*.pyc
+
+# Heavy outputs
+output/*.mp4
+# Large backups and archives
+backups_legados/
+*.zip
+
+# Audio intermediates
+*.wav
+!output/user_cloned_voice.wav
+output/*.wav
+output/*.png
+output/*.bin
+output/*.txt
+output/test_voices/
+output/audicoes/
 
 # Local environment
 .env

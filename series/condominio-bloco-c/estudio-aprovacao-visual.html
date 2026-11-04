@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cena 01 (9:16 TikTok) — Condomínio Solaris: Bloco C</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #04070e;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      overflow: hidden;
+    }
+    .phone {
+      height: calc(100vh - 40px);
+      aspect-ratio: 9 / 16;
+      border-radius: 26px;
+      overflow: hidden;
+      border: 2px solid rgba(56, 189, 248, 0.3);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+      position: relative;
+      background: #000;
+    }
+    body.render-mode {
+      padding: 0 !important;
+      margin: 0 !important;
+      gap: 0 !important;
+      justify-content: flex-start !important;
+      align-items: flex-start !important;
+      background: #000 !important;
+      width: 1080px !important;
+      height: 1920px !important;
+    }
+    body.render-mode .phone {
+      width: 1080px !important;
+      height: 1920px !important;
+      border-radius: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      aspect-ratio: auto !important;
+    }
+    body.render-mode .panel {
+      display: none !important;
+    }
+    body.render-mode .decision-overlay {
+      padding: 100px 64px !important;
+    }
+    body.render-mode .decision-badge {
+      font-size: 26px !important;
+      padding: 10px 26px !important;
+      border-radius: 999px !important;
+      margin-bottom: 24px !important;
+    }
+    body.render-mode .simple-question-title {
+      font-size: 64px !important;
+      letter-spacing: -1px !important;
+      margin-bottom: 12px !important;
+    }
+    body.render-mode .simple-question-sub {
+      font-size: 28px !important;
+      margin-bottom: 24px !important;
+    }
+    body.render-mode .timer-bar-wrap {
+      max-width: 860px !important;
+      height: 16px !important;
+      margin: 14px auto 14px !important;
+    }
+    body.render-mode .countdown-pill {
+      font-size: 32px !important;
+      margin-bottom: 44px !important;
+    }
+    body.render-mode .choice-card {
+      padding: 36px 40px !important;
+      border-radius: 30px !important;
+      margin-bottom: 30px !important;
+      gap: 32px !important;
+      border-width: 3.5px !important;
+    }
+    body.render-mode .choice-emoji-box {
+      width: 128px !important;
+      height: 128px !important;
+      border-radius: 28px !important;
+      font-size: 72px !important;
+    }
+    body.render-mode .choice-title {
+      font-size: 40px !important;
+    }
+    body.render-mode .choice-desc {
+      font-size: 26px !important;
+      margin-top: 8px !important;
+    }
+    body.render-mode .choice-pct {
+      font-size: 36px !important;
+    }
+    body.render-mode .choice-action-pill {
+      font-size: 28px !important;
+      padding: 8px 22px !important;
+      border-radius: 14px !important;
+      margin-top: 14px !important;
+      gap: 10px !important;
+    }
+    body.render-mode .choice-bar {
+      height: 10px !important;
+      margin-top: 16px !important;
+    }
+    body.render-mode .simple-footer-hint {
+      font-size: 30px !important;
+      padding: 22px 32px !important;
+      border-radius: 20px !important;
+      margin-top: 26px !important;
+    }
+    body.render-mode #voteFeedback {
+      font-size: 28px !important;
+      margin-top: 24px !important;
+    }
+    canvas { width: 100%; height: 100%; display: block; cursor: pointer; }
+    .panel {
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .card {
+      background: #0b111e;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+    .card h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #38bdf8;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .row { display: flex; gap: 8px; }
+    button {
+      flex: 1;
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+      font-weight: 700;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+    button:hover { border-color: #38bdf8; }
+    button.primary { background: #10b981; color: #022c22; border-color: #34d399; }
+    button.on { background: #38bdf8; color: #020617; }
+    .track {
+      height: 8px;
+      background: #020617;
+      border-radius: 999px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+    .fill { height: 100%; width: 0; background: linear-gradient(90deg, #38bdf8, #3b82f6); }
+    .time { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #38bdf8; margin-top: 6px; }
+    .beat { padding: 6px 8px; border-radius: 6px; margin-top: 4px; }
+    .beat.active { background: rgba(56, 189, 248, 0.14); color: #f8fafc; }
+
+    /* OVERLAY INTERATIVO: VOCÊ DECIDE O FIM (MINIMALISTA DE ALTO IMPACTO) */
+    .decision-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(10, 15, 30, 0.90), rgba(2, 6, 23, 0.96));
+      backdrop-filter: blur(12px);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 24px;
+      z-index: 50;
+      text-align: center;
+      box-sizing: border-box;
+      animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .decision-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.16);
+      border: 1.5px solid rgba(239, 68, 68, 0.45);
+      box-shadow: 0 0 18px rgba(239, 68, 68, 0.25);
+      margin-bottom: 10px;
+    }
+    .simple-question-title {
+      font-size: 23px;
+      font-weight: 900;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      margin: 0 0 4px 0;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+    }
+    .simple-question-sub {
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin: 0 0 8px 0;
+    }
+    .timer-bar-wrap {
+      width: 100%;
+      max-width: 280px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 8px auto 6px;
+    }
+    .timer-bar-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
+      transition: width 0.1s linear;
+    }
+    .countdown-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: #f59e0b;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+    }
+    .choice-card {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.92);
+      border: 2px solid rgba(148, 163, 184, 0.35);
+      border-radius: 16px;
+      padding: 15px 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+    }
+    .choice-card.opt-1 {
+      border-color: rgba(56, 189, 248, 0.55);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(12, 74, 110, 0.35));
+    }
+    .choice-card.opt-2 {
+      border-color: rgba(16, 185, 129, 0.55);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(6, 78, 59, 0.35));
+    }
+    .choice-card:hover {
+      border-color: #38bdf8;
+      background: rgba(30, 41, 59, 0.95);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(56, 189, 248, 0.25);
+    }
+    .choice-card:active {
+      transform: scale(0.97);
+    }
+    .choice-card.selected {
+      border-color: #10b981;
+      background: rgba(6, 78, 59, 0.4);
+      box-shadow: 0 0 24px rgba(16, 185, 129, 0.4);
+    }
+    .choice-emoji-box {
+      width: 54px;
+      height: 54px;
+      flex-shrink: 0;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      transition: transform 0.2s ease;
+    }
+    .choice-card:hover .choice-emoji-box {
+      transform: scale(1.15);
+    }
+    .choice-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .choice-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .choice-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+    }
+    .choice-desc {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #cbd5e1;
+      margin-top: 3px;
+      line-height: 1.3;
+    }
+    .choice-pct {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 800;
+      color: #38bdf8;
+      display: none;
+    }
+    .choice-action-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(56, 189, 248, 0.2);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.45);
+    }
+    .choice-bar {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+      display: none;
+    }
+    .choice-bar-fill {
+      height: 100%;
+      background: #38bdf8;
+      width: 0%;
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .simple-footer-hint {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      font-size: 12px;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: -0.2px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone" style="position: relative;">
+    <canvas id="stage" width="1080" height="1920"></canvas>
+
+    <!-- OVERLAY INTERATIVO: VOCÊ DECIDE O FIM (ESCOLHA ABERTA · ZERO RESULTADO ANTECIPADO) -->
+    <div id="decisionOverlay" class="decision-overlay">
+      <div class="decision-badge">🚨 VOCÊ DECIDE O FIM • EPISÓDIO 1</div>
+      <h2 class="simple-question-title">O QUE VOCÊ FAZ AGORA?</h2>
+      <p class="simple-question-sub">O apagão travou o portão e a neblina tomou a rua.</p>
+
+      <div class="timer-bar-wrap">
+        <div id="decisionTimerBar" class="timer-bar-fill"></div>
+      </div>
+      <div id="decisionCountdownText" class="countdown-pill">
+        ⏳ 10.0s PARA DECIDIR
+      </div>
+
+      <!-- CARD OPÇÃO 1: SUBIR PRO 302 -->
+      <div class="choice-card opt-1" id="cardOpt1" onclick="voteOption(1)">
+        <div class="choice-emoji-box" style="border-color: rgba(56, 189, 248, 0.55); background: rgba(56, 189, 248, 0.16);">
+          🏃‍♂️
+        </div>
+        <div class="choice-body">
+          <div class="choice-header-row">
+            <span class="choice-title">OPÇÃO 1: SUBIR PRO 302</span>
+            <span class="choice-pct" id="pctLabel1"></span>
+          </div>
+          <div class="choice-desc">Correr pelas escadas e trancar a porta do apartamento.</div>
+          <div class="choice-action-pill">
+            <span>Comente</span> <b>🏃‍♂️</b> <span>para escolher</span>
+          </div>
+          <div class="choice-bar" id="barWrap1"><div class="choice-bar-fill" id="barFill1" style="background: #38bdf8;"></div></div>
+        </div>
+      </div>
+
+      <!-- CARD OPÇÃO 2: FICAR NA GUARITA -->
+      <div class="choice-card opt-2" id="cardOpt2" onclick="voteOption(2)">
+        <div class="choice-emoji-box" style="border-color: rgba(16, 185, 129, 0.55); background: rgba(16, 185, 129, 0.16);">
+          🛡️
+        </div>
+        <div class="choice-body">
+          <div class="choice-header-row">
+            <span class="choice-title">OPÇÃO 2: FICAR NA GUARITA</span>
+            <span class="choice-pct" id="pctLabel2"></span>
+          </div>
+          <div class="choice-desc">Se trancar na guarita blindada com o Seu Valdir e o rádio.</div>
+          <div class="choice-action-pill" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border-color: rgba(16, 185, 129, 0.45);">
+            <span>Comente</span> <b>🛡️</b> <span>para escolher</span>
+          </div>
+          <div class="choice-bar" id="barWrap2"><div class="choice-bar-fill" id="barFill2" style="background: #10b981;"></div></div>
+        </div>
+      </div>
+
+      <div class="simple-footer-hint">
+        💬 <b>QUAL A SUA ESCOLHA?</b><br/>
+        Comente <b>🏃‍♂️</b> ou <b>🛡️</b> — a opção vencedora define o roteiro do Episódio 2!
+      </div>
+
+      <div id="voteFeedback" style="display: none; margin-top: 10px; font-size: 11.5px; color: #34d399; font-weight: 700;">
+        <!-- Preenchido apenas se clicado manualmente no preview -->
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="card">
+      <h2>Cena 01 • Vertical 1080×1920</h2>
+      <div class="row">
+        <button class="primary" id="btnPlay">▶ Play</button>
+        <button id="btnRestart">⟲ Reiniciar</button>
+      </div>
+      <div style="margin-top:12px" class="track" id="track"><div class="fill" id="fill"></div></div>
+      <div class="time" id="time">00.0s / 00.0s</div>
+    </div>
+
+    <div class="card">
+      <h2>Planos</h2>
+      <div class="beat" id="beatA"><b>A · Plano médio seguindo (Perfil)</b> — Você caminha pelo hall olhando o celular em perfil 2.5D.</div>
+      <div class="beat" id="beatB"><b>B · Corte frontal + push-in</b> — Parada na eclusa; apagão nos postes e neblina leitosa.</div>
+      <div class="beat" id="beatC"><b>C · Corte na Guarita</b> — Seu Valdir no rádio HT com monitores CFTV perfeitamente enquadrados.</div>
+      <div class="beat" id="beatD"><b>D · Você Decide o Fim</b> — Clímax com votação interativa e cronômetro de 10s.</div>
+    </div>
+
+    <div class="card">
+      <h2>Visualização</h2>
+      <div class="row">
+        <button id="btnSafe">Zona segura TikTok</button>
+        <button id="btnSubs" class="on">Legendas</button>
+      </div>
+    </div>
+
+    <!-- ESTÚDIO INTEGRADO DE GRAVAÇÃO DA VOZ REAL DO USUÁRIO -->
+    <div class="card" style="border: 1px solid rgba(56, 189, 248, 0.45); background: rgba(15, 23, 42, 0.9);">
+      <h2 style="color: #38bdf8; display: flex; align-items: center; justify-content: space-between;">
+        <span>🎙️ Minha Voz Real (Narração)</span>
+        <span id="recBadge" style="font-size: 10px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 2px 6px; border-radius: 4px;">PRONTO</span>
+      </h2>
+      <p style="font-size: 11.5px; color: #94a3b8; margin: 4px 0 8px;">
+        Grave no microfone ou envie o áudio da narração com a sua voz real:
+      </p>
+      <div style="background: rgba(2, 6, 23, 0.7); border-left: 3px solid #38bdf8; padding: 8px 10px; font-size: 12px; color: #f8fafc; font-style: italic; border-radius: 0 6px 6px 0; margin-bottom: 10px; line-height: 1.45;">
+        "São onze e quarenta e dois da noite. Você só desceu de moletom e chinelo pra pegar seu lanche na portaria... mas quando olha pelo vidro, a rua inteira lá fora sumiu numa neblina branca."
+      </div>
+      <div class="row">
+        <button id="btnRecord" style="background: #ef4444; color: #fff; font-weight: 700;">🔴 Gravar Microfone</button>
+        <button id="btnStopRecord" style="display: none; background: #eab308; color: #020617; font-weight: 700;">⏹ Parar (00s)</button>
+      </div>
+      <div id="vuMeter" style="display: none; height: 6px; background: #020617; border-radius: 999px; overflow: hidden; margin-top: 8px;">
+        <div id="vuFill" style="height: 100%; width: 0; background: #10b981; transition: width 0.05s ease;"></div>
+      </div>
+      <div id="recPlayerBox" style="display: none; margin-top: 10px;">
+        <audio id="recPreview" controls style="width: 100%; height: 32px; border-radius: 6px;"></audio>
+        <button id="btnUseRec" class="primary" style="width: 100%; margin-top: 8px; padding: 10px;">✅ Usar Minha Voz Gravada no Episódio</button>
+      </div>
+      <div style="margin-top: 10px; text-align: center;">
+        <label style="font-size: 11px; color: #64748b; cursor: pointer; text-decoration: underline;">
+          📁 Ou carregar arquivo de áudio (MP3/WAV/M4A)
+          <input type="file" id="fileUpload" accept="audio/*" style="display: none;">
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <audio id="audio" src="./audio/cena01_mix.mp3" preload="auto"></audio>
+
+  <script src="./audio/cena01_timeline.js"></script>
+  <script src="./characters/VoceMorador.js"></script>
+  <script src="./characters/SeuValdirPorteiro.js"></script>
+  <script src="./scenarios/PortariaBlocoC.js"></script>
+  <script src="./engine/CameraRig2D.js"></script>
+
+  <script>
+    const W = 1080;
+    const H = 1920;
+    const canvas = document.getElementById('stage');
+    const ctx = canvas.getContext('2d');
+    const audio = document.getElementById('audio');
+    const T = window.CENA01;
+
+    const scenario = new window.StudioScenarios.PortariaBlocoC({ fogDensity: 0.35 });
+    const voce = new window.StudioCharacters.VoceMorador({ x: 1600, y: 570, scale: 1.05, emotion: 'neutral', pose: 'phone_look' });
+    const valdir = new window.StudioCharacters.SeuValdirPorteiro({ x: 330, y: 445, scale: 0.95, emotion: 'neutral', pose: 'hands_desk' });
+    const cam = new window.StudioEngine.CameraRig2D(W, H);
+
+    window.voce = voce;
+    window.valdir = valdir;
+    window.cam = cam;
+    window.scenario = scenario;
+
+    // ---------- Linha do tempo derivada do áudio real ----------
+    const narrWords = T.words.filter(w => w.spk === 'NARR');
+    const masWord = narrWords.find(w => w.w.toLowerCase().startsWith('mas'));
+    const tB = masWord ? masWord.t : T.narrEnd * 0.55;
+    const tC = T.narrEnd + 0.25;
+    const sumiuWord = narrWords.find(w => w.w.toLowerCase().startsWith('sumiu'));
+    const tBlackout = sumiuWord ? sumiuWord.t : T.narrEnd - 1.5;
+    const tQuestion = (T.valdirEnd || 25.5) + 0.3;
+    const TOTAL_DURATION = T.duration || (tQuestion + 13.7);
+
+    // Velocidade no chão casada com o ciclo de passada (zero pé deslizando)
+    const WALK_RATE = 4.6 * 0.85;               // rad/s do ciclo
+    const STRIDE_PER_CYCLE = 149;               // px percorridos por ciclo completo (escala 1)
+    const GROUND_SPEED = (WALK_RATE / (2 * Math.PI)) * STRIDE_PER_CYCLE * voce.scale;
+    const STOP_X = 1000;
+    const START_X = STOP_X + GROUND_SPEED * tB;
+
+    // Legendas: blocos de até 3 palavras do mesmo falante
+    const chunks = [];
+    T.words.forEach((w) => {
+      const last = chunks[chunks.length - 1];
+      if (last && last.spk === w.spk && last.words.length < 3 && w.t - (last.end) < 0.6) {
+        last.words.push(w);
+        last.end = w.t + w.d;
+      } else {
+        chunks.push({ spk: w.spk, words: [w], start: w.t, end: w.t + w.d });
+      }
+    });
+
+    let playing = false;
+    let t = 0;
+    let shot = '';
+    let showSafe = false;
+    let showSubs = true;
+    let lastStepIdx = -1;
+
+    // ---------- Áudio ambiente (Web Audio): chuva, passos, drone, chiado ----------
+    let ac = null;
+    let rainGain = null;
+    let droneGain = null;
+    function initAudio() {
+      if (ac) return;
+      ac = new (window.AudioContext || window.webkitAudioContext)();
+      const len = ac.sampleRate * 2;
+      const buf = ac.createBuffer(1, len, ac.sampleRate);
+      const d = buf.getChannelData(0);
+      let b0 = 0, b1 = 0, b2 = 0;
+      for (let i = 0; i < len; i++) {
+        const wn = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + wn * 0.0555179;
+        b1 = 0.99332 * b1 + wn * 0.0750759;
+        b2 = 0.969 * b2 + wn * 0.153852;
+        d[i] = (b0 + b1 + b2) * 0.09;
+      }
+      const src = ac.createBufferSource();
+      src.buffer = buf;
+      src.loop = true;
+      const lp = ac.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 1500;
+      rainGain = ac.createGain();
+      rainGain.gain.value = 0.0;
+      src.connect(lp).connect(rainGain).connect(ac.destination);
+      src.start();
+
+      const osc = ac.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = 52;
+      droneGain = ac.createGain();
+      droneGain.gain.value = 0;
+      osc.connect(droneGain).connect(ac.destination);
+      osc.start();
+    }
+    function sfxStep() {
+      if (!ac) return;
+      const now = ac.currentTime;
+      const len = Math.floor(ac.sampleRate * 0.06);
+      const buf = ac.createBuffer(1, len, ac.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+      const s = ac.createBufferSource();
+      s.buffer = buf;
+      const bp = ac.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = 900 + Math.random() * 300; // "plec" de chinelo
+      bp.Q.value = 1.2;
+      const g = ac.createGain();
+      g.gain.value = 0.35;
+      s.connect(bp).connect(g).connect(ac.destination);
+      s.start(now);
+    }
+    function sfxStatic() {
+      if (!ac) return;
+      const len = Math.floor(ac.sampleRate * 0.5);
+      const buf = ac.createBuffer(1, len, ac.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len) * 0.25;
+      const s = ac.createBufferSource();
+      s.buffer = buf;
+      const hp = ac.createBiquadFilter();
+      hp.type = 'highpass';
+      hp.frequency.value = 2500;
+      s.connect(hp).connect(ac.destination);
+      s.start();
+    }
+    function setAmbience(rain, drone) {
+      if (!ac) return;
+      rainGain.gain.setTargetAtTime(rain, ac.currentTime, 0.3);
+      droneGain.gain.setTargetAtTime(drone, ac.currentTime, 0.6);
+    }
+
+    // ---------- Elementos da Pergunta Final Interativa ----------
+    const decisionOverlay = document.getElementById('decisionOverlay');
+    const decisionTimerBar = document.getElementById('decisionTimerBar');
+    const decisionCountdownText = document.getElementById('decisionCountdownText');
+    const voteFeedback = document.getElementById('voteFeedback');
+
+    function showQuestionUI() {
+      decisionOverlay.style.display = 'flex';
+    }
+
+    function hideQuestionUI() {
+      decisionOverlay.style.display = 'none';
+      resetQuestionUI();
+    }
+
+    function resetQuestionUI() {
+      document.getElementById('cardOpt1').classList.remove('selected');
+      document.getElementById('cardOpt2').classList.remove('selected');
+      document.getElementById('pctLabel1').style.display = 'none';
+      document.getElementById('pctLabel2').style.display = 'none';
+      document.getElementById('barWrap1').style.display = 'none';
+      document.getElementById('barWrap2').style.display = 'none';
+      voteFeedback.style.display = 'none';
+    }
+
+    function updateQuestionTimer() {
+      const remain = Math.max(0, TOTAL_DURATION - t);
+      const totalDecisionWindow = Math.max(1, TOTAL_DURATION - tQuestion);
+      const pct = Math.min(100, Math.max(0, (remain / totalDecisionWindow) * 100));
+      decisionTimerBar.style.width = pct + '%';
+      decisionCountdownText.textContent = `⏳ ${remain.toFixed(1)}s PARA DECIDIR`;
+    }
+
+    window.voteOption = function(num) {
+      document.getElementById('cardOpt1').classList.toggle('selected', num === 1);
+      document.getElementById('cardOpt2').classList.toggle('selected', num === 2);
+
+      const emoji = num === 1 ? '🏃‍♂️' : '🛡️';
+      voteFeedback.style.display = 'block';
+      voteFeedback.innerHTML = `Escolha selecionada: <b>${emoji}</b>! Comente nos comentários para definir o Episódio 2.`;
+    };
+
+    // ---------- Direção da cena (tudo calculado a partir de t) ----------
+    let blackoutFired = false;
+    function direct(dt) {
+      if (t < tB) {
+        // PLANO A — caminhada lateral em perfil 2.5D, plano médio
+        if (shot !== 'A') {
+          shot = 'A';
+          voce.viewMode = 'profile';
+          voce.pose = 'phone_look';
+          voce.emotion = 'neutral';
+          scenario.streetBlackout = false;
+          scenario.fogDensity = 0.35;
+          blackoutFired = false;
+          cam.cut(START_X - 60, 640, 2.9);
+          setAmbience(0.16, 0.0);
+          hideQuestionUI();
+        }
+        voce.isWalking = true;
+        voce.walkSpeed = 0.85;
+        voce.flipX = true;
+        voce.walkCycle = (t * WALK_RATE) % (Math.PI * 2);
+        voce.x = START_X - GROUND_SPEED * t;
+        cam.cut(voce.x - 60, 640, 2.9);
+
+        const stepIdx = Math.floor((t * WALK_RATE + Math.PI / 2) / Math.PI);
+        if (playing && stepIdx !== lastStepIdx) sfxStep();
+        lastStepIdx = stepIdx;
+      } else if (t < tC) {
+        // PLANO B — corte frontal, parada brusca na eclusa; push-in com neblina e blackout
+        if (shot !== 'B') {
+          shot = 'B';
+          voce.stop();
+          voce.viewMode = 'front';
+          voce.x = STOP_X;
+          voce.flipX = false;
+          voce.pose = 'step_back';
+          voce.emotion = 'shocked';
+          cam.cut(STOP_X, 560, 2.3);
+          setAmbience(0.22, 0.05);
+          hideQuestionUI();
+        }
+        const k = Math.min(1.0, Math.max(0, (t - tB) / (tC - tB)));
+        cam.cut(STOP_X, 560 - k * 20, 2.3 + k * 0.5);
+        scenario.fogDensity = 0.35 + k * 0.65;
+        if (t >= tBlackout && !blackoutFired) {
+          blackoutFired = true;
+          scenario.streetBlackout = true;
+          if (playing) sfxStatic();
+        }
+        if (t < tBlackout) scenario.streetBlackout = false;
+      } else if (t < tQuestion) {
+        // PLANO C — Corte Cinematográfico na Guarita: Seu Valdir olha o monitor e fala no rádio HT
+        if (shot !== 'C') {
+          shot = 'C';
+          scenario.streetBlackout = true;
+          scenario.fogDensity = 1;
+          valdir.pose = 'point_monitors';
+          valdir.emotion = 'worried';
+          cam.cut(275, 410, 3.35); // Enquadramento centralizado: Seu Valdir e os 4 monitores sem cortes!
+          setAmbience(0.1, 0.07);
+          hideQuestionUI();
+        }
+        if (t >= T.valdirStart - 0.25) {
+          valdir.pose = 'radio_talk';
+          valdir.emotion = 'panicked';
+          const kValdir = Math.min(1.0, Math.max(0, (t - T.valdirStart) / 12.0));
+          cam.cut(275 + kValdir * 10, 410 - kValdir * 6, 3.35 + kValdir * 0.25);
+        } else {
+          cam.cut(275, 410, 3.35);
+        }
+      } else {
+        // PLANO D — PERGUNTA FINAL INTERATIVA ("VOCÊ DECIDE O FIM")
+        if (shot !== 'D') {
+          shot = 'D';
+          scenario.alarmActive = true;
+          valdir.pose = 'radio_talk';
+          valdir.emotion = 'panicked';
+          cam.cut(285, 420, 2.8);
+          setAmbience(0.06, 0.22);
+          showQuestionUI();
+        }
+        updateQuestionTimer();
+      }
+
+      document.getElementById('beatA').classList.toggle('active', shot === 'A');
+      document.getElementById('beatB').classList.toggle('active', shot === 'B');
+      document.getElementById('beatC').classList.toggle('active', shot === 'C');
+      document.getElementById('beatD').classList.toggle('active', shot === 'D');
+    }
+
+    // ---------- Render ----------
+    function drawWorld() {
+      cam.beginFrame(ctx);
+      scenario.drawBackground(ctx, (cam.fx - 960) * 0.5);
+      scenario.drawMidground(ctx);
+      valdir.draw(ctx);
+      scenario.drawGuaritaFore(ctx);
+      scenario.drawFloor(ctx);
+      voce.draw(ctx);
+      scenario.drawForeground(ctx);
+      cam.endFrame(ctx);
+    }
+
+    function drawClock() {
+      if (t >= tQuestion) return;
+      ctx.save();
+      ctx.fillStyle = 'rgba(2, 6, 23, 0.75)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(60, 110, 240, 58, 14);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(88, 139, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '700 30px "JetBrains Mono", monospace';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('TER 23:42', 108, 140);
+      ctx.restore();
+    }
+
+    function drawSubtitles() {
+      if (!showSubs || t >= tQuestion) return;
+      let cur = null;
+      for (let i = 0; i < chunks.length; i++) {
+        const c = chunks[i];
+        const next = chunks[i + 1];
+        const until = next ? Math.min(next.start, c.end + 0.5) : c.end + 0.5;
+        if (t >= c.start && t < until) { cur = c; break; }
+      }
+      if (!cur) return;
+      ctx.save();
+      ctx.font = '900 76px Inter, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.lineJoin = 'round';
+      const parts = cur.words.map(w => w.w.toUpperCase());
+      const space = 22;
+      const widths = parts.map(p => ctx.measureText(p).width);
+      const total = widths.reduce((a, b) => a + b, 0) + space * (parts.length - 1);
+      let x = (W - total) / 2;
+      const y = 1380;
+      parts.forEach((p, i) => {
+        const w = cur.words[i];
+        const active = t >= w.t && t < w.t + Math.max(w.d, 0.12) + 0.05;
+        ctx.lineWidth = 14;
+        ctx.strokeStyle = '#000';
+        ctx.strokeText(p, x, y);
+        const base = cur.spk === 'VALDIR' ? '#fde047' : '#ffffff';
+        ctx.fillStyle = active ? '#38bdf8' : base;
+        ctx.fillText(p, x, active ? y - 4 : y);
+        x += widths[i] + space;
+      });
+      ctx.restore();
+    }
+
+    function drawSafeZone() {
+      if (!showSafe) return;
+      ctx.save();
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.22)';
+      ctx.fillRect(0, 0, W, 200);            // abas do topo
+      ctx.fillRect(W - 150, 820, 150, 820);  // botões laterais
+      ctx.fillRect(0, 1560, W, 360);         // descrição/música
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.8)';
+      ctx.setLineDash([14, 10]);
+      ctx.lineWidth = 3;
+      ctx.strokeRect(60, 200, W - 210, 1360);
+      ctx.restore();
+    }
+
+    function drawStartOverlay() {
+      if (document.body.classList.contains('render-mode')) return;
+      if (playing || t > 0) return;
+      ctx.save();
+      ctx.fillStyle = 'rgba(2, 6, 23, 0.55)';
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#fff';
+      ctx.font = '800 60px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('▶ Toque para assistir', W / 2, H / 2);
+      ctx.restore();
+    }
+
+    // ---------- Loop de Renderização 60fps com Clock de Alta Precisão ----------
+    const isRenderMode = new URLSearchParams(window.location.search).has('render');
+    if (isRenderMode) {
+      document.body.classList.add('render-mode');
+    }
+
+    let last = performance.now();
+    let customAudio = null;
+
+    function frame(now) {
+      if (isRenderMode) return;
+      if (!now) now = performance.now();
+      const dt = Math.min(0.05, Math.max(0.001, (now - last) / 1000));
+      last = now;
+
+      if (playing) {
+        const activeAudio = customAudio || audio;
+        if (activeAudio && !activeAudio.paused && !activeAudio.ended && activeAudio.currentTime > 0) {
+          t = activeAudio.currentTime;
+        } else {
+          t += dt;
+        }
+
+        if (t >= TOTAL_DURATION) {
+          t = TOTAL_DURATION;
+          pause();
+        }
+      }
+
+      direct(dt);
+      cam.update(dt);
+      scenario.update(dt);
+
+      const f = Math.min(T.open.length - 1, Math.max(0, Math.floor(t * T.fps)));
+      const speaking = playing || t > 0;
+      const keepCycle = voce.walkCycle;
+      voce.update(dt, 0, 0.5); // narração é voz-off: a boca do Você fica fechada
+      if (shot === 'A') voce.walkCycle = keepCycle;
+      valdir.update(dt, speaking ? T.open[f] : 0, T.wide[f]);
+
+      ctx.clearRect(0, 0, W, H);
+      drawWorld();
+      drawClock();
+      drawSubtitles();
+      drawSafeZone();
+      drawStartOverlay();
+
+      document.getElementById('fill').style.width = (t / TOTAL_DURATION) * 100 + '%';
+      document.getElementById('time').textContent = `${t.toFixed(1)}s / ${TOTAL_DURATION.toFixed(1)}s`;
+      requestAnimationFrame(frame);
+    }
+
+    // ---------- Controles de Reprodução Robustos (Zero Falhas) ----------
+    function play() {
+      playing = true;
+      document.getElementById('btnPlay').textContent = '⏸ Pausar';
+      document.getElementById('btnPlay').classList.add('on');
+
+      try {
+        initAudio();
+        if (ac && ac.state === 'suspended') ac.resume();
+      } catch (err) {
+        console.warn('WebAudio init notice:', err);
+      }
+
+      if (t >= TOTAL_DURATION - 0.05) seek(0);
+
+      const activeAudio = customAudio || audio;
+      try {
+        activeAudio.currentTime = Math.min(activeAudio.duration || 0, t);
+        const p = activeAudio.play();
+        if (p && p.catch) {
+          p.catch(err => {
+            console.warn('Audio play notice (clock fallback ativo):', err);
+          });
+        }
+      } catch (err) {
+        console.warn('Audio notice:', err);
+      }
+    }
+
+    function pause() {
+      playing = false;
+      document.getElementById('btnPlay').textContent = '▶ Play';
+      document.getElementById('btnPlay').classList.remove('on');
+      try { if (customAudio) customAudio.pause(); } catch(e) {}
+      try { if (audio) audio.pause(); } catch(e) {}
+      setAmbience(0, 0);
+    }
+
+    function seek(sec) {
+      t = Math.max(0, Math.min(TOTAL_DURATION, sec));
+      try { if (customAudio) customAudio.currentTime = Math.min(customAudio.duration || 0, t); } catch(e) {}
+      try { if (audio) audio.currentTime = Math.min(audio.duration || 0, t); } catch(e) {}
+      shot = '';
+      lastStepIdx = -1;
+      if (t < tQuestion) hideQuestionUI();
+    }
+    window.seek = seek;
+
+    window.renderAt = function(sec) {
+      t = Math.max(0, Math.min(TOTAL_DURATION, sec));
+      const dt = 1 / 30;
+      direct(dt);
+      cam.update(dt);
+      scenario.update(dt);
+
+      const f = Math.min(T.open.length - 1, Math.max(0, Math.floor(t * T.fps)));
+      const speaking = true;
+      const keepCycle = voce.walkCycle;
+      voce.update(dt, 0, 0.5);
+      if (shot === 'A') voce.walkCycle = keepCycle;
+      valdir.update(dt, speaking ? T.open[f] : 0, T.wide[f]);
+
+      ctx.clearRect(0, 0, W, H);
+      drawWorld();
+      drawClock();
+      drawSubtitles();
+
+      // Mantém ambas as escolhas 100% abertas e visíveis durante todo o final do vídeo (sem mostrar resultado antecipado!)
+      resetQuestionUI();
+    };
+    window.renderDeterministicFrame = window.renderAt;
+    window._debugState = () => ({ t, shot, START_X, STOP_X, tB, GROUND_SPEED, voce_x: voce.x, voce_y: voce.y, cam_fx: cam.fx, cam_fy: cam.fy, cam_zoom: cam.zoom });
+
+    document.getElementById('btnPlay').onclick = () => (playing ? pause() : play());
+    canvas.onclick = () => (playing ? pause() : play());
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') { e.preventDefault(); playing ? pause() : play(); }
+    });
+    document.getElementById('btnRestart').onclick = () => { seek(0); play(); };
+    document.getElementById('track').onclick = (e) => {
+      const r = e.currentTarget.getBoundingClientRect();
+      seek(((e.clientX - r.left) / r.width) * TOTAL_DURATION);
+    };
+    document.getElementById('btnSafe').onclick = (e) => {
+      showSafe = !showSafe;
+      e.currentTarget.classList.toggle('on', showSafe);
+    };
+    document.getElementById('btnSubs').onclick = (e) => {
+      showSubs = !showSubs;
+      e.currentTarget.classList.toggle('on', showSubs);
+    };
+
+    // ---------- Gravador de Voz Real do Usuário (Microfone + Upload) ----------
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let recTimer = null;
+    let recStartTime = 0;
+    let recAudioBlob = null;
+    let recAnalyser = null;
+    let recAnimId = null;
+
+    const btnRecord = document.getElementById('btnRecord');
+    const btnStopRecord = document.getElementById('btnStopRecord');
+    const recBadge = document.getElementById('recBadge');
+    const vuMeter = document.getElementById('vuMeter');
+    const vuFill = document.getElementById('vuFill');
+    const recPlayerBox = document.getElementById('recPlayerBox');
+    const recPreview = document.getElementById('recPreview');
+    const btnUseRec = document.getElementById('btnUseRec');
+    const fileUpload = document.getElementById('fileUpload');
+
+    btnRecord.onclick = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        recordedChunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaStreamSource(stream);
+        recAnalyser = audioCtx.createAnalyser();
+        recAnalyser.fftSize = 256;
+        source.connect(recAnalyser);
+
+        function updateVU() {
+          const data = new Uint8Array(recAnalyser.frequencyBinCount);
+          recAnalyser.getByteFrequencyData(data);
+          const avg = data.reduce((a, b) => a + b, 0) / data.length;
+          vuFill.style.width = Math.min(100, (avg / 128) * 100) + '%';
+          if (mediaRecorder && mediaRecorder.state === 'recording') {
+            recAnimId = requestAnimationFrame(updateVU);
+          }
+        }
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) recordedChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          cancelAnimationFrame(recAnimId);
+          stream.getTracks().forEach(tr => tr.stop());
+          recAudioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+          const audioUrl = URL.createObjectURL(recAudioBlob);
+          recPreview.src = audioUrl;
+          recPlayerBox.style.display = 'block';
+          vuMeter.style.display = 'none';
+          recBadge.textContent = 'GRAVADO!';
+          recBadge.style.color = '#10b981';
+          recBadge.style.background = 'rgba(16, 185, 129, 0.2)';
+        };
+
+        mediaRecorder.start(100);
+        recStartTime = Date.now();
+        btnRecord.style.display = 'none';
+        btnStopRecord.style.display = 'block';
+        vuMeter.style.display = 'block';
+        recBadge.textContent = 'GRAVANDO...';
+        recBadge.style.color = '#ef4444';
+        recBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+
+        recTimer = setInterval(() => {
+          const elapsed = Math.floor((Date.now() - recStartTime) / 1000);
+          btnStopRecord.textContent = `⏹ Parar (${elapsed < 10 ? '0' : ''}${elapsed}s)`;
+        }, 500);
+
+        recAnimId = requestAnimationFrame(updateVU);
+      } catch (err) {
+        alert('Não foi possível acessar o microfone: ' + err.message);
+      }
+    };
+
+    btnStopRecord.onclick = () => {
+      clearInterval(recTimer);
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+      }
+      btnStopRecord.style.display = 'none';
+      btnRecord.style.display = 'block';
+      btnRecord.textContent = '🔴 Gravar Novamente';
+    };
+
+    btnUseRec.onclick = () => {
+      if (!recAudioBlob) return;
+      applyNewVoice(recAudioBlob, 'Sua Voz Gravada');
+    };
+
+    fileUpload.onchange = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) {
+        applyNewVoice(file, file.name);
+      }
+    };
+
+    function applyNewVoice(blobOrFile, label) {
+      const audioUrl = URL.createObjectURL(blobOrFile);
+      if (customAudio) {
+        try { customAudio.pause(); } catch(e) {}
+      }
+      customAudio = new Audio(audioUrl);
+      customAudio.preload = 'auto';
+
+      recBadge.textContent = 'VOZ ATIVA!';
+      recBadge.style.color = '#38bdf8';
+      recBadge.style.background = 'rgba(56, 189, 248, 0.2)';
+      btnUseRec.textContent = `✅ ${label} Ativa no Episódio!`;
+      btnUseRec.style.background = '#0284c7';
+
+      seek(0);
+      play();
+    }
+
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>

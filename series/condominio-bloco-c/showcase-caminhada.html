@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Showcase de Caminhada Lateral 2D — Condomínio Bloco C</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #030712; color: #f8fafc; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#030712] text-slate-100">
+  <!-- Barra de Topo -->
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center font-black text-xl shadow-lg shadow-cyan-500/20">
+        🚶‍♂️
+      </div>
+      <div>
+        <h1 class="text-lg font-bold flex items-center gap-2">
+          Laboratório Biomecânico de Caminhada Lateral (60 FPS)
+          <span class="text-xs bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded-full font-mono">v16 Rigs 2D</span>
+        </h1>
+        <p class="text-xs text-slate-400">Inspeção anatômica, cinemática de passos e consistência visual</p>
+      </div>
+    </div>
+
+    <!-- Links Rápidos -->
+    <div class="flex items-center gap-2">
+      <a href="/clone" class="px-3.5 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
+        <span>🎙️</span> Clonar Minha Voz (VoiceStudio)
+      </a>
+      <a href="/series/condominio-bloco-c/estudio-aprovacao-visual.html" class="px-3.5 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
+        <span>🎬</span> Cena Completa
+      </a>
+      <a href="/hub-projetos.html" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition">
+        <span>🚀</span> Hub de Projetos
+      </a>
+    </div>
+  </header>
+
+  <!-- Corpo Principal -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <!-- Painel de Controles e Seleção (Esquerda) -->
+    <div class="lg:col-span-1 space-y-4">
+      <!-- Seletor de Personagem -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
+          <span>👥</span> Personagens do Elenco
+        </h2>
+        <div class="space-y-2" id="char-buttons">
+          <button onclick="selectChar('voce')" id="btn-char-voce" class="w-full text-left p-3 rounded-xl border bg-cyan-500/15 border-cyan-500/50 text-white font-bold text-sm flex items-center justify-between transition">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl">👤</span>
+              <div>
+                <p class="leading-tight">Você (Morador 302)</p>
+                <p class="text-[11px] text-cyan-300 font-normal">Moletom, bermuda, Havaianas</p>
+              </div>
+            </div>
+            <span class="text-xs text-cyan-400 font-mono">Ativo</span>
+          </button>
+
+          <button onclick="selectChar('valdir')" id="btn-char-valdir" class="w-full text-left p-3 rounded-xl border bg-slate-800/40 border-slate-700/60 text-slate-300 hover:text-white hover:bg-slate-800 font-medium text-sm flex items-center justify-between transition">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl">👮‍♂️</span>
+              <div>
+                <p class="leading-tight">Seu Valdir (Porteiro)</p>
+                <p class="text-[11px] text-slate-400 font-normal">61 anos, óculos, chaves, HT</p>
+              </div>
+            </div>
+          </button>
+
+          <button onclick="selectChar('lucas')" id="btn-char-lucas" class="w-full text-left p-3 rounded-xl border bg-slate-800/40 border-slate-700/60 text-slate-300 hover:text-white hover:bg-slate-800 font-medium text-sm flex items-center justify-between transition">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl">🛵</span>
+              <div>
+                <p class="leading-tight">Lucas (Entregador)</p>
+                <p class="text-[11px] text-slate-400 font-normal">Capacete, Bag vermelha, botas</p>
+              </div>
+            </div>
+          </button>
+
+          <button onclick="selectChar('camila')" id="btn-char-camila" class="w-full text-left p-3 rounded-xl border bg-slate-800/40 border-slate-700/60 text-slate-300 hover:text-white hover:bg-slate-800 font-medium text-sm flex items-center justify-between transition">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl">🐕</span>
+              <div>
+                <p class="leading-tight">Camila & Paçoca</p>
+                <p class="text-[11px] text-slate-400 font-normal">Coque alto + Caramelo 4 patas</p>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modo de Visualização -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
+          <span>🎥</span> Modo de Câmera / Ângulo
+        </h2>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="setViewMode('profile', true)" id="btn-view-walk" class="p-2.5 rounded-xl border bg-cyan-500/20 border-cyan-500 text-cyan-300 font-bold text-xs flex flex-col items-center gap-1 transition">
+            <span class="text-lg">🚶‍♂️</span>
+            <span>Andando Lado</span>
+          </button>
+          <button onclick="setViewMode('profile', false)" id="btn-view-idle" class="p-2.5 rounded-xl border bg-slate-800/40 border-slate-700 text-slate-400 font-medium text-xs flex flex-col items-center gap-1 hover:text-white transition">
+            <span class="text-lg">🧍</span>
+            <span>Parado Lado</span>
+          </button>
+          <button onclick="setViewMode('front', false)" id="btn-view-front" class="col-span-2 p-2.5 rounded-xl border bg-slate-800/40 border-slate-700 text-slate-400 font-medium text-xs flex items-center justify-center gap-2 hover:text-white transition">
+            <span class="text-lg">🎯</span>
+            <span>Visão Frontal (Comparar Identidade)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Controles de Playback & Velocidade -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Cinemática</span>
+          <button onclick="toggleDirection()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 font-mono transition">
+            Inverter Direção ↔️
+          </button>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs text-slate-400 mb-1">
+            <span>Velocidade do Passo:</span>
+            <span id="speed-val" class="font-mono text-cyan-400">1.0x</span>
+          </div>
+          <input type="range" id="speed-slider" min="0.2" max="2.0" step="0.1" value="1.0" class="w-full accent-cyan-400 bg-slate-800 rounded cursor-pointer" oninput="updateSpeed(this.value)">
+          <div class="flex justify-between text-[10px] text-slate-500 font-mono mt-0.5">
+            <span>0.2x (Slow Motion)</span>
+            <span>1.0x (Normal)</span>
+            <span>2.0x (Corrida)</span>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <button onclick="togglePlay()" id="btn-play" class="flex-1 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition">
+            <span id="play-icon">⏸️</span>
+            <span id="play-text">Pausar</span>
+          </button>
+          <button onclick="stepFrame()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition">
+            Frame ⏭️
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas Central de Visualização (Direita) -->
+    <div class="lg:col-span-3 space-y-4">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 shadow-2xl relative overflow-hidden flex flex-col items-center">
+        <!-- Grade de Fundo Suave -->
+        <div class="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none"></div>
+
+        <!-- Canvas -->
+        <canvas id="viewCanvas" width="900" height="520" class="w-full max-w-[900px] h-auto rounded-2xl bg-[#090d16] border border-slate-800 shadow-inner relative z-10"></canvas>
+
+        <!-- Legenda Inferior de Telemetria Biomecânica -->
+        <div class="w-full max-w-[900px] mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
+          <div class="bg-slate-950/70 border border-slate-800 p-2.5 rounded-xl">
+            <span class="text-slate-500 block text-[10px] uppercase">Personagem</span>
+            <span id="hud-name" class="text-cyan-300 font-bold">Você (Morador 302)</span>
+          </div>
+          <div class="bg-slate-950/70 border border-slate-800 p-2.5 rounded-xl">
+            <span class="text-slate-500 block text-[10px] uppercase">Ângulo / Visão</span>
+            <span id="hud-view" class="text-emerald-400 font-bold">Perfil 2.5D (Andando)</span>
+          </div>
+          <div class="bg-slate-950/70 border border-slate-800 p-2.5 rounded-xl">
+            <span class="text-slate-500 block text-[10px] uppercase">Fase do Ciclo (φ)</span>
+            <span id="hud-phase" class="text-purple-400 font-bold">0.00 rad</span>
+          </div>
+          <div class="bg-slate-950/70 border border-slate-800 p-2.5 rounded-xl">
+            <span class="text-slate-500 block text-[10px] uppercase">Flexão Joelho / Impacto</span>
+            <span id="hud-knee" class="text-amber-400 font-bold">Dinâmica 60fps</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Caixa de Destaque das Melhorias Implementadas -->
+      <div class="bg-gradient-to-r from-cyan-950/30 to-blue-950/30 border border-cyan-800/40 rounded-2xl p-4 text-xs text-slate-300 space-y-1.5">
+        <div class="font-bold text-cyan-300 flex items-center gap-1.5 text-sm">
+          <span>✨</span> Melhorias Biomecânicas Aplicadas:
+        </div>
+        <ul class="list-disc list-inside space-y-1 text-slate-400">
+          <li><strong class="text-slate-200">Silhueta Bézier Suave:</strong> Eliminação de ângulos triangulares duros no nariz, queixo e mandíbula.</li>
+          <li><strong class="text-slate-200">Flexão Natural do Joelho:</strong> Joelhos dobram para trás na fase de passagem, eliminando a perna de pau mecânica.</li>
+          <li><strong class="text-slate-200">Gravidade no Chinelo Havaianas:</strong> O solado descola levemente do calcanhar quando o pé está no ar.</li>
+          <li><strong class="text-slate-200">Todos os Personagens Articulados de Lado:</strong> Seu Valdir (colete e chaves), Lucas (mochila de entrega e capacete), Camila (coque e legging) e Paçoca (trote de 4 patas).</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts dos Personagens -->
+  <script src="/series/condominio-bloco-c/characters/VoceMorador.js"></script>
+  <script src="/series/condominio-bloco-c/characters/SeuValdirPorteiro.js"></script>
+  <script src="/series/condominio-bloco-c/characters/LucasEntregador.js"></script>
+  <script src="/series/condominio-bloco-c/characters/CamilaEPacoca.js"></script>
+
+  <!-- Script do Showcase -->
+  <script>
+    const canvas = document.getElementById('viewCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let isPlaying = true;
+    let walkSpeed = 1.0;
+    let currentCharKey = 'voce';
+    let currentView = 'profile';
+    let isWalking = true;
+    let isFlipped = false;
+
+    // Instanciação de todos os personagens com enquadramento perfeito (pés no piso)
+    const characters = {
+      voce: new StudioCharacters.VoceMorador({ x: 450, y: 205, scale: 1.45, viewMode: 'profile', isWalking: true }),
+      valdir: new StudioCharacters.SeuValdirPorteiro({ x: 450, y: 205, scale: 1.45, viewMode: 'profile', isWalking: true }),
+      lucas: new StudioCharacters.LucasEntregador({ x: 450, y: 205, scale: 1.45, viewMode: 'profile', isWalking: true }),
+      camila: new StudioCharacters.CamilaEPacoca({ x: 500, y: 205, scale: 1.45, viewMode: 'profile', isWalking: true, showDog: true })
+    };
+
+    function selectChar(key) {
+      currentCharKey = key;
+      // Atualizar botões
+      ['voce', 'valdir', 'lucas', 'camila'].forEach(k => {
+        const btn = document.getElementById('btn-char-' + k);
+        if (k === key) {
+          btn.className = 'w-full text-left p-3 rounded-xl border bg-cyan-500/15 border-cyan-500/50 text-white font-bold text-sm flex items-center justify-between transition';
+        } else {
+          btn.className = 'w-full text-left p-3 rounded-xl border bg-slate-800/40 border-slate-700/60 text-slate-300 hover:text-white hover:bg-slate-800 font-medium text-sm flex items-center justify-between transition';
+        }
+      });
+      applyCurrentState();
+    }
+
+    function setViewMode(view, walk) {
+      currentView = view;
+      isWalking = walk;
+
+      const btnWalk = document.getElementById('btn-view-walk');
+      const btnIdle = document.getElementById('btn-view-idle');
+      const btnFront = document.getElementById('btn-view-front');
+
+      btnWalk.className = (view === 'profile' && walk) ? 'p-2.5 rounded-xl border bg-cyan-500/20 border-cyan-500 text-cyan-300 font-bold text-xs flex flex-col items-center gap-1 transition' : 'p-2.5 rounded-xl border bg-slate-800/40 border-slate-700 text-slate-400 font-medium text-xs flex flex-col items-center gap-1 hover:text-white transition';
+      btnIdle.className = (view === 'profile' && !walk) ? 'p-2.5 rounded-xl border bg-cyan-500/20 border-cyan-500 text-cyan-300 font-bold text-xs flex flex-col items-center gap-1 transition' : 'p-2.5 rounded-xl border bg-slate-800/40 border-slate-700 text-slate-400 font-medium text-xs flex flex-col items-center gap-1 hover:text-white transition';
+      btnFront.className = (view === 'front') ? 'col-span-2 p-2.5 rounded-xl border bg-cyan-500/20 border-cyan-500 text-cyan-300 font-bold text-xs flex items-center justify-center gap-2 transition' : 'col-span-2 p-2.5 rounded-xl border bg-slate-800/40 border-slate-700 text-slate-400 font-medium text-xs flex items-center justify-center gap-2 hover:text-white transition';
+
+      applyCurrentState();
+    }
+
+    function toggleDirection() {
+      isFlipped = !isFlipped;
+      characters[currentCharKey].flipX = isFlipped;
+    }
+
+    function updateSpeed(val) {
+      walkSpeed = parseFloat(val);
+      document.getElementById('speed-val').textContent = walkSpeed.toFixed(1) + 'x';
+      applyCurrentState();
+    }
+
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      document.getElementById('play-icon').textContent = isPlaying ? '⏸️' : '▶️';
+      document.getElementById('play-text').textContent = isPlaying ? 'Pausar' : 'Reproduzir';
+    }
+
+    function stepFrame() {
+      isPlaying = false;
+      document.getElementById('play-icon').textContent = '▶️';
+      document.getElementById('play-text').textContent = 'Reproduzir';
+      characters[currentCharKey].update(1 / 30);
+      drawScene();
+    }
+
+    function applyCurrentState() {
+      const char = characters[currentCharKey];
+      char.viewMode = currentView;
+      char.isWalking = isWalking;
+      char.walkSpeed = walkSpeed;
+      char.flipX = isFlipped;
+
+      // Atualizar HUD
+      document.getElementById('hud-name').textContent = char.name;
+      document.getElementById('hud-view').textContent = currentView === 'front' ? 'Visão Frontal' : (isWalking ? 'Perfil 2.5D (Andando)' : 'Perfil 2.5D (Parado)');
+    }
+
+    let lastTime = performance.now();
+
+    function renderLoop(time) {
+      const dt = Math.min((time - lastTime) / 1000, 0.1);
+      lastTime = time;
+
+      if (isPlaying) {
+        characters[currentCharKey].update(dt);
+      }
+
+      drawScene();
+      requestAnimationFrame(renderLoop);
+    }
+
+    function drawScene() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Fundo Elegante de Estúdio
+      const bgGrad = ctx.createRadialGradient(450, 260, 50, 450, 260, 460);
+      bgGrad.addColorStop(0, '#111827');
+      bgGrad.addColorStop(1, '#030712');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Linha do Piso Suave
+      ctx.strokeStyle = 'rgba(51, 65, 85, 0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(80, 442);
+      ctx.lineTo(820, 442);
+      ctx.stroke();
+
+      // Grade do Piso em Perspectiva Sutil
+      ctx.strokeStyle = 'rgba(51, 65, 85, 0.15)';
+      for (let i = 120; i <= 780; i += 60) {
+        ctx.beginPath();
+        ctx.moveTo(i, 442);
+        ctx.lineTo(i + (i - 450) * 0.4, 520);
+        ctx.stroke();
+      }
+
+      // Renderizar Personagem Selecionado
+      const char = characters[currentCharKey];
+      char.draw(ctx);
+
+      // Atualizar dados de fase no HUD
+      document.getElementById('hud-phase').textContent = (char.walkCycle || 0).toFixed(2) + ' rad';
+    }
+
+    applyCurrentState();
+    requestAnimationFrame(renderLoop);
+  </script>
+</body>
+</html>

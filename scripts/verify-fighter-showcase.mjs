@@ -9,7 +9,7 @@ const ARTIFACT_DIR = 'C:/Users/Ruan Gomes/.gemini/antigravity/brain/f65a7527-d97
 
 async function main() {
   console.log('\n========================================================================');
-  console.log('🔍 AUDITORIA VISUAL DO PERSONAGEM MODULAR (ESTILO ULTIMATO AI)');
+  console.log('🔍 AUDITORIA VISUAL DO PERSONAGEM MODULAR COM SISTEMAS DE ÓRGÃOS');
   console.log('========================================================================\n');
 
   await mkdir(OUT_DIR, { recursive: true });
@@ -25,7 +25,7 @@ async function main() {
     '--ignore-gpu-blocklist',
     '--no-first-run',
     `--user-data-dir=${tmpDir}`,
-    'http://localhost:5174/fighter-showcase.html'
+    'http://127.0.0.1:5174/fighter-showcase.html'
   ], { stdio: 'ignore' });
 
   try {
@@ -71,25 +71,33 @@ async function main() {
     const audits = [
       {
         name: 'fighter_1_solid_guard',
-        fn: `window.toggleTurntable(); window.setMode('solid'); window.setPose('guard'); window.setCamera('full');`
+        fn: `window.setMode('solid'); window.setPose('guard'); window.setCamera('full');`
       },
       {
-        name: 'fighter_2_xray_chest_ribs',
-        fn: `window.setMode('xray-soft'); window.setCamera('chest');`
+        name: 'fighter_2_xray_cardio_lungs',
+        fn: `window.setMode('xray-soft'); window.setPresetXRay('cardio'); window.setCamera('chest');`
       },
       {
-        name: 'fighter_3_xray_head_brain',
-        fn: `window.setMode('xray-soft'); window.setCamera('head'); window.setPose('shock');`
+        name: 'fighter_3_xray_neuro_brain',
+        fn: `window.setMode('xray-soft'); window.setPresetXRay('neuro'); window.setCamera('head'); window.setPose('shock');`
       },
       {
-        name: 'fighter_4_topdown_90',
-        fn: `window.setMode('xray-soft'); window.setCamera('topdown');`
+        name: 'fighter_4_xray_viscera_digestive',
+        fn: `window.setMode('xray-soft'); window.setPresetXRay('visceral'); window.setCamera('viscera'); window.setPose('relaxed');`
+      },
+      {
+        name: 'fighter_5_xray_complete_all',
+        fn: `window.setMode('xray-soft'); window.setPresetXRay('all'); window.setCamera('full'); window.setPose('guard');`
+      },
+      {
+        name: 'fighter_6_solid_face_close',
+        fn: `window.setMode('solid'); window.setCamera('head'); window.setPose('guard');`
       }
     ];
 
     for (const a of audits) {
       await send('Runtime.evaluate', { expression: a.fn });
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 450));
 
       const screenshot = await send('Page.captureScreenshot', { format: 'png' });
       const buf = Buffer.from(screenshot.data, 'base64');
@@ -110,6 +118,6 @@ async function main() {
 }
 
 main().catch(err => {
-  console.error('❌ Falha na auditoria:', err);
+  console.error('❌ Erro na auditoria visual:', err);
   process.exit(1);
 });

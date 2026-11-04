@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Episódio 02 (9:16 TikTok) — Condomínio Solaris: Bloco C</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #04070e;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      overflow: hidden;
+    }
+    .phone {
+      height: calc(100vh - 40px);
+      aspect-ratio: 9 / 16;
+      border-radius: 26px;
+      overflow: hidden;
+      border: 2px solid rgba(56, 189, 248, 0.3);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+      position: relative;
+      background: #000;
+    }
+    body.render-mode {
+      padding: 0 !important;
+      margin: 0 !important;
+      gap: 0 !important;
+      justify-content: flex-start !important;
+      align-items: flex-start !important;
+      background: #000 !important;
+      width: 1080px !important;
+      height: 1920px !important;
+    }
+    body.render-mode .phone {
+      width: 1080px !important;
+      height: 1920px !important;
+      border-radius: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      aspect-ratio: auto !important;
+    }
+    body.render-mode .panel {
+      display: none !important;
+    }
+    body.render-mode .decision-overlay {
+      padding: 100px 64px !important;
+    }
+    body.render-mode .decision-badge {
+      font-size: 26px !important;
+      padding: 10px 26px !important;
+      border-radius: 999px !important;
+      margin-bottom: 24px !important;
+    }
+    body.render-mode .simple-question-title {
+      font-size: 64px !important;
+      letter-spacing: -1px !important;
+      margin-bottom: 12px !important;
+    }
+    body.render-mode .simple-question-sub {
+      font-size: 28px !important;
+      margin-bottom: 24px !important;
+    }
+    body.render-mode .timer-bar-wrap {
+      max-width: 860px !important;
+      height: 16px !important;
+      margin: 14px auto 14px !important;
+    }
+    body.render-mode .countdown-pill {
+      font-size: 32px !important;
+      margin-bottom: 44px !important;
+    }
+    body.render-mode .choice-card {
+      padding: 36px 40px !important;
+      border-radius: 30px !important;
+      margin-bottom: 30px !important;
+      gap: 32px !important;
+      border-width: 3.5px !important;
+    }
+    body.render-mode .choice-emoji-box {
+      width: 128px !important;
+      height: 128px !important;
+      border-radius: 28px !important;
+      font-size: 72px !important;
+    }
+    body.render-mode .choice-title {
+      font-size: 40px !important;
+    }
+    body.render-mode .choice-desc {
+      font-size: 26px !important;
+      margin-top: 8px !important;
+    }
+    body.render-mode .choice-action-pill {
+      font-size: 28px !important;
+      padding: 8px 22px !important;
+      border-radius: 14px !important;
+      margin-top: 14px !important;
+      gap: 10px !important;
+    }
+    body.render-mode .simple-footer-hint {
+      font-size: 30px !important;
+      padding: 22px 32px !important;
+      border-radius: 20px !important;
+      margin-top: 26px !important;
+    }
+
+    canvas { width: 100%; height: 100%; display: block; cursor: pointer; }
+    .panel {
+      width: 360px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      padding-right: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .panel::-webkit-scrollbar { width: 5px; }
+    .panel::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.25); border-radius: 999px; }
+    .panel::-webkit-scrollbar-track { background: transparent; }
+    .card {
+      background: #0b111e;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+    .card h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #38bdf8;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .row { display: flex; gap: 8px; }
+    button {
+      flex: 1;
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+      font-weight: 700;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+    button:hover { border-color: #38bdf8; }
+    button.primary { background: #10b981; color: #022c22; border-color: #34d399; }
+    button.on { background: #38bdf8; color: #020617; }
+    .voice-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+      padding: 8px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      background: #0f172a;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 8px;
+      cursor: pointer;
+      color: #e2e8f0;
+      transition: all 0.15s ease;
+      box-sizing: border-box;
+    }
+    .voice-btn:hover {
+      background: #1e293b;
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+    .voice-btn.playing {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+    .vbadge {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(148, 163, 184, 0.15);
+      color: #94a3b8;
+      flex-shrink: 0;
+    }
+    .vbadge.vs { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+    .vbadge.radio { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+    .track {
+      height: 8px;
+      background: #020617;
+      border-radius: 999px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+    .fill { height: 100%; width: 0; background: linear-gradient(90deg, #38bdf8, #3b82f6); }
+    .time { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #38bdf8; margin-top: 6px; }
+    .beat { padding: 6px 8px; border-radius: 6px; margin-top: 4px; }
+    .beat.active { background: rgba(56, 189, 248, 0.14); color: #f8fafc; }
+
+    /* OVERLAY INTERATIVO: VOCÊ DECIDE O FIM (EPISÓDIO 2 · ESCOLHA ABERTA) */
+    .decision-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(10, 15, 30, 0.92), rgba(2, 6, 23, 0.97));
+      backdrop-filter: blur(14px);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 24px;
+      z-index: 50;
+      text-align: center;
+      box-sizing: border-box;
+      animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .decision-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.16);
+      border: 1.5px solid rgba(239, 68, 68, 0.45);
+      box-shadow: 0 0 18px rgba(239, 68, 68, 0.25);
+      margin-bottom: 10px;
+    }
+    .simple-question-title {
+      font-size: 23px;
+      font-weight: 900;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      margin: 0 0 4px 0;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+    }
+    .simple-question-sub {
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin: 0 0 8px 0;
+    }
+    .timer-bar-wrap {
+      width: 100%;
+      max-width: 280px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 8px auto 6px;
+    }
+    .timer-bar-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
+      transition: width 0.1s linear;
+    }
+    .countdown-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: #f59e0b;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+    }
+    .choice-card {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.92);
+      border: 2px solid rgba(148, 163, 184, 0.35);
+      border-radius: 16px;
+      padding: 15px 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+    }
+    .choice-card.opt-1 {
+      border-color: rgba(56, 189, 248, 0.55);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(12, 74, 110, 0.35));
+    }
+    .choice-card.opt-2 {
+      border-color: rgba(239, 68, 68, 0.55);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(127, 29, 29, 0.35));
+    }
+    .choice-card:hover {
+      border-color: #38bdf8;
+      background: rgba(30, 41, 59, 0.95);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(56, 189, 248, 0.25);
+    }
+    .choice-card.selected {
+      border-color: #10b981;
+      background: rgba(6, 78, 59, 0.4);
+      box-shadow: 0 0 24px rgba(16, 185, 129, 0.4);
+    }
+    .choice-emoji-box {
+      width: 54px;
+      height: 54px;
+      flex-shrink: 0;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      transition: transform 0.2s ease;
+    }
+    .choice-card:hover .choice-emoji-box {
+      transform: scale(1.15);
+    }
+    .choice-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .choice-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .choice-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+    }
+    .choice-desc {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: #cbd5e1;
+      margin-top: 3px;
+      line-height: 1.3;
+    }
+    .choice-action-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(56, 189, 248, 0.2);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.45);
+    }
+    .simple-footer-hint {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      font-size: 12px;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: -0.2px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone" style="position: relative;">
+    <canvas id="stage" width="1080" height="1920"></canvas>
+
+    <!-- OVERLAY INTERATIVO: VOCÊ DECIDE O FIM (EPISÓDIO 2 · 100% DUBLADO) -->
+    <div id="decisionOverlay" class="decision-overlay">
+      <div class="decision-badge">🔊 VOCÊ DECIDE O FIM • DUBLADO (SEM PRECISAR LER)</div>
+      <p style="font-size: 12px; color: #94a3b8; max-width: 310px; line-height: 1.35; margin-bottom: 8px; font-weight: 600;">
+        O público escolheu <b style="color:#38bdf8;">FICAR NA GUARITA</b> com o Seu Valdir... mas o apagão travou tudo e uma sombra de mais de 2 metros encostou na eclusa.
+      </p>
+      <h2 class="simple-question-title">E AGORA, O QUE VOCÊ FAZ?</h2>
+
+      <div class="timer-bar-wrap">
+        <div id="decisionTimerBar" class="timer-bar-fill"></div>
+      </div>
+      <div id="decisionCountdownText" class="countdown-pill">
+        ⏳ 23.0s PARA DECIDIR
+      </div>
+
+      <!-- CARD OPÇÃO 1: ACENDER O HOLOFOTE -->
+      <div class="choice-card opt-1" id="cardOpt1" onclick="voteOption(1)">
+        <div class="choice-emoji-box" style="border-color: rgba(56, 189, 248, 0.55); background: rgba(56, 189, 248, 0.16);">
+          🔦
+        </div>
+        <div class="choice-body">
+          <div class="choice-header-row">
+            <span class="choice-title">🔦 COMENTE 🔦</span>
+            <span id="badgeSpeak1" style="display:none; font-size:9.5px; background:#38bdf8; color:#020617; padding:2px 6px; border-radius:4px; font-weight:900;">🔊 FALANDO AGORA</span>
+          </div>
+          <div class="choice-desc">Para acender o holofote de mil watts na neblina!</div>
+          <div class="choice-action-pill">
+            <span>Comente</span> <b>🔦</b> <span>nos comentários</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD OPÇÃO 2: DISPARAR O ALARME GERAL -->
+      <div class="choice-card opt-2" id="cardOpt2" onclick="voteOption(2)">
+        <div class="choice-emoji-box" style="border-color: rgba(239, 68, 68, 0.55); background: rgba(239, 68, 68, 0.16);">
+          🚨
+        </div>
+        <div class="choice-body">
+          <div class="choice-header-row">
+            <span class="choice-title">🚨 COMENTE 🚨</span>
+            <span id="badgeSpeak2" style="display:none; font-size:9.5px; background:#ef4444; color:#fff; padding:2px 6px; border-radius:4px; font-weight:900;">🔊 FALANDO AGORA</span>
+          </div>
+          <div class="choice-desc">Para acionar o alarme geral de emergência do Bloco C!</div>
+          <div class="choice-action-pill" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: rgba(239, 68, 68, 0.45);">
+            <span>Comente</span> <b>🚨</b> <span>nos comentários</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="simple-footer-hint">
+        💬 <b>A opção mais comentada define o Roteiro do Episódio 3!</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="card">
+      <h2>Episódio 02 • Vertical 1080×1920 (68s)</h2>
+      <div class="row">
+        <button class="primary" id="btnPlay">▶ Play</button>
+        <button id="btnRestart">⟲ Reiniciar</button>
+      </div>
+      <div style="margin-top:12px" class="track" id="track"><div class="fill" id="fill"></div></div>
+      <div class="time" id="time">00.0s / 68.0s</div>
+    </div>
+
+    <div class="card">
+      <h2>Câmera Dinâmica 2.5D & Diálogos (68s)</h2>
+      <div class="beat" id="beatA"><b>A · 0s a 14s</b> — Entrada de perfil + <b>Você Fala 1</b> ("Tranca tudo!") + tranca e faíscas.</div>
+      <div class="beat" id="beatB"><b>B · 14s a 31s</b> — <b>Seu Valdir Fala 1</b> (desacelerado 61a) + <b>Rádio HT Motorola</b>.</div>
+      <div class="beat" id="beatC"><b>C · 31s a 51s</b> — <b>Você Fala 2</b> ("Câmera 2!") + Super Zoom IR + 3 Pancadas no vidro!</div>
+      <div class="beat" id="beatD"><b>D · 51s a 68s</b> — Você Decide 100% Dublado (Cards piscam em sincronia com a voz!).</div>
+    </div>
+
+    <div class="card">
+      <h2>Visualização</h2>
+      <div class="row">
+        <button id="btnSafe">Zona segura TikTok</button>
+        <button id="btnSubs" class="on">Legendas</button>
+      </div>
+    </div>
+
+    <!-- CARD ELENCO DE VOZES CLONADAS NO VOICESTUDIO & PACK DE SFX -->
+    <div class="card" style="border-color: rgba(56, 189, 248, 0.4); background: #070e1b;">
+      <h2 style="color: #38bdf8; display:flex; justify-content:space-between; align-items:center;">
+        <span>🎙️ Elenco & Efeitos de Transmissão</span>
+        <span style="font-size:9.5px; background:rgba(16,185,129,0.18); color:#34d399; padding:2px 6px; border-radius:4px;">VoiceStudio DSP</span>
+      </h2>
+      <p style="font-size:11px; color:#94a3b8; margin-bottom:10px;">
+        Vozes calibradas no VoiceStudio com processamento acústico por canal de transmissão (direto, rádio HT, interfone e alto-falante):
+      </p>
+
+      <!-- 1. RUAN: NARRADOR & PROTAGONISTA VOCÊ -->
+      <div style="margin-bottom:10px; border-bottom:1px solid rgba(148,163,184,0.12); padding-bottom:8px;">
+        <div style="font-weight:700; font-size:11px; color:#38bdf8; margin-bottom:5px;">
+          ⭐ 1. RUAN (Sua Voz Limpa · Sem Sopro)
+        </div>
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <button class="voice-btn" onclick="playAudition('/output/audicoes/narrador_opcaoA_ruan_real.mp3', this)">
+            <span>▶ <b>Narrador Oficial (De-Breathed)</b></span>
+            <span class="vbadge vs">PADRÃO • 128Hz</span>
+          </button>
+          <button class="voice-btn" onclick="playAudition('/output/audicoes/voce_protagonista_ruan.mp3', this)">
+            <span>▶ <b>Você (Protagonista):</b> Fala na Guarita</span>
+            <span class="vbadge">SALA • DIRETA</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. SEU VALDIR (SENHOR 61 ANOS - DESACELERADO) -->
+      <div style="margin-bottom:10px; border-bottom:1px solid rgba(148,163,184,0.12); padding-bottom:8px;">
+        <div style="font-weight:700; font-size:11px; color:#fde047; margin-bottom:5px;">
+          👴 2. SEU VALDIR (Porteiro 61a · Desacelerado & Maduro)
+        </div>
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <button class="voice-btn" onclick="playAudition('/output/audicoes/valdir_opcaoA_maduro_natural.mp3', this)">
+            <span>▶ <b>Presencial:</b> Cadência Lenta & Humana</span>
+            <span class="vbadge">-14% • 95Hz</span>
+          </button>
+          <button class="voice-btn" onclick="playAudition('/output/audicoes/valdir_opcaoB_radio_ht.mp3', this)">
+            <span>▶ <b>No Rádio HT Motorola:</b> Passa-Banda</span>
+            <span class="vbadge radio">RÁDIO HT</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. OUTROS PERSONAGENS DA SÉRIE -->
+      <div style="margin-bottom:10px; border-bottom:1px solid rgba(148,163,184,0.12); padding-bottom:8px;">
+        <div style="font-weight:700; font-size:11px; color:#34d399; margin-bottom:5px;">
+          🎭 3. OUTROS PERSONAGENS (Reformulados)
+        </div>
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <button class="voice-btn" onclick="playAudition('/output/audicoes/lucas_entregador_jovem.mp3', this)">
+            <span>▶ <b>Lucas (Entregador 22a):</b> Jovem Brasileiro</span>
+            <span class="vbadge">Motoboy • 148Hz</span>
+          </button>
+          <button class="voice-btn" onclick="playAudition('/output/audicoes/camila_vizinha_304.mp3', this)">
+            <span>▶ <b>Dona Camila (304):</b> Interfone Predial</span>
+            <span class="vbadge">Interfone • 215Hz</span>
+          </button>
+          <button class="voice-btn" onclick="playAudition('/output/audicoes/sindico_central_grave.mp3', this)">
+            <span>▶ <b>Síndico / Central:</b> P.A. Alto-Falante</span>
+            <span class="vbadge">P.A. Reverb • 88Hz</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 4. PACK DE EFEITOS SONOROS (SFX) -->
+      <div>
+        <div style="font-weight:700; font-size:11px; color:#f472b6; margin-bottom:5px;">
+          🔊 4. PACK DE EFEITOS SONOROS (SFX Pack)
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
+          <button class="voice-btn" style="font-size:10px;" onclick="playAudition('/series/condominio-bloco-c/audio/sfx/porta_aco_batida.mp3', this)">
+            <span>▶ Porta Aço</span>
+          </button>
+          <button class="voice-btn" style="font-size:10px;" onclick="playAudition('/series/condominio-bloco-c/audio/sfx/radio_ht_bip_on.mp3', this)">
+            <span>▶ Bip Rádio</span>
+          </button>
+          <button class="voice-btn" style="font-size:10px;" onclick="playAudition('/series/condominio-bloco-c/audio/sfx/vidro_blindado_pancada3.mp3', this)">
+            <span>▶ Pancada Vidro</span>
+          </button>
+          <button class="voice-btn" style="font-size:10px;" onclick="playAudition('/series/condominio-bloco-c/audio/sfx/sombra_drone_sub.mp3', this)">
+            <span>▶ Drone 2.2m</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="audio" src="./audio/cena02_mix.mp3" preload="auto"></audio>
+
+  <script src="./audio/cena02_timeline.js"></script>
+  <script src="./characters/VoceMorador.js"></script>
+  <script src="./characters/SeuValdirPorteiro.js"></script>
+  <script src="./scenarios/PortariaBlocoC.js"></script>
+  <script src="./engine/CameraRig2D.js"></script>
+
+  <script>
+    const W = 1080;
+    const H = 1920;
+    const canvas = document.getElementById('stage');
+    const ctx = canvas.getContext('2d');
+    const audio = document.getElementById('audio');
+    const T = window.CENA02_TIMELINE;
+
+    const scenario = new window.StudioScenarios.PortariaBlocoC({ fogDensity: 0.85, streetBlackout: true });
+    // Você posicionado dentro da guarita à esquerda de Seu Valdir
+    const voce = new window.StudioCharacters.VoceMorador({ x: 200, y: 445, scale: 0.95, emotion: 'tense', pose: 'phone_look' });
+    const valdir = new window.StudioCharacters.SeuValdirPorteiro({ x: 330, y: 445, scale: 0.95, emotion: 'worried', pose: 'hands_desk' });
+    const cam = new window.StudioEngine.CameraRig2D(W, H);
+
+    window.voce = voce;
+    window.valdir = valdir;
+    window.scenario = scenario;
+    window.cam = cam;
+
+    const TOTAL_DURATION = T.duration || T.totalDuration || 68.0;
+    const DECISION_START = T.decisionStart || 51.35;
+    const BANG_TIMES = T.bangTimes || [41.50, 42.18, 42.86];
+    const OPT1_TIME = T.opt1HighlightTime || 54.76;
+    const OPT2_TIME = T.opt2HighlightTime || 59.42;
+    const chunks = T.chunks || [];
+
+    let playing = false;
+    let t = 0.0;
+    let shot = '';
+    let subShot = '';
+    let showSafe = false;
+    let showSubs = true;
+
+    // WebAudio para ambiência e ducking
+    let ac = null;
+    let droneGain = null;
+
+    function initAudioContext() {
+      if (ac) return;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      ac = new AudioCtx();
+      const osc = ac.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = 48; // drone grave de tensão
+      droneGain = ac.createGain();
+      droneGain.gain.value = 0.04;
+      osc.connect(droneGain).connect(ac.destination);
+      osc.start();
+    }
+
+    // ---------- Direção Cinematográfica 2.5D Dinâmica do Episódio 2 ----------
+    function direct(dt) {
+      const b1 = BANG_TIMES[0];
+      const b2 = BANG_TIMES[1];
+      const b3 = BANG_TIMES[2];
+
+      if (t < 14.3) {
+        // ATO A: Entrada apressada de perfil + Faíscas de trava + Você Fala 1 ("Tranca tudo agora!")
+        shot = 'A';
+        cctvFullscreenActive = false;
+        hideQuestionUI();
+        scenario.alarmActive = false;
+
+        if (t < 3.2) {
+          // A1: Tracking Shot acompanhando Você caminhando rápido de perfil até a bancada
+          const prog = Math.min(1, Math.max(0, t / 3.0));
+          voce.viewMode = 'profile';
+          voce.isWalking = prog < 0.96;
+          voce.walkDir = 1;
+          voce.flipX = false;
+          voce.walkSpeed = 1.65;
+          voce.walkCycle = t * 9.5;
+          voce.x = 68 + prog * 132;
+          voce.y = 445;
+          voce.emotion = 'tense';
+          valdir.emotion = 'serious';
+          valdir.pose = 'hands_desk';
+
+          if (subShot !== 'A1') {
+            subShot = 'A1';
+            cam.cut(voce.x + 35, 425, 3.15);
+          } else {
+            cam.panTo(voce.x + 35, 425, 3.05, 0.25);
+          }
+          if ((t >= 2.75 && t <= 2.95) || (t >= 3.05 && t <= 3.25)) {
+            cam.shake(0.25);
+          }
+        } else if (t < 6.3) {
+          // A2: Você para ofegante e vira 100% de FRENTE para a câmera (mais bonito, imersivo e sem braço extra)
+          voce.stop();
+          voce.viewMode = 'front';
+          voce.isWalking = false;
+          voce.x = 200;
+          voce.pose = 'step_back';
+          voce.emotion = 'tense';
+          if (subShot !== 'A2') {
+            subShot = 'A2';
+            cam.panTo(265, 410, 2.55, 1.1);
+          }
+        } else {
+          // A3: Você Fala 1 ("Seu Valdir! Tranca tudo agora! Tem uma sombra na eclusa!") — 100% de FRENTE
+          voce.stop();
+          voce.viewMode = 'front';
+          voce.isWalking = false;
+          voce.x = 200;
+          voce.emotion = 'shocked';
+          voce.pose = 'phone_look';
+          valdir.emotion = 'worried';
+          if (subShot !== 'A3') {
+            subShot = 'A3';
+            cam.panTo(215, 395, 3.25, 1.0);
+          }
+        }
+      } else if (t < 29.5) {
+        // ATO B: Seu Valdir Fala 1 (Presencial 61a) + ERGUE O RÁDIO HT MOTOROLA COM BIPE PTT (14.35s a 29.5s)
+        shot = 'B';
+        cctvFullscreenActive = false;
+        hideQuestionUI();
+        voce.stop();
+        voce.viewMode = 'front';
+        voce.isWalking = false;
+        voce.x = 200;
+        voce.emotion = 'shocked';
+
+        if (t < 21.8) {
+          // B1: Seu Valdir acalma Você falando com voz pausada e madura de 61 anos (14.35s a 21.55s)
+          valdir.emotion = 'worried';
+          valdir.pose = 'hands_desk';
+          if (subShot !== 'B1') {
+            subShot = 'B1';
+            cam.panTo(315, 400, 3.55, 1.2);
+          }
+        } else {
+          // B2: SEU VALDIR ERGUE O RÁDIO HT MOTOROLA! (21.8s a 29.5s · Bip PTT + Transmissão para Central)
+          valdir.emotion = 'panicked';
+          valdir.pose = 'radio_talk';
+          if (subShot !== 'B2') {
+            subShot = 'B2';
+            cam.cut(325, 405, 3.75);
+            cam.panTo(310, 395, 3.90, 2.0);
+          }
+        }
+      } else if (t < DECISION_START) {
+        // ATO C: Você Fala 2 ("Câmera 2!") + FOCO NA CÂMERA (CENÁRIO DIFERENTE COM A AÇÃO) + 3 Pancadas Brutais no Vidro!
+        shot = 'C';
+        hideQuestionUI();
+        voce.stop();
+        voce.viewMode = 'front';
+        voce.isWalking = false;
+
+        if (t < 35.1) {
+          // C1: FOCO TOTAL NA CÂMERA 02 (CCTV FULLSCREEN)!
+          // Você fala: "Olha lá na câmera dois! Ela tá avançando na nossa direção!" (29.65s a 34.95s)
+          // A tela cheia mostra a cena externa viva: chuva, neblina, portão travado e a criatura colossal avançando!
+          cctvFullscreenActive = true;
+          voce.x = 200;
+          voce.emotion = 'scared';
+          valdir.pose = 'radio_talk';
+          valdir.emotion = 'panicked';
+          if (subShot !== 'C1') {
+            subShot = 'C1';
+          }
+        } else if (t < b1 - 0.1) {
+          // C2: CORTA DE VOLTA PARA A GUARITA! (35.1s a 39.84s)
+          // Narração: "De repente, três pancadas brutais sacodem o vidro blindado..." (35.30s a 39.79s)
+          // Você e Seu Valdir (segurando o rádio HT) em choque total olhando para a janela de vidro blindado!
+          cctvFullscreenActive = false;
+          valdir.pose = 'radio_talk';
+          valdir.emotion = 'panicked';
+          voce.emotion = 'scared';
+          if (subShot !== 'C2') {
+            subShot = 'C2';
+            cam.cut(250, 400, 2.90);
+          }
+        } else if (t < b3 + 0.55) {
+          // C3: As 3 Pancadas Brutais no Vidro Blindado! (b1=39.94s, b2=40.62s, b3=41.30s) — Na Guarita!
+          cctvFullscreenActive = false;
+          voce.emotion = 'scared';
+          valdir.pose = 'radio_talk';
+          valdir.emotion = 'panicked';
+          const recoil = Math.min(1, Math.max(0, (t - b1) / 1.6));
+          voce.x = 200 - recoil * 24;
+          if (subShot !== 'C3') {
+            subShot = 'C3';
+            cam.cut(255, 405, 2.85);
+          }
+          if (
+            (t >= b1 - 0.05 && t <= b1 + 0.35) ||
+            (t >= b2 - 0.05 && t <= b2 + 0.35) ||
+            (t >= b3 - 0.05 && t <= b3 + 0.40)
+          ) {
+            cam.shake(0.85);
+          }
+          if (t >= b2) {
+            scenario.alarmActive = true;
+          }
+        } else {
+          // C4: Seu Valdir Reação Pós-Pancadas no Rádio ("Segura firme aí atrás! Não foi nenhum ser humano!") (41.85s a 49.17s)
+          cctvFullscreenActive = false;
+          voce.x = 176;
+          voce.emotion = 'scared';
+          valdir.pose = 'radio_talk';
+          valdir.emotion = 'panicked';
+          scenario.alarmActive = true;
+          if (subShot !== 'C4') {
+            subShot = 'C4';
+            cam.panTo(265, 402, 3.25, 0.75);
+          }
+        }
+      } else {
+        // ATO D: Você Decide o Fim (100% Dublado pela voz do Ruan + 16.65s para leitura e escolha)
+        cctvFullscreenActive = false;
+        if (shot !== 'D') {
+          shot = 'D';
+          subShot = 'D1';
+          scenario.alarmActive = true;
+          cam.panTo(270, 415, 2.75, 0.8);
+          showQuestionUI();
+        }
+        updateQuestionTimer();
+      }
+
+      document.getElementById('beatA').classList.toggle('active', shot === 'A');
+      document.getElementById('beatB').classList.toggle('active', shot === 'B');
+      document.getElementById('beatC').classList.toggle('active', shot === 'C');
+      document.getElementById('beatD').classList.toggle('active', shot === 'D');
+    }
+
+    // ---------- Efeitos Visuais Cinematográficos no Mundo 2.5D ----------
+    function drawEclusaMonsterShadow() {
+      // Sombra colossal de mais de 2 metros atrás do vidro da eclusa na neblina
+      if (t < 3.6) return;
+      const alpha = Math.min(0.88, (t - 3.6) / 3.0);
+      const sway = Math.sin(t * 1.8) * 3;
+      const loom = (t >= 21.0) ? Math.min(1.18, 1.0 + (t - 21.0) * 0.025) : 1.0;
+
+      ctx.save();
+      ctx.translate(155 + sway, 375);
+      ctx.scale(loom, loom);
+      ctx.globalAlpha = alpha;
+
+      // Halo escuro denso na neblina
+      const grad = ctx.createRadialGradient(0, -40, 10, 0, -40, 95);
+      grad.addColorStop(0, 'rgba(2, 6, 23, 0.96)');
+      grad.addColorStop(0.6, 'rgba(15, 23, 42, 0.72)');
+      grad.addColorStop(1, 'rgba(15, 23, 42, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(0, -40, 95, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Silhueta de 2,20m (ombros largos desproporcionais e cabeça alta)
+      ctx.fillStyle = '#020617';
+      ctx.beginPath();
+      ctx.roundRect(-42, -95, 84, 135, [34, 34, 8, 8]);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, -118, 22, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Olhos reflexivos pálidos na neblina
+      const eyeGlow = 0.55 + 0.45 * Math.sin(t * 5.0);
+      ctx.fillStyle = `rgba(248, 113, 113, ${eyeGlow})`;
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(-7, -120, 2.6, 0, Math.PI * 2);
+      ctx.arc(7, -120, 2.6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawDoorLockSparksAndRadioWaves() {
+      // 1. ESTRUTURA METÁLICA ROBUSTA DO BATENTE E DOS 3 FERROLHOS DE AÇO MACIÇO
+      // Totalmente alinhado ao roteiro: as 3 travas batem em sequência com faíscas reais de atrito e permanecem travadas
+      ctx.save();
+      const doorX = 66;
+      const doorY = 248;
+      const doorW = 52;
+      const doorH = 264;
+
+      // Chapa de aço pesada do batente da porta lateral da guarita
+      const jambGrad = ctx.createLinearGradient(doorX, doorY, doorX + doorW, doorY);
+      jambGrad.addColorStop(0, '#070b14');
+      jambGrad.addColorStop(0.35, '#1e293b');
+      jambGrad.addColorStop(0.7, '#334155');
+      jambGrad.addColorStop(1, '#0f172a');
+      ctx.fillStyle = jambGrad;
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.roundRect(doorX, doorY, doorW, doorH, 5);
+      ctx.fill();
+      ctx.stroke();
+
+      // Friso interno chanfrado do batente de alta blindagem
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(doorX + 3, doorY + 3, doorW - 6, doorH - 6);
+
+      // Rebites industriais sextavados
+      ctx.fillStyle = '#94a3b8';
+      for (const ry of [258, 335, 415, 498]) {
+        ctx.beginPath();
+        ctx.arc(doorX + 8, ry, 2.5, 0, Math.PI * 2);
+        ctx.arc(doorX + doorW - 8, ry, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Painel de Status Tático dos Ferrolhos no topo do batente
+      ctx.fillStyle = '#050811';
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.roundRect(doorX + 6, doorY + 10, doorW - 12, 28, 4);
+      ctx.fill();
+      ctx.stroke();
+
+      // 3 Ferrolhos Mecânicos Industriais de Aço Carbono (Superior: 295, Central: 375, Inferior: 455)
+      const bolts = [
+        { y: 295, tHit: 2.75 },
+        { y: 375, tHit: 2.95 },
+        { y: 455, tHit: 3.15 }
+      ];
+
+      bolts.forEach((bolt, idx) => {
+        const tStart = bolt.tHit - 0.14;
+        let slideProg = 0;
+        if (t >= bolt.tHit) {
+          slideProg = 1.0;
+        } else if (t >= tStart) {
+          slideProg = (t - tStart) / 0.14;
+        }
+
+        // Base de ancoragem do ferrolho na porta
+        ctx.fillStyle = '#1e293b';
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(doorX + 6, bolt.y - 14, 38, 28, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        // Parafusos de fixação
+        ctx.fillStyle = '#cbd5e1';
+        ctx.fillRect(doorX + 9, bolt.y - 11, 2.5, 2.5);
+        ctx.fillRect(doorX + 9, bolt.y + 8.5, 2.5, 2.5);
+
+        // Barra maciça do ferrolho de aço (desliza da direita para a esquerda engastando na chapa fêmea)
+        const boltLen = 26 + slideProg * 20;
+        const boltGrad = ctx.createLinearGradient(doorX - 12, bolt.y, doorX + 36, bolt.y);
+        boltGrad.addColorStop(0, '#475569');
+        boltGrad.addColorStop(0.25, '#94a3b8');
+        boltGrad.addColorStop(0.65, '#f1f5f9');
+        boltGrad.addColorStop(1, '#334155');
+        ctx.fillStyle = boltGrad;
+        ctx.strokeStyle = '#f8fafc';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.roundRect(doorX + 22 - boltLen, bolt.y - 7, boltLen, 14, 3);
+        ctx.fill();
+        ctx.stroke();
+
+        // Alavanca / manopla industrial de pressão do ferrolho
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(doorX + 16 - slideProg * 8, bolt.y - 10, 5, 20);
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillRect(doorX + 17 - slideProg * 8, bolt.y - 10, 2, 20);
+
+        // LED indicador individual no mini-painel
+        const ledX = doorX + 11 + idx * 11;
+        const isLocked = t >= bolt.tHit;
+        ctx.fillStyle = isLocked ? '#ef4444' : '#10b981';
+        ctx.shadowColor = isLocked ? '#ef4444' : '#10b981';
+        ctx.shadowBlur = isLocked ? 6 : 2;
+        ctx.beginPath();
+        ctx.arc(ledX, doorY + 20, 2.8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Faíscas Físicas Reais de Impacto Metálico (Duração ultra-rápida de 0.16s após cada batida)
+        if (t >= bolt.tHit && t <= bolt.tHit + 0.16) {
+          const sparkAge = (t - bolt.tHit) / 0.16;
+          const hitX = doorX + 2;
+          const hitY = bolt.y;
+
+          // Clarão térmico pontual de choque metálico
+          const flashGlow = ctx.createRadialGradient(hitX, hitY, 1, hitX, hitY, 24 * (1 - sparkAge));
+          flashGlow.addColorStop(0, `rgba(255, 255, 255, ${1 - sparkAge})`);
+          flashGlow.addColorStop(0.35, `rgba(251, 191, 36, ${(1 - sparkAge) * 0.85})`);
+          flashGlow.addColorStop(1, 'rgba(234, 88, 12, 0)');
+          ctx.fillStyle = flashGlow;
+          ctx.beginPath();
+          ctx.arc(hitX, hitY, 24 * (1 - sparkAge), 0, Math.PI * 2);
+          ctx.fill();
+
+          // 14 Feixes balísticos lineares de faíscas incandescentes com gravidade física
+          for (let s = 0; s < 14; s++) {
+            const seed = (s * 137.5) % 1;
+            const ang = -Math.PI * 0.5 + (seed - 0.5) * 1.9;
+            const spd = 50 + seed * 65;
+            const sx = hitX + Math.cos(ang) * spd * sparkAge;
+            const sy = hitY + Math.sin(ang) * spd * sparkAge + 220 * sparkAge * sparkAge; // gravidade
+            const sparkLen = Math.max(2.5, 7 * (1 - sparkAge));
+            ctx.strokeStyle = s % 2 === 0 ? '#ffffff' : (s % 3 === 0 ? '#fbbf24' : '#ea580c');
+            ctx.lineWidth = 1.6 * (1 - sparkAge);
+            ctx.beginPath();
+            ctx.moveTo(sx, sy);
+            ctx.lineTo(sx - Math.cos(ang) * sparkLen, sy - Math.sin(ang) * sparkLen);
+            ctx.stroke();
+          }
+        }
+      });
+
+      // Mini-legenda tática "3/3 TRAVAS" no batente quando completo
+      if (t >= 3.15) {
+        ctx.fillStyle = '#fca5a5';
+        ctx.font = '700 7px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('3/3 TRAVADO', doorX + doorW * 0.5, doorY + 33);
+      }
+      ctx.restore();
+
+      // 2. LED tático no Rádio HT quando Seu Valdir fala (sem arcos cartunescos)
+      const spk = getActiveSpeaker(t);
+      if (spk === 'VALDIR') {
+        ctx.save();
+        const rx = valdir.x + 23;
+        const ry = valdir.y - 42;
+        const txPulse = 0.6 + Math.sin(t * 16) * 0.4;
+        ctx.fillStyle = `rgba(245, 158, 11, ${txPulse})`;
+        ctx.shadowColor = '#f59e0b';
+        ctx.shadowBlur = 6;
+        ctx.beginPath();
+        ctx.arc(rx, ry, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function drawGlassCracksWorld() {
+      // Teias de rachaduras no vidro blindado a partir das 3 pancadas brutais
+      const b1 = BANG_TIMES[0];
+      const b2 = BANG_TIMES[1];
+      const b3 = BANG_TIMES[2];
+      if (t < b1) return;
+
+      const drawWeb = (cx, cy, radius, branches, seed) => {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.strokeStyle = 'rgba(226, 232, 240, 0.85)';
+        ctx.shadowColor = '#38bdf8';
+        ctx.shadowBlur = 6;
+        ctx.lineWidth = 1.6;
+        for (let i = 0; i < branches; i++) {
+          const a = (i / branches) * Math.PI * 2 + seed;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          const x1 = Math.cos(a) * (radius * 0.45);
+          const y1 = Math.sin(a) * (radius * 0.45);
+          const x2 = Math.cos(a + 0.12) * radius;
+          const y2 = Math.sin(a - 0.12) * radius;
+          ctx.lineTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+        }
+        // Anéis concêntricos de vidro laminado trincado
+        for (const rFrac of [0.28, 0.58, 0.85]) {
+          ctx.beginPath();
+          ctx.arc(0, 0, radius * rFrac, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      };
+
+      if (t >= b1) drawWeb(165, 345, 34, 7, 0.2);
+      if (t >= b2) drawWeb(235, 325, 44, 9, 0.7);
+      if (t >= b3) drawWeb(200, 365, 58, 11, 1.3);
+    }
+
+    // ---------- Render do Mundo ----------
+    function drawWorld() {
+      cam.beginFrame(ctx);
+      scenario.drawBackground(ctx, 0);
+      drawEclusaMonsterShadow();
+      scenario.drawMidground(ctx);
+      valdir.draw(ctx);
+      voce.draw(ctx);
+      drawDoorLockSparksAndRadioWaves();
+      scenario.drawGuaritaFore(ctx);
+      drawGlassCracksWorld();
+      scenario.drawForeground(ctx);
+      cam.endFrame(ctx);
+    }
+
+    // ---------- Monitor Tático PIP (Visão Noturna CAM 02) & Alertas de Tela ----------
+    function drawTacticalHUD() {
+      if (t >= DECISION_START) return;
+      const b1 = BANG_TIMES[0];
+      const b2 = BANG_TIMES[1];
+      const b3 = BANG_TIMES[2];
+
+      // 1. Badge de Trava de Aço (2.7s a 5.8s) — Alinhado perfeitamente no cabeçalho com o relógio
+      if (t >= 2.75 && t <= 5.8) {
+        ctx.save();
+        const bx = 340;
+        const by = 110;
+        const bw = 680;
+        const bh = 58;
+        ctx.fillStyle = 'rgba(6, 78, 59, 0.94)';
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.roundRect(bx, by, bw, bh, 14);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#ecfdf5';
+        ctx.font = '800 22px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🔒 PORTA BLINDADA DA GUARITA: TRAVADA', bx + bw * 0.5, 139);
+        ctx.restore();
+      }
+
+      // 2. Flash de Choque e Alerta de Vidro Blindado nas 3 Pancadas
+      for (const bt of [b1, b2, b3]) {
+        if (t >= bt && t <= bt + 0.18) {
+          const fl = 1 - (t - bt) / 0.18;
+          ctx.save();
+          ctx.fillStyle = `rgba(239, 68, 68, ${fl * 0.32})`;
+          ctx.fillRect(0, 0, W, H);
+          ctx.restore();
+        }
+      }
+      if (t >= b1 && t < DECISION_START) {
+        const integrity = t >= b3 ? 34 : (t >= b2 ? 61 : 82);
+        ctx.save();
+        ctx.fillStyle = 'rgba(127, 29, 29, 0.92)';
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(140, 195, 800, 64, 16);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#fef2f2';
+        ctx.font = '900 26px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`🚨 IMPACTO BRUTAL! INTEGRIDADE DO VIDRO BLINDADO: ${integrity}%`, W / 2, 227);
+        ctx.restore();
+      }
+    }
+
+    function drawClock() {
+      if (t >= DECISION_START || cctvFullscreenActive) return;
+      ctx.save();
+      ctx.fillStyle = 'rgba(2, 6, 23, 0.85)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(60, 110, 260, 58, 14);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(88, 139, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '700 23px "JetBrains Mono", monospace';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('TER 23:44 • EP 2', 108, 140);
+      ctx.restore();
+    }
+
+    // ---------- Controle de Lip-Sync Estrito (Zero Vazamento na Narração) ----------
+    function getActiveSpeaker(time) {
+      if (!chunks) return null;
+      for (let i = 0; i < chunks.length; i++) {
+        const c = chunks[i];
+        if (time >= c.start && time <= c.end) {
+          return c.spk;
+        }
+      }
+      return null;
+    }
+
+    // ---------- Legendas Dinâmicas Shorts/TikTok (Clusters de 3 Palavras, Safe-Zone 840px) ----------
+    function drawSubtitles() {
+      if (!showSubs || t >= DECISION_START) return;
+      let cur = null;
+      for (let i = 0; i < chunks.length; i++) {
+        const c = chunks[i];
+        const next = chunks[i + 1];
+        const until = next ? Math.min(next.start, c.end + 0.3) : c.end + 0.3;
+        if (t >= c.start && t < until) { cur = c; break; }
+      }
+      if (!cur || !cur.words || cur.words.length === 0) return;
+
+      // 1. Encontra o índice da palavra atualmente falada
+      let activeIdx = -1;
+      for (let i = 0; i < cur.words.length; i++) {
+        const w = cur.words[i];
+        const dur = Math.max(w.d || 0.22, 0.18);
+        if (t >= w.t && t < w.t + dur + 0.08) {
+          activeIdx = i;
+          break;
+        }
+      }
+      if (activeIdx === -1) {
+        for (let i = 0; i < cur.words.length; i++) {
+          if (cur.words[i].t > t) {
+            activeIdx = Math.max(0, i - 1);
+            break;
+          }
+        }
+        if (activeIdx === -1) activeIdx = cur.words.length - 1;
+      }
+
+      // 2. Agrupa em blocos de até 3 palavras centralizadas (TikTok/Reels standard)
+      const CLUSTER_SIZE = 3;
+      const clusterIdx = Math.floor(activeIdx / CLUSTER_SIZE);
+      const startIdx = clusterIdx * CLUSTER_SIZE;
+      const endIdx = Math.min(cur.words.length, startIdx + CLUSTER_SIZE);
+      const clusterWords = cur.words.slice(startIdx, endIdx);
+
+      ctx.save();
+      let fontSize = 70;
+      ctx.font = `900 ${fontSize}px Inter, sans-serif`;
+      const parts = clusterWords.map(w => w.w.toUpperCase());
+      const space = 22;
+      let widths = parts.map(p => ctx.measureText(p).width);
+      let totalW = widths.reduce((a, b) => a + b, 0) + space * (parts.length - 1);
+
+      // 3. Trava de largura para nunca vazar os 840px úteis da tela vertical
+      const MAX_ALLOWED_W = 840;
+      if (totalW > MAX_ALLOWED_W) {
+        const scale = MAX_ALLOWED_W / totalW;
+        fontSize = Math.floor(fontSize * scale);
+        ctx.font = `900 ${fontSize}px Inter, sans-serif`;
+        widths = parts.map(p => ctx.measureText(p).width);
+        totalW = widths.reduce((a, b) => a + b, 0) + space * (parts.length - 1);
+      }
+
+      const xStart = (W - totalW) / 2;
+      const y = 1420;
+
+      // 4. Cápsula de fundo translúcida com borda sutil neon
+      ctx.fillStyle = 'rgba(2, 6, 23, 0.82)';
+      ctx.strokeStyle = cur.spk === 'VALDIR' ? 'rgba(253, 224, 71, 0.45)' : 'rgba(56, 189, 248, 0.45)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.roundRect(xStart - 28, y - 56, totalW + 56, 102, 22);
+      ctx.fill();
+      ctx.stroke();
+
+      // Tag de Identificação do Falante
+      if (cur.spk === 'VALDIR') {
+        ctx.fillStyle = '#fde047';
+        ctx.font = '800 24px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('👴 SEU VALDIR (61 ANOS)', W / 2, y - 76);
+      } else if (cur.spk === 'VOCE') {
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '800 24px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🙋 VOCÊ (MORADOR)', W / 2, y - 76);
+      }
+
+      // 5. Renderiza cada palavra com contorno grosso de 14px e destaque na ativa
+      let curX = xStart;
+      ctx.font = `900 ${fontSize}px Inter, sans-serif`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.lineJoin = 'round';
+
+      clusterWords.forEach((w, i) => {
+        const p = parts[i];
+        const isCurrentWord = (startIdx + i) === activeIdx;
+
+        ctx.lineWidth = 14;
+        ctx.strokeStyle = '#000000';
+        ctx.strokeText(p, curX, isCurrentWord ? y - 4 : y);
+
+        if (isCurrentWord) {
+          ctx.fillStyle = cur.spk === 'VALDIR' ? '#f59e0b' : '#38bdf8';
+        } else {
+          ctx.fillStyle = cur.spk === 'VALDIR' ? '#fde047' : '#ffffff';
+        }
+        ctx.fillText(p, curX, isCurrentWord ? y - 4 : y);
+
+        curX += widths[i] + space;
+      });
+      ctx.restore();
+    }
+
+    function drawSafeZone() {
+      if (!showSafe) return;
+      ctx.save();
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.22)';
+      ctx.fillRect(0, 0, W, 200);
+      ctx.fillRect(W - 150, 820, 150, 820);
+      ctx.fillRect(0, 1560, W, 360);
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.8)';
+      ctx.setLineDash([14, 10]);
+      ctx.lineWidth = 3;
+      ctx.strokeRect(60, 200, W - 210, 1360);
+      ctx.restore();
+    }
+
+    // ---------- Overlay de Decisão Dublado (Com Destaque Sincronizado na Voz) ----------
+    const decisionOverlay = document.getElementById('decisionOverlay');
+    const decisionTimerBar = document.getElementById('decisionTimerBar');
+    const decisionCountdownText = document.getElementById('decisionCountdownText');
+
+    function showQuestionUI() { decisionOverlay.style.display = 'flex'; }
+    function hideQuestionUI() { decisionOverlay.style.display = 'none'; }
+
+    function updateQuestionTimer() {
+      const remain = Math.max(0, TOTAL_DURATION - t);
+      const windowLen = TOTAL_DURATION - DECISION_START;
+      const pct = Math.min(100, Math.max(0, (remain / windowLen) * 100));
+      decisionTimerBar.style.width = pct + '%';
+      decisionCountdownText.textContent = `⏳ ${remain.toFixed(1)}s PARA ESCOLHER NOS COMENTÁRIOS`;
+
+      // Destaque automático sincronizado com a dublagem (sem a pessoa precisar ler!)
+      const speakingOpt1 = t >= OPT1_TIME && t < OPT2_TIME - 0.2;
+      const speakingOpt2 = t >= OPT2_TIME && t < OPT2_TIME + 5.2;
+      const card1 = document.getElementById('cardOpt1');
+      const card2 = document.getElementById('cardOpt2');
+      const b1 = document.getElementById('badgeSpeak1');
+      const b2 = document.getElementById('badgeSpeak2');
+
+      if (card1) {
+        card1.style.transform = speakingOpt1 ? 'scale(1.04)' : '';
+        card1.style.boxShadow = speakingOpt1 ? '0 0 32px rgba(56, 189, 248, 0.65)' : '';
+      }
+      if (card2) {
+        card2.style.transform = speakingOpt2 ? 'scale(1.04)' : '';
+        card2.style.boxShadow = speakingOpt2 ? '0 0 32px rgba(239, 68, 68, 0.65)' : '';
+      }
+      if (b1) b1.style.display = speakingOpt1 ? 'inline-block' : 'none';
+      if (b2) b2.style.display = speakingOpt2 ? 'inline-block' : 'none';
+    }
+
+    window.voteOption = function(num) {
+      document.getElementById('cardOpt1').classList.toggle('selected', num === 1);
+      document.getElementById('cardOpt2').classList.toggle('selected', num === 2);
+    };
+
+    // ---------- Loop de Renderização Determinístico & Playback ----------
+    const isRenderMode = new URLSearchParams(window.location.search).has('render');
+    if (isRenderMode) document.body.classList.add('render-mode');
+
+    let last = performance.now();
+    let cctvFullscreenActive = false; // Flag para câmera CFTV em tela cheia
+    function frame(now) {
+      if (isRenderMode) return;
+      if (!now) now = performance.now();
+      const dt = Math.min(0.05, Math.max(0.001, (now - last) / 1000));
+      last = now;
+
+      if (playing) {
+        if (audio && !audio.paused && !audio.ended && audio.currentTime > 0) {
+          t = audio.currentTime;
+        } else {
+          t += dt;
+        }
+        if (t >= TOTAL_DURATION) {
+          t = TOTAL_DURATION;
+          pause();
+        }
+      }
+
+      cctvFullscreenActive = false; // Reseta ANTES de direct(); direct() reativa se necessário no mesmo frame
+      direct(dt);
+      cam.update(dt);
+      scenario.time = t;
+      scenario.update(dt);
+
+      const f = Math.min(T.open.length - 1, Math.max(0, Math.floor(t * T.fps)));
+      const activeSpk = getActiveSpeaker(t);
+      const valdirMouth = (activeSpk === 'VALDIR') ? ((T.open_valdir ? T.open_valdir[f] : T.open[f]) || 0) : 0;
+      const voceMouth = (activeSpk === 'VOCE') ? ((T.open_voce ? T.open_voce[f] : T.open[f]) || 0) : 0;
+      const valdirWide = (activeSpk === 'VALDIR') ? (T.wide[f] || 0.5) : 0.5;
+
+      // Fala sincronizada com trava estrita: durante a narração em off, boca 100% imóvel
+      valdir.update(dt, valdirMouth, valdirWide);
+      voce.update(dt, voceMouth, 0.5);
+
+      ctx.clearRect(0, 0, W, H);
+
+      // Renderização do frame: Câmera CFTV 02 em tela cheia com a criatura vs Mundo 2.5D da Guarita
+      if (cctvFullscreenActive) {
+        scenario.drawCCTVFullscreen(ctx, 1, W, H, {
+          time: t,
+          shadowVisible: true,
+          bangActive: false,
+          blackout: true
+        });
+      } else {
+        drawWorld();
+      }
+      drawTacticalHUD();
+      drawClock();
+      drawSubtitles();
+      drawSafeZone();
+
+      document.getElementById('fill').style.width = (t / TOTAL_DURATION) * 100 + '%';
+      document.getElementById('time').textContent = `${t.toFixed(1)}s / ${TOTAL_DURATION.toFixed(1)}s`;
+      requestAnimationFrame(frame);
+    }
+
+    function play() {
+      playing = true;
+      document.getElementById('btnPlay').textContent = '⏸ Pausar';
+      document.getElementById('btnPlay').classList.add('on');
+      try { initAudioContext(); if (ac && ac.state === 'suspended') ac.resume(); } catch(e) {}
+      if (t >= TOTAL_DURATION - 0.05) seek(0);
+      try {
+        audio.currentTime = Math.min(audio.duration || 0, t);
+        audio.play().catch(e => console.warn('Audio play fallback ativo:', e));
+      } catch(e) {}
+    }
+
+    function pause() {
+      playing = false;
+      document.getElementById('btnPlay').textContent = '▶ Play';
+      document.getElementById('btnPlay').classList.remove('on');
+      try { if (audio) audio.pause(); } catch(e) {}
+    }
+
+    function seek(sec) {
+      t = Math.max(0, Math.min(TOTAL_DURATION, sec));
+      try { if (audio) audio.currentTime = Math.min(audio.duration || 0, t); } catch(e) {}
+      shot = '';
+      if (t < DECISION_START) hideQuestionUI();
+    }
+    window.seek = seek;
+    window.seekTo = seek;
+
+    // Interface para o renderizador Full HD frame a frame
+    window.renderAt = function(sec) {
+      t = Math.max(0, Math.min(TOTAL_DURATION, sec));
+      const dt = 1 / 30;
+      direct(dt);
+      cam.update(dt);
+      scenario.time = t;
+      scenario.update(dt);
+
+      const f = Math.min(T.open.length - 1, Math.max(0, Math.floor(t * T.fps)));
+      const activeSpk = getActiveSpeaker(t);
+      const valdirMouth = (activeSpk === 'VALDIR') ? ((T.open_valdir ? T.open_valdir[f] : T.open[f]) || 0) : 0;
+      const voceMouth = (activeSpk === 'VOCE') ? ((T.open_voce ? T.open_voce[f] : T.open[f]) || 0) : 0;
+      const valdirWide = (activeSpk === 'VALDIR') ? (T.wide[f] || 0.5) : 0.5;
+
+      valdir.update(dt, valdirMouth, valdirWide);
+      voce.update(dt, voceMouth, 0.5);
+
+      ctx.clearRect(0, 0, W, H);
+      if (cctvFullscreenActive) {
+        scenario.drawCCTVFullscreen(ctx, 1, W, H, {
+          time: t,
+          shadowVisible: true,
+          bangActive: false,
+          blackout: true
+        });
+      } else {
+        drawWorld();
+      }
+      drawTacticalHUD();
+      drawClock();
+      drawSubtitles();
+    };
+    window.renderDeterministicFrame = window.renderAt;
+
+    // ---------- Player Interativo de Audição de Vozes (VoiceStudio) ----------
+    let auditionAudio = null;
+    let currentAuditionBtn = null;
+    let currentOrigHtml = '';
+
+    window.playAudition = function(src, btn) {
+      if (auditionAudio) {
+        auditionAudio.pause();
+        auditionAudio = null;
+        if (currentAuditionBtn) {
+          currentAuditionBtn.classList.remove('playing');
+          currentAuditionBtn.innerHTML = currentOrigHtml;
+        }
+      }
+
+      if (currentAuditionBtn === btn) {
+        currentAuditionBtn = null;
+        return;
+      }
+
+      currentOrigHtml = btn.innerHTML;
+      currentAuditionBtn = btn;
+      btn.classList.add('playing');
+      const labelSpan = btn.querySelector('span');
+      if (labelSpan) labelSpan.innerHTML = '⏹ <b>Parar Áudio</b>';
+
+      auditionAudio = new Audio(src);
+      auditionAudio.play().catch(e => console.warn('Erro ao reproduzir audição:', e));
+      auditionAudio.onended = () => {
+        btn.classList.remove('playing');
+        btn.innerHTML = currentOrigHtml;
+        currentAuditionBtn = null;
+        auditionAudio = null;
+      };
+    };
+
+    document.getElementById('btnPlay').onclick = () => (playing ? pause() : play());
+    canvas.onclick = () => (playing ? pause() : play());
+    document.getElementById('btnRestart').onclick = () => { seek(0); play(); };
+    document.getElementById('track').onclick = (e) => {
+      const r = e.currentTarget.getBoundingClientRect();
+      seek(((e.clientX - r.left) / r.width) * TOTAL_DURATION);
+    };
+    document.getElementById('btnSafe').onclick = (e) => {
+      showSafe = !showSafe;
+      e.currentTarget.classList.toggle('on', showSafe);
+    };
+    document.getElementById('btnSubs').onclick = (e) => {
+      showSubs = !showSubs;
+      e.currentTarget.classList.toggle('on', showSubs);
+    };
+
+    if (!isRenderMode) {
+      requestAnimationFrame(frame);
+    }
+  </script>
+</body>
+</html>

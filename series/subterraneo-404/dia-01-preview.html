@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Subterrâneo 404 — Dia 01: O Lacramento (Interactive Preview)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&family=Syne:wght@700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #030508;
+      --red-alert: #ef4444;
+      --amber-alert: #f59e0b;
+      --cyan-tech: #06b6d4;
+      --card-bg: rgba(10, 15, 25, 0.88);
+      --font-display: 'Syne', sans-serif;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+    body {
+      width: 100vw; height: 100vh;
+      background: radial-gradient(circle at center, #0a0e17 0%, #020306 100%);
+      font-family: var(--font-sans);
+      color: #f1f5f9;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+
+    #stage {
+      position: relative;
+      width: 100%; height: 100%;
+      max-width: calc(100vh * 9 / 16);
+      max-height: 100vh;
+      aspect-ratio: 9 / 16;
+      background: #000000;
+      overflow: hidden;
+      box-shadow: 0 0 100px rgba(239, 68, 68, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      display: flex; flex-direction: column;
+    }
+
+    /* Ambient Canvas */
+    canvas#view {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 1;
+    }
+
+    /* UI Overlay */
+    .overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 10;
+      pointer-events: none;
+      display: flex; flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 20px;
+    }
+
+    /* Header Badge */
+    .header-top {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .badge-day {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+      font-family: var(--font-mono);
+      font-size: 13px; font-weight: 800;
+      padding: 6px 14px; border-radius: 999px;
+      display: flex; align-items: center; gap: 8px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+      animation: pulseAlert 2s infinite ease-in-out;
+    }
+    .badge-live {
+      width: 8px; height: 8px; background: #ef4444; border-radius: 50%;
+      box-shadow: 0 0 8px #ef4444;
+    }
+
+    .badge-countdown {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #94a3b8;
+      font-family: var(--font-mono);
+      font-size: 12px; font-weight: 700;
+      padding: 6px 12px; border-radius: 8px;
+    }
+
+    /* Dialogue Subtitle Box (Narrative 2nd Person) */
+    .narrative-box {
+      margin-top: auto;
+      margin-bottom: 16px;
+      background: linear-gradient(180deg, rgba(8, 12, 20, 0.7) 0%, rgba(3, 5, 10, 0.95) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 16px 18px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+      pointer-events: auto;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .speaker-tag {
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 800;
+      color: var(--amber-alert);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .narrative-text {
+      font-size: 15px; line-height: 1.45;
+      color: #f8fafc;
+      font-weight: 600;
+    }
+    .narrative-text span.highlight {
+      color: #f87171;
+      font-weight: 800;
+    }
+
+    /* Binary Choices Cards */
+    .choices-container {
+      display: flex; flex-direction: column; gap: 10px;
+      pointer-events: auto;
+    }
+    .choice-btn {
+      background: var(--card-bg);
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      padding: 14px 16px;
+      color: #fff;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px;
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      backdrop-filter: blur(10px);
+      text-align: left;
+    }
+    .choice-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    .choice-btn.active-1 {
+      border-color: var(--amber-alert);
+      background: linear-gradient(90deg, rgba(245, 158, 11, 0.2) 0%, rgba(10, 15, 25, 0.9) 100%);
+      box-shadow: 0 0 30px rgba(245, 158, 11, 0.35);
+    }
+    .choice-btn.active-2 {
+      border-color: var(--cyan-tech);
+      background: linear-gradient(90deg, rgba(6, 182, 212, 0.2) 0%, rgba(10, 15, 25, 0.9) 100%);
+      box-shadow: 0 0 30px rgba(6, 182, 212, 0.35);
+    }
+    .choice-tag {
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 800;
+      padding: 4px 8px; border-radius: 6px;
+      white-space: nowrap;
+    }
+    .tag-1 { background: rgba(245, 158, 11, 0.25); color: #fbbf24; }
+    .tag-2 { background: rgba(6, 182, 212, 0.25); color: #38bdf8; }
+
+    .choice-info { flex: 1; }
+    .choice-title { font-weight: 800; font-size: 14px; margin-bottom: 2px; }
+    .choice-desc { font-size: 11px; color: #94a3b8; }
+    .choice-votes {
+      font-family: var(--font-mono); font-size: 13px; font-weight: 800;
+      color: #e2e8f0; min-width: 44px; text-align: right;
+    }
+
+    /* Sound Trigger Button */
+    #soundToggle {
+      position: absolute;
+      top: 70px; right: 20px;
+      z-index: 20;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #e2e8f0;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px; font-family: var(--font-mono);
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 0.9; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.03); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="stage">
+    <canvas id="view"></canvas>
+
+    <button id="soundToggle">🔊 ATIVAR ÁUDIO TENSÃO</button>
+
+    <div class="overlay">
+      <!-- Header -->
+      <div class="header-top">
+        <div class="badge-day">
+          <div class="badge-live"></div>
+          DIA 01 DE 30
+        </div>
+        <div class="badge-countdown">
+          FALTAM 719h 46m
+        </div>
+      </div>
+
+      <!-- Narrative & Choices Container -->
+      <div>
+        <div class="narrative-box" id="narrativeBox">
+          <div class="speaker-tag" id="speakerTag">⚠ VOZ DA CABINE (RÁDIO MILITAR)</div>
+          <div class="narrative-text" id="narrativeText">
+            "Aviso de emergência: <span class="highlight">Quarentena Subterrânea Ativada</span>. Portas blindadas travadas por 30 dias. Sobrevivam."
+          </div>
+        </div>
+
+        <!-- Binary Choices -->
+        <div class="choices-container">
+          <button class="choice-btn" id="btnOpt1" onclick="vote(1)">
+            <span class="choice-tag tag-1">OPÇÃO 1</span>
+            <div class="choice-info">
+              <div class="choice-title">Ligar Gerador da Subestação</div>
+              <div class="choice-desc">Traz luz forte, mas motor faz barulho nos túneis.</div>
+            </div>
+            <div class="choice-votes" id="votes1">54%</div>
+          </button>
+
+          <button class="choice-btn" id="btnOpt2" onclick="vote(2)">
+            <span class="choice-tag tag-2">OPÇÃO 2</span>
+            <div class="choice-info">
+              <div class="choice-title">Recuar para Duto de Ventilação 3</div>
+              <div class="choice-desc">Silencioso e estreito, mas água de esgoto tá subindo.</div>
+            </div>
+            <div class="choice-votes" id="votes2">46%</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('view');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    function resize() {
+      width = canvas.width = canvas.offsetWidth;
+      height = canvas.height = canvas.offsetHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Narrative steps timeline
+    const timeline = [
+      { speaker: "⚠ VOCÊ (ELETRICISTA)", text: "Faltam 30 dias para o resgate... Se é que tem alguém vivo lá em cima.", tag: "SITUAÇÃO" },
+      { speaker: "🚪 PORTÃO BLINDADO", text: "As 10 toneladas de aço desceram. Todas as saídas de emergência estão seladas.", tag: "BLOQUEIO" },
+      { speaker: "🔦 SEU TIÃO (SEGURANÇA)", text: "A energia principal caiu. A bateria de emergência dura só mais 8 minutos.", tag: "AVISO" },
+      { speaker: "👁 ALGO NOS TRILHOS", text: "Uma voz idêntica à da moça da faxina sussurra lá do escuro do túnel...", tag: "MIMETISMO" },
+      { speaker: "⚡ SUA VEZ DE DECIDIR", text: "Comente agora: Opção 1 ou Opção 2? O voto mais popular define o Dia 02 amanhã.", tag: "ESCOLHA" }
+    ];
+
+    let step = 0;
+    setInterval(() => {
+      step = (step + 1) % timeline.length;
+      document.getElementById('speakerTag').innerText = timeline[step].speaker;
+      document.getElementById('narrativeText').innerHTML = timeline[step].text;
+    }, 4500);
+
+    // Audio tension simulation (Web Audio API)
+    let audioCtx = null;
+    let isMuted = true;
+    const soundBtn = document.getElementById('soundToggle');
+
+    function initAudio() {
+      if (audioCtx) return;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      
+      // Drone bass
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(55, audioCtx.currentTime); // 55Hz bass drone
+      
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(140, audioCtx.currentTime);
+
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+
+      // Intermittent sub-heartbeat
+      setInterval(() => {
+        if (!audioCtx || isMuted) return;
+        const kickOsc = audioCtx.createOscillator();
+        const kickGain = audioCtx.createGain();
+        kickOsc.frequency.setValueAtTime(80, audioCtx.currentTime);
+        kickOsc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.35);
+        kickGain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        kickGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+        kickOsc.connect(kickGain);
+        kickGain.connect(audioCtx.destination);
+        kickOsc.start();
+        kickOsc.stop(audioCtx.currentTime + 0.35);
+      }, 1200);
+    }
+
+    soundBtn.addEventListener('click', () => {
+      initAudio();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      isMuted = !isMuted;
+      soundBtn.innerText = isMuted ? "🔊 ATIVAR ÁUDIO TENSÃO" : "🔇 MUTAR ÁUDIO";
+    });
+
+    // Voting interaction
+    let v1 = 54, v2 = 46;
+    function vote(opt) {
+      if (opt === 1) {
+        v1++;
+        document.getElementById('btnOpt1').classList.add('active-1');
+        document.getElementById('btnOpt2').classList.remove('active-2');
+      } else {
+        v2++;
+        document.getElementById('btnOpt2').classList.add('active-2');
+        document.getElementById('btnOpt1').classList.remove('active-1');
+      }
+      const total = v1 + v2;
+      document.getElementById('votes1').innerText = Math.round((v1 / total) * 100) + '%';
+      document.getElementById('votes2').innerText = Math.round((v2 / total) * 100) + '%';
+    }
+
+    // 2D/3D Canvas Rendering (Atmospheric Metro Tunnel & Lighting)
+    let time = 0;
+    function render() {
+      time += 0.02;
+      ctx.fillStyle = '#020306';
+      ctx.fillRect(0, 0, width, height);
+
+      // Vanishing point of the tunnel
+      const cx = width * 0.5;
+      const cy = height * 0.42;
+
+      // Tunnel arches in perspective
+      for (let i = 8; i >= 1; i--) {
+        const p = ((i + (time * 0.3) % 1) / 8);
+        const radius = Math.pow(p, 1.8) * (width * 0.95);
+        const yCenter = cy - (1 - p) * 40;
+
+        ctx.strokeStyle = `rgba(30, 41, 59, ${p * 0.6})`;
+        ctx.lineWidth = 3 * p;
+        ctx.beginPath();
+        ctx.arc(cx, yCenter, radius, Math.PI, 0);
+        ctx.stroke();
+
+        // Tunnel tracks
+        ctx.beginPath();
+        ctx.moveTo(cx - radius * 0.6, yCenter + radius * 0.9);
+        ctx.lineTo(cx, cy);
+        ctx.moveTo(cx + radius * 0.6, yCenter + radius * 0.9);
+        ctx.lineTo(cx, cy);
+        ctx.strokeStyle = `rgba(15, 23, 42, ${p * 0.8})`;
+        ctx.stroke();
+      }
+
+      // Emergency Strobe Light (Red Pulse on the top ceiling)
+      const strobe = Math.sin(time * 6) > 0.4 ? 1 : 0.15;
+      const redGlow = ctx.createRadialGradient(cx, height * 0.15, 10, cx, height * 0.3, width * 0.8);
+      redGlow.addColorStop(0, `rgba(239, 68, 68, ${0.45 * strobe})`);
+      redGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = redGlow;
+      ctx.fillRect(0, 0, width, height);
+
+      // Flashlight cone (Following camera / breathing motion)
+      const fX = cx + Math.sin(time * 0.8) * 35;
+      const fY = cy + Math.cos(time * 1.1) * 25;
+      const flash = ctx.createRadialGradient(cx, height * 0.75, 20, fX, fY, width * 0.55);
+      flash.addColorStop(0, 'rgba(255, 240, 200, 0.35)');
+      flash.addColorStop(0.5, 'rgba(254, 215, 170, 0.08)');
+      flash.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = flash;
+      ctx.fillRect(0, 0, width, height);
+
+      // Silhouette of Protagonist (Back turned, looking into the darkness)
+      ctx.fillStyle = '#05070d';
+      ctx.beginPath();
+      // Head
+      ctx.arc(cx - 20, height * 0.68, 22, 0, Math.PI * 2);
+      ctx.fill();
+      // Shoulders and Torso
+      ctx.beginPath();
+      ctx.moveTo(cx - 55, height * 0.78);
+      ctx.lineTo(cx + 25, height * 0.78);
+      ctx.lineTo(cx + 40, height);
+      ctx.lineTo(cx - 70, height);
+      ctx.closePath();
+      ctx.fill();
+
+      // Flashlight beam from hand
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(cx + 10, height * 0.76);
+      ctx.lineTo(fX, fY);
+      ctx.stroke();
+
+      // Creepy glowing eye in the distant curve of the tunnel
+      const eyeBlink = Math.sin(time * 3) > 0.8 ? 0 : 0.8;
+      ctx.fillStyle = `rgba(248, 113, 113, ${eyeBlink})`;
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.arc(cx + 45, cy - 10, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      requestAnimationFrame(render);
+    }
+    render();
+  </script>
+</body>
+</html>

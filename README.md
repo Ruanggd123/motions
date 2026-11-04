@@ -1,43 +1,71 @@
-# 🎬 Motions — Estúdio de Animações & Vídeos 3D Verticais (9:16)
+# 🎬 Motions — Central de Criação de Vídeos Verticais (9:16)
 
-> Pipeline de produção audiovisual autônoma para Reels, Shorts e TikTok com **Three.js**, **VoiceStudio**, renderizador acelerado **Turbo Dual-GPU** e kits virais automatizados para YouTube.
-
----
-
-## 🚀 Destaques da Arquitetura
-
-- **Single-File 3D HTML Interativo:** Cada projeto é gerado em um único arquivo `.html` autônomo com áudio master embutido em Base64, HUD com barra de progresso segmentada, legendas cinéticas e pins 3D projetados em tempo real (`camera.updateMatrixWorld()`).
-- **Visão de Cima (Top-Down) & Transparência Raio-X:** Câmera elevada (`45°–60°`) com paredes translúcidas (`opacity: 0.05`, `depthWrite: false`) e contorno luminoso ciano para visualização 100% desobstruída de mecanismos internos.
-- **Motor de Interpolação Suave (`evaluateAndRenderAtTime`):** Transições contínuas com curva `easeInOutCubic` (1.35s) eliminando cortes secos e agitação mecânica.
-- **VoiceStudio Neural + Analog DSP (`http://127.0.0.1:8000`):** Locução em tomada única contínua (`edge-tts -f` + timestamps `.vtt`), sem interrupções entre frases, masterizada com Pad documental em `C maj9`, ducking IIR suave e Soft-Knee Limiter (`Math.tanh`).
-- **Renderizador Turbo Dual-GPU (`scripts/render-turbo-gpu.mjs`):** Aceleração de hardware via Direct3D11 ANGLE com múltiplos processos paralelos Chrome headless, entregando vídeo HD 720×1280 @ 30fps (`H.264 / AAC 192k`) em alta velocidade.
-- **Kit Viral para Redes Sociais (`scripts/generate-youtube-kit.mjs`):** Geração automática de títulos de alto CTR, descrição SEO com capítulos temporizados (`MM:SS`) e tags prontas para o YouTube Studio.
+> Três estúdios de animação e vídeo 100% independentes para TikTok, Reels e Shorts com skills dedicadas no Antigravity e Claude Code.
 
 ---
 
-## 📦 Projetos Produzidos
-
-### 1. 🐈📦 O Gato de Schrödinger
-- **HTML Interativo:** [`gato-schrodinger-3d.html`](./gato-schrodinger-3d.html)
-- **Vídeo Final MP4:** [`output/video-gato-schrodinger.mp4`](./output/video-gato-schrodinger.mp4)
-- **Kit Viral do YouTube:** [`output/youtube-kit-gato-schrodinger.md`](./output/youtube-kit-gato-schrodinger.md)
-
-### 2. ⚡🧬 O Paradoxo do Teletransporte
-- **HTML Interativo:** [`teletransporte-3d.html`](./teletransporte-3d.html)
-- **Vídeo Final MP4:** [`output/video-teletransporte-quantico.mp4`](./output/video-teletransporte-quantico.mp4)
-- **Kit Viral do YouTube:** [`output/youtube-kit-teletransporte-quantico.md`](./output/youtube-kit-teletransporte-quantico.md)
+## 🌐 Hub Central de Navegação
+Abra o dashboard no navegador para acessar e testar todos os projetos com 1 clique:
+👉 **[`hub-projetos.html`](./hub-projetos.html)** (ou via servidor local: `http://localhost:8000/hub-projetos.html`)
 
 ---
 
-## 🛠️ Comandos Rápidos
+## 🎭 Os 3 Formatos de Vídeo & Suas Skills Dedicadas
+
+### 1. 🎬 Séries de Animação 2D Interativa ("Você Decide o Fim")
+- **Comando da Skill:** `/animacao-2d`
+- **Pasta:** [`series/condominio-bloco-c/`](./series/condominio-bloco-c/)
+- **Player de Aprovação Visual:** [`series/condominio-bloco-c/estudio-aprovacao-visual.html`](./series/condominio-bloco-c/estudio-aprovacao-visual.html)
+- **Características:**
+  - Personagens modulares com rig ósseo vetorial Bézier (`VoceMorador.js`, `SeuValdirPorteiro.js`).
+  - Cenários 2.5D com 4 camadas de paralaxe e reflexo real no piso (`PortariaBlocoC.js`).
+  - Dublagem multi-voz realista com sincronia labial e VoiceStudio.
+  - Overlay interativo minimalista de decisão via emojis virais (`🏃‍♂️` vs `🛡️`).
+
+### 2. 🥊 Combate 3D & Biomecânica de Nocaute ("Fighter Arena")
+- **Comando da Skill:** `/luta-3d` ou `/luta`
+- **Pasta / Arquivos:**
+  - Showcase Anatômico: [`fighter-showcase.html`](./fighter-showcase.html)
+  - Biomecânica Nocaute: [`biomecanica-nocaute-3d.html`](./biomecanica-nocaute-3d.html)
+  - Combo Mortal: [`combo-mortal-3d.html`](./combo-mortal-3d.html)
+  - Soco no Queixo: [`soco-no-queixo-3d.html`](./soco-no-queixo-3d.html)
+  - Módulos de Suporte: [`src/fighter/`](./src/fighter/) e [`src/kodeo-scene-builder.js`](./src/kodeo-scene-builder.js)
+- **Características:**
+  - Manequim anatômico 3D de alta performance com Three.js.
+  - Modo Raio-X seletivo (crânio, costelas, mandíbula, coluna).
+  - Vetores físicos de força em Newtons (N) e torque cervical.
+  - Hitstop dramático (congelamento no milissegundo do impacto) com câmera 60fps.
+
+### 3. 🌌 Cinema 3D Cósmico & Curiosidades Virais ("Buraco Negro / O Que Aconteceria Se...")
+- **Comando da Skill:** `/video-3d` ou `/video`
+- **Arquivos:**
+  - [`buraco-negro-3d.html`](./buraco-negro-3d.html)
+  - [`estrela-neutrons-3d.html`](./estrela-neutrons-3d.html)
+  - [`gravidade-zero-3d.html`](./gravidade-zero-3d.html)
+  - [`gato-schrodinger-3d.html`](./gato-schrodinger-3d.html)
+  - [`implosao-submarino-3d.html`](./implosao-submarino-3d.html)
+  - [`oxigenio-5-segundos-3d.html`](./oxigenio-5-segundos-3d.html)
+  - [`teletransporte-3d.html`](./teletransporte-3d.html)
+  - [`terra-parou-3d.html`](./terra-parou-3d.html)
+  - Kit Viral: [`kit-video-3d/`](./kit-video-3d/)
+- **Características:**
+  - 12 cenários procedurais tridimensionais distintos por vídeo.
+  - Personagem sofrendo ações físicas diretas (expressões Pixar, dor, queda, alívio respiratório).
+  - Tela 3D pura sem poluição de legendas no DOM (pins 3D flutuantes).
+  - Áudio VoiceStudio contínuo sem cortes (+2s tail margin).
+  - Renderizador acelerado Dual-GPU e Kit Viral do YouTube Shorts (Títulos A/B + SEO).
+
+---
+
+## 🛠️ Comandos Globais de Produção
 
 ```bash
-# Iniciar servidor VoiceStudio (porta 8000)
-node scripts/voicestudio-server.mjs
+# Iniciar servidor local (porta 8000)
+node series/condominio-bloco-c/serve.js
 
-# Renderizar vídeo HD com aceleração Turbo Dual-GPU
+# Renderizar vídeo 3D com aceleração Turbo Dual-GPU
 node scripts/render-turbo-gpu.mjs <arquivo.html> <audio.wav> <saida.mp4> <duracao_segundos>
 
-# Gerar Kit Viral do YouTube (Títulos, Descrição e Tags)
-node scripts/generate-youtube-kit.mjs
+# Executar suíte de validação de projeto
+node "C:\Users\Ruan Gomes\.claude\scripts\verify-project.mjs"
 ```

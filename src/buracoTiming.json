@@ -1,0 +1,89 @@
+{
+  "totalDuration": 81,
+  "beats": [
+    {
+      "id": 0,
+      "text": "Imagine que você está em uma missão espacial tranquila, quando de repente sua nave encontra um buraco negro supermassivo!",
+      "start": 0,
+      "end": 7.51,
+      "duration": 7.46
+    },
+    {
+      "id": 1,
+      "text": "Antes mesmo de você reagir, a gravidade monstruosa arranca os painéis da sua nave e puxa você para o abismo!",
+      "start": 7.51,
+      "end": 14.62,
+      "duration": 7.11
+    },
+    {
+      "id": 2,
+      "text": "A luz é tão curvada na esfera de fótons que, se você olhar para a frente, verá a sua própria nuca refletida no espaço!",
+      "start": 14.62,
+      "end": 22.4,
+      "duration": 7.78
+    },
+    {
+      "id": 3,
+      "text": "Ao seu lado, um planeta rochoso inteiro é despedaçado como se fosse feito de areia, alimentando um disco de plasma a milhões de graus!",
+      "start": 22.4,
+      "end": 30.83,
+      "duration": 8.43
+    },
+    {
+      "id": 4,
+      "text": "Aqui o espaço-tempo afunda tanto que o tempo quase para: cada segundo no seu pulso equivale a mil anos passando lá na Terra!",
+      "start": 30.83,
+      "end": 38.53,
+      "duration": 7.7
+    },
+    {
+      "id": 5,
+      "text": "Para quem te observa de longe, você parece desacelerar até congelar completamente, ficando cada vez mais vermelho!",
+      "start": 38.53,
+      "end": 46.14,
+      "duration": 7.61
+    },
+    {
+      "id": 6,
+      "text": "Mas para você, a queda continua em velocidade absurda! E como seus pés estão mais perto do centro, eles sofrem uma tração brutal!",
+      "start": 46.14,
+      "end": 50.54,
+      "duration": 4.4
+    },
+    {
+      "id": 7,
+      "text": "A diferença de gravidade entre seus pés e sua cabeça é de bilhões de vezes: seu corpo e a nave são esticados como um fio de espaguete!",
+      "start": 50.54,
+      "end": 55.6,
+      "duration": 5.06
+    },
+    {
+      "id": 8,
+      "text": "Você finalmente cruza o Horizonte de Eventos! A partir dessa fronteira invisível, nem mesmo a velocidade da luz consegue escapar!",
+      "start": 55.6,
+      "end": 64.06,
+      "duration": 8.46
+    },
+    {
+      "id": 9,
+      "text": "Lá dentro, espaço e tempo trocam de papel: tentar fugir para trás é tão impossível quanto tentar viajar para o ontem!",
+      "start": 64.06,
+      "end": 67.55,
+      "duration": 3.49
+    },
+    {
+      "id": 10,
+      "text": "No centro está a Singularidade de densidade infinita! Mas e se um buraco de minhoca te lançasse para fora em outra região do cosmos?",
+      "start": 67.55,
+      "end": 73.11,
+      "duration": 5.56
+    },
+    {
+      "id": 11,
+      "text": "Você voltaria intacto, mas milhões de anos no futuro! E aí, você teria coragem de pular nesse abismo cósmico?",
+      "start": 73.11,
+      "end": 81,
+      "duration": 7.72
+    }
+  ]
+}

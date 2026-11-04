@@ -1,0 +1,139 @@
+{
+  "project": "Condomínio Bloco C",
+  "active_cast": {
+    "narrador": {
+      "character": "Narrador Oficial",
+      "voice_id": "ruan_cloned",
+      "voice_name": "Ruan (Sua Voz Oficial Clonada)",
+      "engine": "VoiceStudio Local Profile 315cf2fd + Timbre Transfer HD",
+      "file": "/output/audicoes/vs_def_1_narrador_ruan.mp3",
+      "status": "aprovado"
+    },
+    "voce": {
+      "character": "Você (Protagonista na Guarita)",
+      "voice_id": "ruan_cloned_voce",
+      "voice_name": "Ruan (Dublagem do Protagonista)",
+      "engine": "VoiceStudio Local Profile 315cf2fd",
+      "file": "/output/audicoes/voce_protagonista_ruan.mp3",
+      "status": "aprovado"
+    },
+    "valdir": {
+      "character": "Seu Valdir (Porteiro 61a)",
+      "voice_id": "pessoa_8_brian",
+      "voice_name": "Brian (Multilingual Neural)",
+      "engine": "VoiceStudio Local + Neural Engine",
+      "file": "/output/audicoes/valdir_oficial_brian.mp3",
+      "file_radio": "/output/audicoes/valdir_radio_brian.mp3",
+      "status": "padrao_aprovado"
+    },
+    "lucas": {
+      "character": "Lucas",
+      "voice_id": "hyunsu",
+      "voice_name": "Hyunsu Multilingual",
+      "file": "/output/audicoes/lucas_hyunsu.mp3",
+      "status": "aprovado"
+    },
+    "camila": {
+      "character": "Dona Camila (Vizinha 304 - Interfone)",
+      "voice_id": "thalita_interfone",
+      "voice_name": "Thalita (Canal Interfone Predial)",
+      "engine": "VoiceStudio Local + DSP Interfone",
+      "file": "/output/audicoes/camila_vizinha_interfone_oficial.mp3",
+      "status": "aprovado"
+    },
+    "sindico": {
+      "character": "Síndico / Central de Segurança (48a)",
+      "voice_id": "duarte_pa_speaker",
+      "voice_name": "Duarte (Canal P.A. Alto-Falante Predial)",
+      "engine": "VoiceStudio Local + DSP Alto-Falante",
+      "file": "/output/audicoes/sindico_altofalante_oficial.mp3",
+      "status": "ativo"
+    }
+  },
+  "voice_roster_pool": [
+    {
+      "id": "pessoa_8_brian",
+      "name": "Brian (Multilingual Neural)",
+      "gender": "Masculino Maduro",
+      "role": "Seu Valdir (Oficial)",
+      "file": "/output/audicoes/valdir_oficial_brian.mp3"
+    },
+    {
+      "id": "pessoa_2_duarte",
+      "name": "Duarte (Maduro Solene)",
+      "gender": "Masculino Maduro",
+      "role": "Síndico / Central (Oficial)",
+      "file": "/output/audicoes/pessoa_2_duarte_maduro.mp3"
+    },
+    {
+      "id": "pessoa_1_google",
+      "name": "Google Neural BR",
+      "gender": "Masculino Neutro",
+      "role": "Banco Reserva / Morador",
+      "file": "/output/audicoes/pessoa_1_google_br.mp3"
+    },
+    {
+      "id": "pessoa_7_seu_tiao",
+      "name": "Seu Tião (Ator Real de Portaria)",
+      "gender": "Masculino Veterano",
+      "role": "Banco Reserva / Segurança Noturno",
+      "file": "/output/audicoes/pessoa_7_seu_tiao_veterano.mp3"
+    },
+    {
+      "id": "pessoa_3_giuseppe",
+      "name": "Giuseppe (Barítono Rouco)",
+      "gender": "Masculino Maduro",
+      "role": "Banco Reserva / Morador Velho",
+      "file": "/output/audicoes/pessoa_3_giuseppe_maduro.mp3"
+    },
+    {
+      "id": "pessoa_4_florian",
+      "name": "Florian (Voz de Peito Profunda)",
+      "gender": "Masculino Profundo",
+      "role": "Banco Reserva / Zelador Antigo",
+      "file": "/output/audicoes/pessoa_4_florian_grave.mp3"
+    },
+    {
+      "id": "pessoa_5_remy",
+      "name": "Remy (Voz Cansada Noturna)",
+      "gender": "Masculino Áspero",
+      "role": "Banco Reserva / Vigia",
+      "file": "/output/audicoes/pessoa_5_remy_maduro.mp3"
+    },
+    {
+      "id": "pessoa_6_william",
+      "name": "William (Veterano Seco)",
+      "gender": "Masculino Seco",
+      "role": "Banco Reserva / Policial / Perito",
+      "file": "/output/audicoes/pessoa_6_william_maduro.mp3"
+    },
+    {
+      "id": "pessoa_9_andrew",
+      "name": "Andrew (Grave Envolvente)",
+      "gender": "Masculino Envolvente",
+      "role": "Banco Reserva / Engenheiro",
+      "file": "/output/audicoes/pessoa_9_andrew_multilingual.mp3"
+    },
+    {
+      "id": "antonio_natural",
+      "name": "Antônio (Jovem Brasileiro)",
+      "gender": "Masculino Jovem",
+      "role": "Lucas Entregador (Oficial)",
+      "file": "/output/audicoes/lucas_entregador_oficial.mp3"
+    },
+    {
+      "id": "thalita_interfone",
+      "name": "Thalita (Interfone)",
+      "gender": "Feminino Jovem-Adulta",
+      "role": "Dona Camila 304 (Oficial)",
+      "file": "/output/audicoes/camila_vizinha_interfone_oficial.mp3"
+    },
+    {
+      "id": "francisca_br",
+      "name": "Francisca Neural BR",
+      "gender": "Feminino Adulto",
+      "role": "Banco Reserva / Moradora / Síndica",
+      "file": "/output/audicoes/camila_vizinha_304.mp3"
+    }
+  ]
+}

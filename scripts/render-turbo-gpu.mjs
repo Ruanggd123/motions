@@ -16,7 +16,8 @@ const durationSec = parseFloat(process.argv[5] || '71');
 const artifactMp4 = process.argv[6] || '';
 
 const CAPTURE_FPS = 18; // 18 fps nativos interpolados para 30fps no H.264 = super fluido e 4x mais rápido!
-const TOTAL_FRAMES = Math.floor(durationSec * CAPTURE_FPS);
+// Margem de segurança de 24 frames (~1.3s) para garantir que o fluxo de vídeo nunca acabe antes do áudio
+const TOTAL_FRAMES = Math.ceil(durationSec * CAPTURE_FPS) + 24;
 const WORKERS = 2;
 const OUT_DIR = join('output', `frames_turbo_${Date.now()}`);
 

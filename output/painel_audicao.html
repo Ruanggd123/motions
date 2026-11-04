@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Estúdio de Voz & Narração — Ruan vs Elenco</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: #0b0f19; color: #e2e8f0; padding: 28px; line-height: 1.5; }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 26px; color: #38bdf8; margin-bottom: 6px; }
+    p.sub { color: #94a3b8; font-size: 14px; margin-bottom: 24px; }
+    
+    .section { background: #131b2e; border: 1px solid #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .section h2 { font-size: 18px; color: #f1f5f9; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    
+    .card { background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #38bdf8; }
+    .card.alt { border-left-color: #a855f7; }
+    .card.cast { border-left-color: #10b981; }
+    .card-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .card-desc { font-size: 13px; color: #94a3b8; margin-bottom: 10px; }
+    .card-quote { font-style: italic; background: #0f172a; padding: 8px 12px; border-radius: 6px; font-size: 13px; color: #cbd5e1; margin-bottom: 10px; }
+    
+    audio { width: 100%; height: 38px; outline: none; border-radius: 6px; }
+    
+    .btn-record { background: #ef4444; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+    .btn-record.recording { animation: pulse 1s infinite alternate; background: #b91c1c; }
+    @keyframes pulse { from { opacity: 1; } to { opacity: 0.6; } }
+    
+    .guide-box { background: #0f172a; border: 1px dashed #334155; border-radius: 8px; padding: 14px; margin-top: 14px; font-size: 13px; color: #cbd5e1; }
+    .guide-box ol { margin-left: 20px; margin-top: 6px; }
+    .guide-box li { margin-bottom: 4px; }
+    .badge { font-size: 11px; padding: 2px 8px; border-radius: 12px; background: #0284c7; color: white; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎙️ Estúdio de Voz & Narração — Série Condomínio Bloco C</h1>
+    <p class="sub">Ouça as amostras abaixo, compare a sua voz calibrada e veja as duas formas de gravar novos episódios.</p>
+
+    <div class="section">
+      <h2>🗣️ 1. Teste de Audição da Narração (Ouça no seu fone)</h2>
+
+      <!-- Opção A Expressiva -->
+      <div class="card" style="border-left: 4px solid #10b981; background: #162032;">
+        <div class="card-title">
+          <span style="color:#34d399;">🌟 Sua Voz Expressiva Cinema (Totalmente Automática — 0 Esforço)</span>
+          <span class="badge" style="background:#059669;">NOVA VERSÃO</span>
+        </div>
+        <div class="card-desc">Modulação dramática de tom (SSML) com pausas de suspense, sem você precisar gravar nada. Usamos a matriz da sua voz com dinâmica cinematográfica.</div>
+        <div class="card-quote">"O público escolheu ficar na guarita com o Seu Valdir... mas o apagão travou tudo. E quando olhamos pelo vidro blindado... uma sombra... de mais de dois metros... encostou na eclusa."</div>
+        <audio controls src="/output/audicoes/narrador_ruan_expressivo_cinema.mp3"></audio>
+      </div>
+
+      <!-- Opção A Anterior -->
+      <div class="card">
+        <div class="card-title">
+          <span>Opção A (Versão Anterior Direta)</span>
+          <span class="badge">Anterior</span>
+        </div>
+        <div class="card-desc">Sua voz autoral clonada com curva espectral Welch, equalização de cinema e corte de ruídos/sopros.</div>
+        <div class="card-quote">"O público escolheu ficar na guarita com o Seu Valdir... mas o apagão travou tudo e uma sombra de mais de dois metros encostou na eclusa."</div>
+        <audio controls src="/output/audicoes/narrador_opcaoA_ruan_real.mp3"></audio>
+      </div>
+
+      <!-- Opção B -->
+      <div class="card alt">
+        <div class="card-title">
+          <span>Opção B: Narrador Dark Cinema (Timbre Profundo)</span>
+          <span class="badge" style="background:#7c3aed">Alternativa</span>
+        </div>
+        <div class="card-desc">Timbre barítono clássico de suspense/terror para quem prefere uma locução de rádio/trailer tradicional.</div>
+        <div class="card-quote">"O público escolheu ficar na guarita com o Seu Valdir... mas o apagão travou tudo..."</div>
+        <audio controls src="/output/audicoes/narrador_opcaoB_suspense_cinema.mp3"></audio>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>👴 2. Elenco de Personagens (Vozes Próprias de Cada Um)</h2>
+
+      <!-- Seu Valdir -->
+      <div class="card cast">
+        <div class="card-title">
+          <span>Seu Valdir (61 anos — Presencial)</span>
+          <span class="badge" style="background:#059669">Porteiro</span>
+        </div>
+        <div class="card-desc">Voz madura, ritmo de conversa natural sem lentidão robótica.</div>
+        <audio controls src="/output/audicoes/valdir_opcaoA_maduro_natural.mp3"></audio>
+      </div>
+
+      <!-- Seu Valdir Rádio -->
+      <div class="card cast">
+        <div class="card-title">
+          <span>Seu Valdir (No Rádio HT Motorola)</span>
+          <span class="badge" style="background:#059669">Rádio Transmissão</span>
+        </div>
+        <div class="card-desc">Efeito passa-banda de rádio comunicador, bips de PTT e compressão de canal.</div>
+        <audio controls src="/output/audicoes/valdir_opcaoB_radio_ht.mp3"></audio>
+      </div>
+
+      <!-- Você Fala na Cena -->
+      <div class="card">
+        <div class="card-title">
+          <span>Personagem 'Você' Fala na Cena (Sua Voz Interpretada)</span>
+          <span class="badge">Protagonista</span>
+        </div>
+        <div class="card-desc">O personagem principal falando dentro da história com a sua voz real.</div>
+        <div class="card-quote">"Seu Valdir! Tranca tudo agora! Tem uma sombra de mais de dois metros encostando na eclusa!"</div>
+        <audio controls src="/output/audicoes/voce_protagonista_ruan.mp3"></audio>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>🔴 3. Gravador Rápido do Ruan (Para Gravar Novas Frases Direto pelo Navegador)</h2>
+      <p class="card-desc">Clique no botão abaixo para gravar sua voz direto pelo microfone do computador. O áudio é salvo automaticamente e aplicado no episódio.</p>
+      
+      <div style="display:flex; gap:12px; align-items:center; margin-top:10px;">
+        <button id="recBtn" class="btn-record" onclick="toggleRecord()">🎤 Iniciar Gravação</button>
+        <span id="recTimer" style="font-weight:700; color:#ef4444; font-size:15px; display:none;">00:00</span>
+        <span id="recStatus" style="font-size:13px; color:#94a3b8;">Pronto para gravar</span>
+      </div>
+
+      <div id="playbackArea" style="margin-top:14px; display:none;">
+        <p style="font-size:13px; color:#38bdf8; margin-bottom:6px;">Prévia da sua gravação:</p>
+        <audio id="recordedAudio" controls></audio>
+        <div style="margin-top:8px;">
+          <button onclick="downloadRecording()" style="background:#0284c7; color:white; border:none; padding:6px 14px; border-radius:6px; font-size:12px; cursor:pointer;">💾 Salvar como Amostra Oficial (user_cloned_voice.wav)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-box">
+      <strong>📌 Como funciona o fluxo:</strong>
+      <ol>
+        <li><strong>Modo 1 (Automático / Inteligente):</strong> Nós escrevemos o roteiro do Episódio 3 em texto, e o sistema gera a fala completa transferindo o seu timbre de forma 100% autônoma.</li>
+        <li><strong>Modo 2 (Sua Gravação Real):</strong> Você lê a frase do narrador gravando pelo botão vermelho acima (ou no gravador do celular) e nós injetamos direto na timeline com os efeitos sonoros.</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+    let timerInterval;
+    let seconds = 0;
+    let recordedBlob = null;
+
+    async function toggleRecord() {
+      const btn = document.getElementById('recBtn');
+      const status = document.getElementById('recStatus');
+      const timer = document.getElementById('recTimer');
+
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = e => {
+            if (e.data.size > 0) audioChunks.push(e.data);
+          };
+
+          mediaRecorder.onstop = () => {
+            recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const audioUrl = URL.createObjectURL(recordedBlob);
+            const player = document.getElementById('recordedAudio');
+            player.src = audioUrl;
+            document.getElementById('playbackArea').style.display = 'block';
+            status.innerText = 'Gravação concluída! Ouça abaixo ou salve.';
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          btn.innerText = '⏹️ Parar Gravação';
+          btn.classList.add('recording');
+          timer.style.display = 'inline';
+          status.innerText = 'Gravando... fale de forma natural e expressiva';
+
+          seconds = 0;
+          timer.innerText = '00:00';
+          timerInterval = setInterval(() => {
+            seconds++;
+            const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const s = String(seconds % 60).padStart(2, '0');
+            timer.innerText = `${m}:${s}`;
+          }, 1000);
+
+        } catch (err) {
+          alert('Erro ao acessar o microfone: ' + err.message);
+        }
+      } else {
+        mediaRecorder.stop();
+        mediaRecorder.stream.getTracks().forEach(t => t.stop());
+        isRecording = false;
+        clearInterval(timerInterval);
+        btn.innerText = '🎤 Gravar Novamente';
+        btn.classList.remove('recording');
+        timer.style.display = 'none';
+      }
+    }
+
+    function downloadRecording() {
+      if (!recordedBlob) return;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(recordedBlob);
+      a.download = 'user_cloned_voice.wav';
+      a.click();
+      alert('Arquivo baixado! Salve na pasta motions/output/user_cloned_voice.wav para atualizar a voz mestre.');
+    }
+  </script>
+</body>
+</html>

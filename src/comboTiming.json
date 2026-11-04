@@ -1,0 +1,47 @@
+{
+  "totalDuration": 25,
+  "beats": [
+    {
+      "id": 0,
+      "text": "Você sabe por que esse é considerado o combo mais devastador da história do combate?",
+      "start": 0,
+      "end": 5.12,
+      "duration": 5.07
+    },
+    {
+      "id": 1,
+      "text": "A trocação começa em ritmo alucinante. Jab, direto, esquiva de cabeça! O lutador lê o movimento e prepara a armadilha.",
+      "start": 5.12,
+      "end": 8.17,
+      "duration": 3.05
+    },
+    {
+      "id": 2,
+      "text": "O contra-ataque explode: um gancho violento no fígado! A pancada comprime o órgão sob as costelas, ativando o nervo vago e drenando o oxigênio.",
+      "start": 8.17,
+      "end": 11.56,
+      "duration": 3.38
+    },
+    {
+      "id": 3,
+      "text": "Com o abdômen paralisado, a guarda desce. É a brecha fatal para o gancho de esquerda na ponta do queixo!",
+      "start": 11.56,
+      "end": 14.87,
+      "duration": 3.31
+    },
+    {
+      "id": 4,
+      "text": "A cabeça gira com torque violento. O cérebro colide contra o crânio e o tronco encefálico desliga a consciência na hora!",
+      "start": 14.87,
+      "end": 19,
+      "duration": 4.13
+    },
+    {
+      "id": 5,
+      "text": "Nocaute absoluto em dois atos. Física, biomecânica e precisão cirúrgica. Você conseguiria defender esse combo?",
+      "start": 19,
+      "end": 25,
+      "duration": 5.98
+    }
+  ]
+}

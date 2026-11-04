@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hub de Projetos & Estúdios de Vídeo · Antigravity & Claude</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at top, #0f172a, #020617);
+      color: #f8fafc;
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 40px 24px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .header {
+      text-align: center;
+      max-width: 800px;
+      margin-bottom: 40px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ffffff 40%, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 24px;
+      width: 100%;
+      max-width: 1200px;
+    }
+    .project-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 20px;
+      padding: 26px;
+      backdrop-filter: blur(16px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .project-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(56, 189, 248, 0.45);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 24px rgba(56, 189, 248, 0.15);
+    }
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .card-icon {
+      font-size: 38px;
+    }
+    .skill-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #f1f5f9;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .card-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+    .card-desc {
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    .features-list {
+      list-style: none;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .features-list li {
+      font-size: 12px;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .features-list li::before {
+      content: '✔';
+      color: #10b981;
+      font-weight: 800;
+      font-size: 11px;
+    }
+    .links-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: auto;
+    }
+    .btn-main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #38bdf8;
+      color: #020617;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-main:hover {
+      background: #7dd3fc;
+      transform: translateY(-1px);
+    }
+    .sub-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .sub-link {
+      font-size: 11px;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
+    }
+    .sub-link:hover {
+      color: #f8fafc;
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.1);
+    }
+    .footer {
+      margin-top: 50px;
+      font-size: 12px;
+      color: #64748b;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="badge">🚀 Central de Criação Audiovisual Autônoma</div>
+    <h1>Hub de Projetos & Estúdios</h1>
+    <p class="subtitle">
+      Selecione o formato de vídeo desejado ou use a Skill correspondente para criar novos episódios de forma autônoma.
+    </p>
+  </div>
+
+  <div class="grid">
+
+    <!-- PROJETO 1: SÉRIES 2D INTERATIVAS -->
+    <div class="project-card" style="border-top: 3px solid #38bdf8;">
+      <div>
+        <div class="card-top">
+          <div class="card-icon">🎬</div>
+          <span class="skill-pill" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">SKILL: /animacao-2d</span>
+        </div>
+        <h2 class="card-title">Séries 2D Interativas ("Você Decide o Fim")</h2>
+        <p class="card-desc">
+          Séries narrativas cotidianas de suspense com personagens e cenários modulares em arte vetorial Bézier rica, física de caminhada real, estúdio de aprovação e decisões interativas via comentários de emoji.
+        </p>
+        <ul class="features-list">
+          <li>Personagens modulares com rig ósseo (Você, Seu Valdir)</li>
+          <li>Cenários 2.5D com 4 camadas de paralaxe e reflexo</li>
+          <li>Clonagem de voz conversacional e dublagem com lip sync</li>
+          <li>Overlay ultra-limpo com votação instantânea por emoji (🏃‍♂️ ou 🛡️)</li>
+        </ul>
+      </div>
+
+      <div class="links-group">
+        <a class="btn-main" href="./series/condominio-bloco-c/showcase-caminhada.html" target="_blank">
+          🚶‍♂️ Abrir Showcase de Caminhada Lateral (60 FPS)
+        </a>
+        <div class="sub-links">
+          <a class="sub-link" href="./series/condominio-bloco-c/estudio-aprovacao-visual.html" target="_blank">🎬 Estúdio de Aprovação Visual</a>
+          <a class="sub-link" href="http://localhost:3901/" target="_blank" style="color: #34d399; border-color: rgba(52, 211, 153, 0.4); font-weight: 700;">🎙️ VoiceStudio Oficial (Web UI :3901)</a>
+          <a class="sub-link" href="http://127.0.0.1:3900/docs" target="_blank" style="color: #38bdf8;">⚡ API FastAPI (:3900)</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROJETO 2: LUTA & COMBATE 3D -->
+    <div class="project-card" style="border-top: 3px solid #ef4444;">
+      <div>
+        <div class="card-top">
+          <div class="card-icon">🥊</div>
+          <span class="skill-pill" style="color: #f87171; border-color: rgba(239, 68, 68, 0.3);">SKILL: /luta-3d</span>
+        </div>
+        <h2 class="card-title">Combate 3D & Biomecânica de Nocaute</h2>
+        <p class="card-desc">
+          Simulações tridimensionais de lutas (boxe, MMA, anime) com manequins anatômicos, vetores de força em Newtons, raio-X seletivo de ossos quebrando e câmera lenta cinematográfica no impacto.
+        </p>
+        <ul class="features-list">
+          <li>Manequim anatômico 3D com modo Raio-X seletivo</li>
+          <li>Vetores de força, torque cervical e desaceleração</li>
+          <li>Hitstop dramático e câmera orbital de ação 60fps</li>
+          <li>Cálculo biomecânico de impacto e fratura</li>
+        </ul>
+      </div>
+
+      <div class="links-group">
+        <a class="btn-main" style="background: #ef4444; color: #fff;" href="./fighter-showcase.html" target="_blank">
+          ▶ Abrir Showcase Anatômico do Lutador
+        </a>
+        <div class="sub-links">
+          <a class="sub-link" href="./biomecanica-nocaute-3d.html" target="_blank">Biomecânica Nocaute</a>
+          <a class="sub-link" href="./combo-mortal-3d.html" target="_blank">Combo Mortal</a>
+          <a class="sub-link" href="./soco-no-queixo-3d.html" target="_blank">Soco no Queixo</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROJETO 3: CINEMA 3D CÓSMICO -->
+    <div class="project-card" style="border-top: 3px solid #a855f7;">
+      <div>
+        <div class="card-top">
+          <div class="card-icon">🌌</div>
+          <span class="skill-pill" style="color: #c084fc; border-color: rgba(168, 85, 247, 0.3);">SKILL: /video-3d</span>
+        </div>
+        <h2 class="card-title">Cinema 3D Cósmico & Curiosidades Virais</h2>
+        <p class="card-desc">
+          Vídeos explicativos de paradoxos científicos, física quântica, astronomia e catástrofes planetárias com Three.js procedural, física reativa no personagem e tela 3D pura sem legendas.
+        </p>
+        <ul class="features-list">
+          <li>12 cenários procedurais cósmicos e extremos</li>
+          <li>Personagem sofrendo efeitos físicos reais (Pixar reactions)</li>
+          <li>Tela limpa sem poluição de legendas no DOM</li>
+          <li>Áudio VoiceStudio sem cortes + Kit Viral YouTube Shorts</li>
+        </ul>
+      </div>
+
+      <div class="links-group">
+        <a class="btn-main" style="background: #a855f7; color: #fff;" href="./buraco-negro-3d.html" target="_blank">
+          ▶ Abrir Vídeo: Buraco Negro 3D
+        </a>
+        <div class="sub-links">
+          <a class="sub-link" href="./estrela-neutrons-3d.html" target="_blank">Estrela de Nêutrons</a>
+          <a class="sub-link" href="./gravidade-zero-3d.html" target="_blank">Gravidade Zero</a>
+          <a class="sub-link" href="./gato-schrodinger-3d.html" target="_blank">Gato de Schrödinger</a>
+          <a class="sub-link" href="./implosao-submarino-3d.html" target="_blank">Implosão Submarino</a>
+          <a class="sub-link" href="./terra-parou-3d.html" target="_blank">Terra Parou</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Antigravity & Claude Code · 3 Estúdios Independentes · Servidor Ativo: http://localhost:8000
+  </div>
+
+</body>
+</html>

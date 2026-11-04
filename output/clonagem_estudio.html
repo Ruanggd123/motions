@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gravar & Calibrar Minha Voz — Estúdio Ruan</title>
+  <style>
+    :root {
+      --bg: #07090e;
+      --card-bg: rgba(15, 23, 42, 0.85);
+      --card-border: rgba(56, 189, 248, 0.2);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+
+    body {
+      background: radial-gradient(circle at 50% -10%, #172554 0%, #07090e 70%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 30px 20px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container { width: 100%; max-width: 900px; }
+
+    .nav-back { margin-bottom: 20px; }
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .btn-back:hover { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); border-color: rgba(56, 189, 248, 0.3); }
+
+    .header { text-align: center; margin-bottom: 26px; }
+    h1 {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p.subtitle { font-size: 14.5px; color: var(--text-muted); max-width: 650px; margin: 0 auto; line-height: 1.5; }
+
+    /* CARD DO GRAVADOR */
+    .recorder-card {
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+      border: 2px solid rgba(56, 189, 248, 0.4);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(56, 189, 248, 0.15);
+      margin-bottom: 30px;
+      backdrop-filter: blur(20px);
+    }
+
+    .teleprompter-box {
+      background: #030712;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .teleprompter-badge {
+      position: absolute;
+      top: -10px;
+      left: 16px;
+      background: #0284c7;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 10px;
+      border-radius: 6px;
+    }
+
+    .teleprompter-text {
+      font-size: 17px;
+      line-height: 1.6;
+      color: #f1f5f9;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .recorder-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .vu-meter-container {
+      width: 100%;
+      height: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 9999px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .vu-meter-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #10b981 0%, #38bdf8 60%, #f43f5e 100%);
+      transition: width 0.05s ease;
+      border-radius: 9999px;
+    }
+
+    .timer-display {
+      font-size: 32px;
+      font-weight: 800;
+      font-family: monospace;
+      color: #38bdf8;
+      letter-spacing: 2px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-rec {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-start {
+      background: #ef4444;
+      color: white;
+      box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+    }
+    .btn-start:hover { background: #dc2626; transform: scale(1.02); }
+    .btn-start.recording {
+      animation: pulse-red 1.2s infinite;
+      background: #b91c1c;
+    }
+
+    @keyframes pulse-red {
+      0%, 100% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.7); }
+      50% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.3); }
+    }
+
+    .btn-stop {
+      background: #475569;
+      color: white;
+    }
+    .btn-stop:hover:not(:disabled) { background: #334155; }
+    .btn-stop:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-save {
+      background: #10b981;
+      color: white;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35);
+    }
+    .btn-save:hover:not(:disabled) { background: #059669; transform: scale(1.02); }
+    .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .preview-box {
+      width: 100%;
+      background: rgba(3, 7, 18, 0.7);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .preview-title { font-size: 13px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+
+    audio { width: 100%; height: 40px; outline: none; filter: invert(1) hue-rotate(180deg); }
+
+    .status-msg {
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      min-height: 22px;
+      margin-top: 6px;
+    }
+    .status-success { color: #34d399; }
+    .status-error { color: #f87171; }
+    .status-info { color: #38bdf8; }
+
+    /* UPLOAD DE ARQUIVO */
+    .file-upload-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0 16px;
+      color: #64748b;
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .file-upload-divider::before, .file-upload-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255, 255, 255, 0.1); }
+
+    .file-dropzone {
+      border: 2px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: rgba(0, 0, 0, 0.2);
+    }
+    .file-dropzone:hover { border-color: var(--accent-blue); background: rgba(56, 189, 248, 0.05); }
+    .file-dropzone p { font-size: 13.5px; color: #94a3b8; }
+    .file-dropzone span { color: var(--accent-blue); font-weight: 600; }
+
+    /* COMPARAÇÃO */
+    .section-title {
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-blue);
+      margin: 36px 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: rgba(56, 189, 248, 0.2); }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 14px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+    .card-title { font-size: 16px; font-weight: 700; color: #f8fafc; margin-bottom: 4px; }
+    .card-sub { font-size: 12.5px; color: #94a3b8; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="nav-back">
+      <a href="/output/validacao_vozes.html" class="btn-back">← Voltar para Escolha de Vozes</a>
+    </div>
+
+    <div class="header">
+      <h1>🎙️ Gravar & Calibrar Sua Voz</h1>
+      <p class="subtitle">
+        Grave sua voz diretamente no microfone do navegador para calibrar a sua clonagem com riqueza de detalhes, sem ruídos e com presença de cinema.
+      </p>
+    </div>
+
+    <!-- O GRAVADOR PRINCIPAL -->
+    <div class="recorder-card">
+      <div class="teleprompter-box">
+        <span class="teleprompter-badge">Texto Sugerido para Leitura (Leia com calma e suspense)</span>
+        <div class="teleprompter-text">
+          "São onze e quarenta e dois da noite. A rua inteira sumiu numa neblina branca. As câmeras de segurança começaram a falhar uma por uma... e lá fora, tem alguma coisa pesada respirando encostada na grade de ferro."
+        </div>
+      </div>
+
+      <div class="recorder-controls">
+        <div class="timer-display" id="timer">00:00</div>
+
+        <div class="vu-meter-container">
+          <div class="vu-meter-bar" id="vuBar"></div>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn-rec btn-start" id="recordBtn" onclick="toggleRecording()">
+            <span>🔴</span> Iniciar Gravação
+          </button>
+          <button class="btn-rec btn-stop" id="stopBtn" onclick="stopRecording()" disabled>
+            <span>⏹️</span> Parar
+          </button>
+          <button class="btn-rec btn-save" id="saveBtn" onclick="uploadRecording()" disabled>
+            <span>🚀</span> Salvar & Calibrar Minha Voz
+          </button>
+        </div>
+
+        <div class="status-msg" id="statusMsg">Pronto para gravar. Clique em "Iniciar Gravação" e autorize o microfone.</div>
+
+        <div class="preview-box" id="previewBox">
+          <div class="preview-title">🎧 Prévia da Sua Gravação (Ouça antes de salvar):</div>
+          <audio id="previewAudio" controls></audio>
+        </div>
+      </div>
+
+      <!-- OU FAÇA UPLOAD DE ARQUIVO -->
+      <div class="file-upload-divider">OU ENVIE UM ÁUDIO DO CELULAR / WHATSAPP</div>
+      <div class="file-dropzone" onclick="document.getElementById('fileInput').click()">
+        <p>Arraste seu arquivo de áudio aqui ou <span>clique para escolher</span> (.wav, .mp3, .m4a, .ogg)</p>
+        <input type="file" id="fileInput" accept="audio/*" style="display: none;" onchange="handleFileSelect(event)">
+      </div>
+    </div>
+
+    <!-- RESULTADOS ATUALIZADOS -->
+    <div class="section-title">🎉 3 Takes Gerados com a Sua Gravação Recente (14.58s)</div>
+
+    <div class="card" style="border-left: 4px solid #10b981; background: rgba(16, 185, 129, 0.08);">
+      <div class="card-title">🎙️ Take 1: Abertura da Cena (Mistério da Neblina)</div>
+      <div class="card-sub">"São onze e quarenta e dois da noite. Você só desceu de moletom e chinelo pra pegar a pizza na portaria. Mas quando você olha pelo vidro blindado, a rua inteira sumiu numa neblina branca."</div>
+      <audio controls preload="auto" src="/output/audicoes/ruan_novo_take1_narracao_cena.mp3?v=100"></audio>
+    </div>
+
+    <div class="card" style="border-left: 4px solid #38bdf8; background: rgba(56, 189, 248, 0.08);">
+      <div class="card-title">👁️ Take 2: O Clímax da Eclusa (Tensão Pura)</div>
+      <div class="card-sub">"As câmeras de segurança começaram a falhar uma por uma... e na escuridão da eclusa, tem dois olhos vermelhos olhando fixamente pra você."</div>
+      <audio controls preload="auto" src="/output/audicoes/ruan_novo_take2_suspense_climax.mp3?v=100"></audio>
+    </div>
+
+    <div class="card" style="border-left: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.08);">
+      <div class="card-title">⚡ Take 3: Decisão do Público (Você Decide o Fim)</div>
+      <div class="card-sub">"E agora? Você decide o fim: o Seu Valdir destranca a eclusa para salvar o entregador, ou tranca tudo e corre para os fundos?"</div>
+      <audio controls preload="auto" src="/output/audicoes/ruan_novo_take3_decisao_publico.mp3?v=100"></audio>
+    </div>
+
+    <div class="section-title">🔍 Amostra Gravada de Referência</div>
+    <div class="card">
+      <div class="card-title">🎤 Sua Gravação Recente Recebida (14.58 segundos)</div>
+      <div class="card-sub">Este é o arquivo bruto gravado no seu microfone:</div>
+      <audio controls preload="auto" src="/output/audicoes/user_amostra_original.mp3?v=100"></audio>
+    </div>
+
+  </div>
+
+  <script>
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let audioBlob = null;
+    let audioContext = null;
+    let analyser = null;
+    let microphone = null;
+    let animationFrame = null;
+    let timerInterval = null;
+    let secondsElapsed = 0;
+
+    const recordBtn = document.getElementById('recordBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const timerDisplay = document.getElementById('timer');
+    const vuBar = document.getElementById('vuBar');
+    const statusMsg = document.getElementById('statusMsg');
+    const previewBox = document.getElementById('previewBox');
+    const previewAudio = document.getElementById('previewAudio');
+
+    async function toggleRecording() {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    }
+
+    async function startRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          audio: { 
+            echoCancellation: false, 
+            noiseSuppression: false, 
+            autoGainControl: false 
+          } 
+        });
+
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        microphone = audioContext.createMediaStreamSource(stream);
+        microphone.connect(analyser);
+
+        updateVUMeter();
+
+        audioChunks = [];
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+
+        mediaRecorder.ondataavailable = e => {
+          if (e.data.size > 0) audioChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          previewAudio.src = audioUrl;
+          previewBox.style.display = 'flex';
+          saveBtn.disabled = false;
+          statusMsg.className = 'status-msg status-info';
+          statusMsg.innerText = 'Gravação concluída! Ouça na prévia acima e clique em "Salvar & Calibrar Minha Voz".';
+
+          // Para os tracks do mic
+          stream.getTracks().forEach(track => track.stop());
+          if (audioContext && audioContext.state !== 'closed') audioContext.close();
+          cancelAnimationFrame(animationFrame);
+          vuBar.style.width = '0%';
+        };
+
+        mediaRecorder.start(100);
+        secondsElapsed = 0;
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+          secondsElapsed++;
+          updateTimerDisplay();
+        }, 1000);
+
+        recordBtn.innerHTML = '<span>⏹️</span> Gravando...';
+        recordBtn.className = 'btn-rec btn-start recording';
+        stopBtn.disabled = false;
+        saveBtn.disabled = true;
+        previewBox.style.display = 'none';
+
+        statusMsg.className = 'status-msg status-info';
+        statusMsg.innerText = 'Gravando! Leia o texto acima com calma e suspense...';
+      } catch (err) {
+        statusMsg.className = 'status-msg status-error';
+        statusMsg.innerText = 'Erro ao acessar microfone: ' + err.message + '. Verifique as permissões do navegador.';
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        clearInterval(timerInterval);
+        recordBtn.innerHTML = '<span>🔴</span> Gravar Novamente';
+        recordBtn.className = 'btn-rec btn-start';
+        stopBtn.disabled = true;
+      }
+    }
+
+    function updateTimerDisplay() {
+      const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+      const secs = String(secondsElapsed % 60).padStart(2, '0');
+      timerDisplay.innerText = `${mins}:${secs}`;
+    }
+
+    function updateVUMeter() {
+      if (!analyser) return;
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(dataArray);
+
+      let sum = 0;
+      for (let i = 0; i < dataArray.length; i++) {
+        sum += dataArray[i];
+      }
+      const avg = sum / dataArray.length;
+      const percent = Math.min(100, Math.round((avg / 128) * 100));
+      vuBar.style.width = percent + '%';
+
+      animationFrame = requestAnimationFrame(updateVUMeter);
+    }
+
+    async function uploadRecording() {
+      if (!audioBlob) return;
+      uploadAudioData(audioBlob);
+    }
+
+    async function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) {
+        uploadAudioData(file);
+      }
+    }
+
+    async function uploadAudioData(blobOrFile) {
+      statusMsg.className = 'status-msg status-info';
+      statusMsg.innerText = '⏳ Enviando áudio, aplicando limpeza de-breathe e calibrando o modelo... aguarde alguns segundos.';
+      saveBtn.disabled = true;
+
+      try {
+        const response = await fetch('/api/upload-voice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/octet-stream' },
+          body: blobOrFile
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          statusMsg.className = 'status-msg status-success';
+          statusMsg.innerText = '🎉 ' + data.message;
+
+          // Atualiza os players da página com timestamp para limpar cache
+          const timestamp = new Date().getTime();
+          document.getElementById('currentCloned').src = '/output/audicoes/narrador_opcaoA_ruan_real.mp3?v=' + timestamp;
+          document.getElementById('currentRef').src = '/output/audicoes/user_amostra_limpa.mp3?v=' + timestamp;
+          document.getElementById('currentCloned').play();
+        } else {
+          statusMsg.className = 'status-msg status-error';
+          statusMsg.innerText = '❌ Erro no processamento: ' + data.error;
+        }
+      } catch (err) {
+        statusMsg.className = 'status-msg status-error';
+        statusMsg.innerText = '❌ Falha na conexão com o servidor: ' + err.message;
+      } finally {
+        saveBtn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
