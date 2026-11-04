@@ -926,26 +926,44 @@
 
       ctx.restore();
 
-      // 3. BRAÇO ESQUERDO (Trás — Segurando Chave do Apê)
+      // 3. BRAÇO ESQUERDO (Trás — Gesto Natural de Equilíbrio / Expressão)
       ctx.save();
       ctx.translate(-26 + hipSway * 0.5, -16 + hipBob);
       ctx.rotate(torsoTilt);
 
       let leftUpperAngle = 0.12 + leftArmSwing;
       let leftForeAngle = 0.22 + Math.max(0, -leftArmSwing) * 0.45;
-      if (this.pose === 'key_ready') {
-        leftUpperAngle = -0.45;
+      let leftHandPose = 'relaxed';
+
+      if (this.pose === 'gesturing_urgent') {
+        // Gesto de urgência com as duas mãos — mão esquerda erguida com a palma aberta
+        leftUpperAngle = -1.15 + Math.sin(this.time * 5.2) * 0.08;
         leftForeAngle = -0.65;
+        leftHandPose = 'open';
+      } else if (this.pose === 'step_back' || this.pose === 'listening') {
+        // Recuo defensivo / ouvindo apreensivo
+        leftUpperAngle = -0.35;
+        leftForeAngle = 0.95;
+        leftHandPose = 'defensive';
+      } else if (this.pose === 'pointing' || this.pose === 'pointing_valdir') {
+        // Equilíbrio enquanto o braço direito aponta
+        leftUpperAngle = 0.22;
+        leftForeAngle = 0.45;
+        leftHandPose = 'relaxed';
+      } else if (this.pose === 'pointing_window') {
+        leftUpperAngle = -0.35;
+        leftForeAngle = 0.65;
+        leftHandPose = 'relaxed';
+      } else if (this.pose === 'hands_counter' || this.pose === 'window_look') {
+        leftUpperAngle = -0.38;
+        leftForeAngle = 0.72;
+        leftHandPose = 'relaxed';
       } else if (this.pose === 'holding_spotlight') {
-        // Mão de apoio no corpo do farol tático
         leftUpperAngle = -0.52;
         leftForeAngle = -1.18;
-      } else if (this.pose === 'gesturing_urgent') {
-        // Gesto de urgência — mão aberta na altura do ombro
-        leftUpperAngle = -0.92 + Math.sin(this.time * 5.2) * 0.07;
-        leftForeAngle = -0.58;
+        leftHandPose = 'relaxed';
       }
-      this._drawArticulatedArm(ctx, leftUpperAngle, leftForeAngle, false);
+      this._drawArticulatedArm(ctx, leftUpperAngle, leftForeAngle, leftHandPose, false);
       ctx.restore();
 
       // 4. TRONCO DO MOLETOM AZUL-PETRÓLEO COM CAPUZ E BOLSO CANGURU
@@ -960,31 +978,55 @@
 
       ctx.restore();
 
-      // 6. BRAÇO DIREITO (Frente — Segurando Smartphone com tela acesa)
+      // 6. BRAÇO DIREITO (Frente — Articulado e Expressivo)
       ctx.save();
       ctx.translate(26 + hipSway * 0.5, -16 + hipBob);
       ctx.rotate(torsoTilt);
 
       let rightUpperAngle = -0.15 + rightArmSwing;
       let rightForeAngle = 0.25;
+      let rightHandPose = 'relaxed';
 
       if (this.pose === 'phone_look') {
         const armBob = this.isWalking ? Math.sin(this.walkCycle) * 0.05 : 0;
         rightUpperAngle = 0.32 + armBob;
         rightForeAngle = 2.15 - armBob * 0.4;
-      } else if (this.pose === 'pointing') {
-        // Ordena a Seu Valdir: braço estendido apontando a eclusa
-        rightUpperAngle = -1.42;
-        rightForeAngle = -0.12;
+        rightHandPose = 'phone_look';
+      } else if (this.pose === 'pointing' || this.pose === 'pointing_valdir') {
+        // Ordena a Seu Valdir com postura diagonal natural (cotovelo flexionado, dedo erguido)
+        rightUpperAngle = -0.85 + Math.sin(this.time * 4.5) * 0.05;
+        rightForeAngle = -0.55;
+        rightHandPose = 'pointing';
+      } else if (this.pose === 'pointing_window') {
+        // Aponta para a janela/porta lateral
+        rightUpperAngle = -1.05 + Math.sin(this.time * 4.0) * 0.04;
+        rightForeAngle = -0.85;
+        rightHandPose = 'pointing';
+      } else if (this.pose === 'hands_counter' || this.pose === 'window_look') {
+        // Ambas as mãos apoiadas ou olhando com tensão
+        rightUpperAngle = -0.38;
+        rightForeAngle = 0.72;
+        rightHandPose = 'relaxed';
+      } else if (this.pose === 'listening') {
+        // Escutando interfone com sobressalto
+        rightUpperAngle = -0.45;
+        rightForeAngle = 1.65;
+        rightHandPose = 'defensive';
+      } else if (this.pose === 'gesturing_urgent') {
+        // Gesto de urgência / súplica
+        rightUpperAngle = -1.25 + Math.sin(this.time * 5.2 + 0.8) * 0.08;
+        rightForeAngle = -0.48;
+        rightHandPose = 'open';
       } else if (this.pose === 'holding_spotlight') {
-        // Segura o farol tático com as duas mãos na altura do peito
         rightUpperAngle = -0.62;
         rightForeAngle = -1.32;
+        rightHandPose = 'relaxed';
       } else if (this.pose === 'step_back') {
-        rightUpperAngle = 0.12;
-        rightForeAngle = 1.15;
+        rightUpperAngle = 0.25;
+        rightForeAngle = 1.35;
+        rightHandPose = 'defensive';
       }
-      this._drawArticulatedArm(ctx, rightUpperAngle, rightForeAngle, true);
+      this._drawArticulatedArm(ctx, rightUpperAngle, rightForeAngle, rightHandPose, true);
       ctx.restore();
     }
 
@@ -1060,7 +1102,7 @@
       ctx.restore();
     }
 
-    _drawArticulatedArm(ctx, upperAngle, foreAngle, holdsPhone) {
+    _drawArticulatedArm(ctx, upperAngle, foreAngle, handPose = 'relaxed', isRight = false) {
       const upperLen = 34;
       const foreLen = 32;
 
@@ -1112,53 +1154,159 @@
       ctx.fillStyle = '#0a1d2e';
       ctx.fillRect(-6, foreLen - 5, 12, 5);
 
-      // Mão Anatômica
+      // Posiciona para desenhar a mão anatômica
       ctx.translate(0, foreLen);
-      ctx.fillStyle = '#c99060';
-      ctx.beginPath();
-      ctx.roundRect(-5.5, 0, 11, 13, 4);
-      ctx.fill();
+      this._drawAnatomicalHand(ctx, handPose, isRight);
 
-      if (holdsPhone) {
-        // Smartphone moderno aceso
+      ctx.restore();
+    }
+
+    _drawAnatomicalHand(ctx, handPose, isRight) {
+      const skinBase = '#c99060';
+      const skinShadow = '#a86c3a';
+      const skinLight = '#dcb285';
+
+      if (handPose === 'pointing') {
+        // MÃO APONTANDO COM DEDO INDICADOR ESTENDIDO (Zero objetos estranhos)
         ctx.save();
-        ctx.translate(0, 6);
-        ctx.rotate(-0.35);
-
-        ctx.fillStyle = '#090d16';
-        ctx.strokeStyle = '#64748b';
-        ctx.lineWidth = 1.4;
+        // Palma fechada com articulações dos dedos
+        ctx.fillStyle = skinBase;
         ctx.beginPath();
-        ctx.roundRect(-6, -14, 12, 24, 3);
+        ctx.roundRect(-5.0, 0, 10.0, 9.5, 3);
+        ctx.fill();
+
+        // Sombra anatômica na palma
+        ctx.fillStyle = skinShadow;
+        ctx.fillRect(-4.0, 6.0, 8.0, 1.8);
+
+        // Dedo indicador estendido para a direção do comando
+        ctx.fillStyle = skinLight;
+        ctx.beginPath();
+        ctx.roundRect(-2.2, 7.0, 4.4, 15.0, 2.2);
+        ctx.fill();
+        ctx.strokeStyle = skinShadow;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+
+        // Linha de articulação da falange do indicador
+        ctx.strokeStyle = skinShadow;
+        ctx.beginPath();
+        ctx.moveTo(-1.6, 14.5);
+        ctx.lineTo(1.6, 14.5);
+        ctx.stroke();
+
+        // Polegar dobrado sobre a articulação
+        ctx.fillStyle = skinBase;
+        ctx.beginPath();
+        ctx.roundRect(isRight ? -6.2 : 2.0, 1.5, 4.4, 7.5, 2);
+        ctx.fill();
+
+        ctx.restore();
+      } else if (handPose === 'phone_look') {
+        // MÃO SEGURANDO SMARTPHONE COM NATURALIDADE (Apenas quando explicitamente na pose phone_look)
+        ctx.save();
+        ctx.translate(0, 4);
+        ctx.rotate(-0.25);
+
+        // Chassi do Smartphone
+        ctx.fillStyle = '#090d16';
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.roundRect(-7, -13, 14, 25, 3);
         ctx.fill();
         ctx.stroke();
 
         // Tela iluminada
         ctx.fillStyle = '#38bdf8';
-        ctx.fillRect(-4.5, -11, 9, 18);
+        ctx.fillRect(-5.5, -10.5, 11, 20);
 
         // Brilho suave da tela
-        const phoneGlow = ctx.createRadialGradient(0, 0, 2, -18, -25, 45);
+        const phoneGlow = ctx.createRadialGradient(0, 0, 2, -15, -20, 42);
         phoneGlow.addColorStop(0, 'rgba(56, 189, 248, 0.35)');
         phoneGlow.addColorStop(1, 'rgba(56, 189, 248, 0)');
         ctx.fillStyle = phoneGlow;
         ctx.beginPath();
-        ctx.arc(-8, -12, 42, 0, Math.PI * 2);
+        ctx.arc(-6, -10, 40, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Dedos segurando o aparelho pelas laterais
+        ctx.fillStyle = skinBase;
+        ctx.beginPath();
+        ctx.roundRect(-7.5, -6, 2.5, 5.0, 1.2);
+        ctx.roundRect(-7.5, 1, 2.5, 5.0, 1.2);
+        ctx.roundRect(5.0, -2, 2.5, 6.0, 1.2);
         ctx.fill();
 
         ctx.restore();
-      } else {
-        // Chave manual do condomínio
-        ctx.strokeStyle = '#fbbf24';
-        ctx.lineWidth = 1.8;
+      } else if (handPose === 'open' || handPose === 'gesturing_urgent') {
+        // MÃO ABERTA EXPRESSIVA (Súplica / Desespero para abrir a porta)
+        ctx.save();
+        ctx.fillStyle = skinBase;
         ctx.beginPath();
-        ctx.arc(0, 8, 4, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.fillStyle = '#cbd5e1';
-        ctx.fillRect(-1.5, 12, 3, 9);
-      }
+        ctx.roundRect(-5.5, 0, 11.0, 10.0, 3);
+        ctx.fill();
 
-      ctx.restore();
+        // 4 Dedos abertos e expressivos
+        for (let i = 0; i < 4; i++) {
+          const fx = -4.2 + i * 2.8;
+          const flen = 10.5 + (i === 1 || i === 2 ? 2.5 : 0);
+          ctx.fillStyle = i % 2 === 0 ? skinBase : skinLight;
+          ctx.beginPath();
+          ctx.roundRect(fx, 7.5, 2.3, flen, 1.1);
+          ctx.fill();
+        }
+
+        // Polegar aberto lateralmente
+        ctx.fillStyle = skinBase;
+        ctx.beginPath();
+        ctx.roundRect(isRight ? -7.5 : 4.5, 1.5, 3.2, 7.5, 1.5);
+        ctx.fill();
+
+        ctx.restore();
+      } else if (handPose === 'defensive') {
+        // MÃO DEFENSIVA EM RECUO DE CHOQUE
+        ctx.save();
+        ctx.fillStyle = skinBase;
+        ctx.beginPath();
+        ctx.roundRect(-5.5, 0, 11.0, 9.0, 3);
+        ctx.fill();
+
+        // Dedos estendidos em tensão
+        for (let i = 0; i < 4; i++) {
+          const fx = -4.0 + i * 2.6;
+          ctx.fillStyle = skinLight;
+          ctx.beginPath();
+          ctx.roundRect(fx, 6.5, 2.2, 9.0, 1.0);
+          ctx.fill();
+        }
+        ctx.restore();
+      } else {
+        // MÃO RELAXADA ANATÔMICA (Em repouso — Zero chaves ou artefatos)
+        ctx.save();
+        ctx.fillStyle = skinBase;
+        ctx.beginPath();
+        ctx.roundRect(-5.0, 0, 10.0, 10.0, 3);
+        ctx.fill();
+
+        // Dedos curvados relaxados
+        for (let i = 0; i < 4; i++) {
+          const fx = -4.0 + i * 2.6;
+          const flen = 6.0 + (i === 1 || i === 2 ? 1.5 : 0);
+          ctx.fillStyle = i % 2 === 0 ? skinBase : skinLight;
+          ctx.beginPath();
+          ctx.roundRect(fx, 7.0, 2.2, flen, 1.1);
+          ctx.fill();
+        }
+
+        // Polegar em repouso
+        ctx.fillStyle = skinBase;
+        ctx.beginPath();
+        ctx.roundRect(isRight ? -6.5 : 3.8, 1.5, 3.0, 6.5, 1.2);
+        ctx.fill();
+
+        ctx.restore();
+      }
     }
 
     /**

@@ -521,6 +521,54 @@
         ctx.fillRect(3, 8, 6, 1.2);
         ctx.fillRect(3, 11, 4, 1.2);
         ctx.restore();
+      } else if (this.pose === 'hands_glass' || this.pose === 'bang_gate') {
+        // AMBOS OS BRAÇOS EM PERFIL ESPALMANDO/ESMURRANDO O VIDRO BLINDADO
+        // Braço Traseiro (Far Arm)
+        ctx.save();
+        ctx.translate(-2, -4);
+        ctx.rotate(-0.85 + (this.pose === 'bang_gate' ? Math.sin(this.time * 16 + 0.5) * 0.12 : 0));
+        ctx.fillStyle = '#991b1b';
+        ctx.beginPath();
+        ctx.roundRect(-4, 0, 8, 28, 3);
+        ctx.fill();
+        ctx.translate(0, 26);
+        ctx.rotate(-0.45);
+        ctx.fillStyle = '#7f1d1d';
+        ctx.beginPath();
+        ctx.roundRect(-3.5, 0, 7, 26, 3);
+        ctx.fill();
+        ctx.fillStyle = '#18181b';
+        ctx.beginPath();
+        ctx.ellipse(0, 28, 4.5, 6.0, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Braço Dianteiro (Near Arm)
+        ctx.save();
+        ctx.translate(4, -2);
+        ctx.rotate(-0.75 + (this.pose === 'bang_gate' ? Math.sin(this.time * 16) * 0.15 : 0));
+        const nearArmGrad = ctx.createLinearGradient(-5, 0, 5, 30);
+        nearArmGrad.addColorStop(0, '#dc2626');
+        nearArmGrad.addColorStop(1, '#991b1b');
+        ctx.fillStyle = nearArmGrad;
+        ctx.beginPath();
+        ctx.roundRect(-4.5, 0, 9, 30, 3);
+        ctx.fill();
+        ctx.translate(0, 28);
+        ctx.rotate(-0.50);
+        ctx.fillStyle = '#991b1b';
+        ctx.beginPath();
+        ctx.roundRect(-4, 0, 8, 28, 3);
+        ctx.fill();
+        // Faixa refletiva no antebraço
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(-3.8, 12, 7.6, 3.5);
+        // Palma da luva preta aberta e achatada contra o vidro
+        ctx.fillStyle = '#09090b';
+        ctx.beginPath();
+        ctx.ellipse(0, 30, 5.5, 7.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
       } else {
         // Balanço natural dos braços
         const armSwing = isWalk ? Math.sin(phi) * 0.40 : 0;

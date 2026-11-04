@@ -438,12 +438,14 @@
       <h2>⏱️ Saltos da Cena</h2>
       <div style="display:flex; flex-direction:column; gap:4px;" id="cueButtons">
         <button onclick="seekTo(0.5)">00s • 🏆 Comentários Reais (@Melissa/@Dark)</button>
-        <button onclick="seekTo(13.8)">14s • 🔦 Ignição do Holofote 1000W</button>
+        <button onclick="seekTo(13.9)">14s • 🚶 Seu Valdir Caminha até o Quadro</button>
+        <button onclick="seekTo(15.8)">16s • ✋ Macro: Mão Puxando a Alavanca</button>
+        <button onclick="seekTo(17.0)">17s • 🔦 Luz Acende (Vista Externa)</button>
         <button onclick="seekTo(28.9)">29s • 📹 CCTV CAM 02: Criatura & Massa Negra</button>
         <button onclick="seekTo(36.7)">37s • 🚴 Lucas Espancando o Vidro Blindado</button>
-        <button onclick="seekTo(46.7)">47s • 👩 Dona Camila no Interfone (DSP)</button>
+        <button onclick="seekTo(44.4)">44s • ☎️ Interfone Macro (Dona Camila)</button>
         <button onclick="seekTo(62.5)">62s • ⚡ Sobrecarga & Cerca de 10kV</button>
-        <button onclick="seekTo(83.4)">83s • 🗳️ Você Decide o Fim (16.5s)</button>
+        <button onclick="seekTo(81.2)">81s • 🗳️ Você Decide o Fim (16.5s)</button>
       </div>
     </div>
   </div>
@@ -494,6 +496,45 @@
     let spotlightActive = false;
     let lastBangCycle = -1;
 
+    // ── DESLOCAMENTO REAL DO SEU VALDIR ATÉ O QUADRO ELÉTRICO (Plano 3A) ──
+    // Ele não "teleporta" para o quadro: caminha da bancada até a parede lateral.
+    // O rig entra em perfil durante a caminhada e volta a frontal ao parar (Bíblia §5.1).
+    // Timing reancorado na fala real: valdir1 vai de 13.77s ("Tá na mão" ... gira a
+    // manivela) até 21.09s. A alavanca fecha em 16.22s, casando com o estalo de
+    // ignição do SFX (spotlight_start = 14.97) e liberando a vista externa em 16.4s.
+    const VALDIR_X_DESK = 330;
+    const VALDIR_X_PANEL = 424;
+    const VALDIR_WALK_START = 13.77;
+    const VALDIR_WALK_END = 15.62;
+    const LEVER_PULL_AT = 15.80;
+    const LEVER_MACRO_START = 15.62;
+    const EXTERIOR_LIGHT_START = 16.40;
+
+    /** Interpolação com desaceleração (o porteiro apoia o pé com peso, não para seco). */
+    function easeOutCubic(p) {
+      return 1 - Math.pow(1 - p, 3);
+    }
+
+    /**
+     * Posiciona o Seu Valdir na caminhada até o quadro elétrico.
+     * Determinístico: depende só do tempo — essencial para o render frame a frame.
+     */
+    function updateValdirWalk(time) {
+      if (time < VALDIR_WALK_START) {
+        valdir.x = VALDIR_X_DESK;
+        valdir.stop();
+        return;
+      }
+      if (time >= VALDIR_WALK_END) {
+        valdir.x = VALDIR_X_PANEL;
+        valdir.stop();
+        return;
+      }
+      const p = (time - VALDIR_WALK_START) / (VALDIR_WALK_END - VALDIR_WALK_START);
+      valdir.x = VALDIR_X_DESK + (VALDIR_X_PANEL - VALDIR_X_DESK) * easeOutCubic(p);
+      valdir.walk(1.15, 1);
+    }
+
     // Elementos DOM
     const ugcBadge = document.getElementById('ugcBadge');
     const decisionOverlay = document.getElementById('decisionOverlay');
@@ -509,9 +550,19 @@
     function seekTo(sec) {
       audio.currentTime = sec;
       t = sec;
-      if (!playing) renderFrame();
+      directScene(t);
+      if (cam.tfx !== undefined) cam.cut(cam.tfx, cam.tfy, cam.tzoom);
+      renderFrame();
     }
     window.seekTo = seekTo;
+
+    window.renderAt = function(sec) {
+      audio.currentTime = sec;
+      t = sec;
+      directScene(t);
+      if (cam.tfx !== undefined) cam.cut(cam.tfx, cam.tfy, cam.tzoom);
+      renderFrame();
+    };
 
     btnPlay.addEventListener('click', () => {
       if (playing) {
@@ -797,9 +848,10 @@
         ctx.restore();
       };
 
-      drawWeb(165, 345, 34, 7, 0.2);
-      drawWeb(235, 325, 44, 9, 0.7);
-      drawWeb(200, 365, 58, 11, 1.3);
+      // Teias de aranha concentradas na vidraça da porta blindada (x: 95 a 115), livres do rosto dos personagens
+      drawWeb(98, 365, 36, 7, 0.2);
+      drawWeb(112, 335, 42, 9, 0.7);
+      drawWeb(104, 395, 48, 11, 1.3);
     }
 
     // 3. LUCAS BATENDO NO VIDRO COM ONDAS DE CHOQUE E TENTÁCULOS DE SOMBRA
@@ -1017,7 +1069,7 @@
 
     // 4. FEIXE DE HOLOFOTE VOLUMÉTRICO 1000W EXTERNO (Apontado para a Rua na Neblina, NUNCA na cara dos personagens)
     function drawSpotlightBeam(ctx) {
-      if (!spotlightActive || cctvActive) return;
+      if (!spotlightActive || cctvActive || activeScenario === 'intercom_macro' || activeScenario === 'lucas_lateral' || t >= 44.0) return;
 
       ctx.save();
       const timeSinceOn = Math.max(0, t - SPOTLIGHT_START);
@@ -1120,410 +1172,1003 @@
       ctx.restore();
     }
 
-    // 4.5. VISÃO DE LONGE DA FACHADA DO SOLARIS: ATIVAÇÃO DO HOLOFOTE DE 1000W NA NEBLINA
-    function drawExteriorDistantShot(ctx) {
+    // 4.6. PLANO 6: VISÃO LATERAL CINEMATOGRÁFICA EM PERFIL 3/4 DO LUCAS ESPANCANDO O VIDRO BLINDADO
+    function drawLucasLateralShot(ctx, lucasMouth) {
       ctx.save();
-      const timeSinceOn = Math.max(0, t - SPOTLIGHT_START);
-      const ignitionFlash = timeSinceOn < 0.35 ? (1 - timeSinceOn / 0.35) : 0;
+      const floorY = 1440;
 
-      // 1. CÉU NOTURNO E PRÉDIOS URBANOS DISTANTES COM RELÂMPAGO DIFUSO
-      const skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.55);
-      skyGrad.addColorStop(0, '#02040a');
-      skyGrad.addColorStop(0.5, '#060d1a');
-      skyGrad.addColorStop(1, '#091322');
-      ctx.fillStyle = skyGrad;
-      ctx.fillRect(0, 0, W, H);
+      // 1. CÉU NOTURNO EXTERNO & RUA CHUVOSA (LADO DIREITO DO VIDRO: x > 380)
+      const streetSky = ctx.createLinearGradient(0, 0, 0, floorY);
+      streetSky.addColorStop(0, '#01040a');
+      streetSky.addColorStop(0.5, '#040a16');
+      streetSky.addColorStop(1, '#02050b');
+      ctx.fillStyle = streetSky;
+      ctx.fillRect(380, 0, W - 380, floorY);
 
-      // Silhuetas dos edifícios vizinhos na escuridão
-      ctx.fillStyle = '#030712';
-      const cityBuildings = [
-        [40, 320, 140, 800], [210, 260, 160, 860], [400, 380, 120, 740],
-        [820, 290, 150, 830], [990, 340, 120, 780]
-      ];
-      cityBuildings.forEach(([bx, by, bw, bh]) => {
-        ctx.fillRect(bx, by, bw, bh);
-        ctx.fillStyle = 'rgba(253, 224, 71, 0.08)';
-        for (let wy = by + 40; wy < by + bh - 100; wy += 55) {
-          for (let wx = bx + 20; wx < bx + bw - 25; wx += 42) {
-            if ((wx * 7 + wy * 13) % 4 === 0) ctx.fillRect(wx, wy, 12, 16);
-          }
-        }
-        ctx.fillStyle = '#030712';
-      });
+      // Asfalto molhado externo com poças e reflexos
+      const wetRoad = ctx.createLinearGradient(380, floorY, W, H);
+      wetRoad.addColorStop(0, '#090e18');
+      wetRoad.addColorStop(0.4, '#04070e');
+      wetRoad.addColorStop(1, '#020306');
+      ctx.fillStyle = wetRoad;
+      ctx.fillRect(380, floorY, W - 380, H - floorY);
 
-      // 2. FACHADA BRUTALISTA DO CONDOMÍNIO SOLARIS (BLOCO C — 8 ANDARES)
-      const facX = 220;
-      const facY = 160;
-      const facW = 640;
-      const facH = 1180;
-      const facGrad = ctx.createLinearGradient(facX, facY, facX + facW, facY + facH);
-      facGrad.addColorStop(0, '#111827');
-      facGrad.addColorStop(0.4, '#0f172a');
-      facGrad.addColorStop(1, '#090d16');
-      ctx.fillStyle = facGrad;
-      ctx.fillRect(facX, facY, facW, facH);
-
-      // Frisos horizontais entre pavimentos
-      ctx.strokeStyle = '#1e293b';
-      ctx.lineWidth = 2.5;
-      for (let f = 0; f < 8; f++) {
-        const fy = facY + f * 145;
-        ctx.beginPath();
-        ctx.moveTo(facX, fy);
-        ctx.lineTo(facX + facW, fy);
-        ctx.stroke();
-
-        // Varandas com parapeito
-        ctx.fillStyle = '#1e293b';
-        ctx.fillRect(facX + 40, fy + 80, facW - 80, 50);
-        ctx.strokeStyle = '#334155';
-        ctx.lineWidth = 1.5;
-        ctx.strokeRect(facX + 40, fy + 80, facW - 80, 50);
-
-        // Janelas do bloco residencial
-        for (let wcol = 0; wcol < 3; wcol++) {
-          const wx = facX + 75 + wcol * 180;
-          const wy = fy + 24;
-          const isLit = (f + wcol) % 3 === 1;
-          ctx.fillStyle = isLit ? 'rgba(254, 240, 138, 0.25)' : '#070b14';
-          ctx.fillRect(wx, wy, 70, 48);
-          ctx.strokeStyle = '#1e293b';
-          ctx.lineWidth = 1.2;
-          ctx.strokeRect(wx, wy, 70, 48);
-        }
-      }
-
-      // Letreiro Luminoso "CONDOMÍNIO SOLARIS · BLOCO C"
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = '800 24px "JetBrains Mono", monospace';
-      ctx.textAlign = 'center';
-      ctx.shadowColor = '#38bdf8';
-      ctx.shadowBlur = 18;
-      ctx.fillText('CONDOMÍNIO SOLARIS · BLOCO C', facX + facW * 0.5, facY - 25);
-      ctx.shadowBlur = 0;
-
-      // 3. ESTRUTURA DA GUARITA NO TÉRREO
-      const gX = 180;
-      const gY = 1100;
-      const gW = 340;
-      const gH = 340;
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(gX, gY, gW, gH);
-      ctx.strokeStyle = '#475569';
-      ctx.lineWidth = 4;
-      ctx.strokeRect(gX, gY, gW, gH);
-
-      // Janela panorâmica da guarita
-      const winGrad = ctx.createLinearGradient(gX + 25, gY + 30, gX + gW - 25, gY + 220);
-      winGrad.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
-      winGrad.addColorStop(0.5, 'rgba(6, 182, 212, 0.25)');
-      winGrad.addColorStop(1, 'rgba(2, 6, 23, 0.85)');
-      ctx.fillStyle = winGrad;
-      ctx.fillRect(gX + 25, gY + 30, gW - 50, 190);
-      ctx.strokeStyle = '#64748b';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(gX + 25, gY + 30, gW - 50, 190);
-
-      // Silhuetas do Seu Valdir e Você dentro da guarita
-      ctx.fillStyle = '#060a12';
+      // Poça d'água com reflexo âmbar do pisca da moto
+      const pGlow = ctx.createRadialGradient(720, floorY + 65, 10, 720, floorY + 65, 190);
+      pGlow.addColorStop(0, 'rgba(245, 158, 11, 0.35)');
+      pGlow.addColorStop(0.6, 'rgba(56, 189, 248, 0.15)');
+      pGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = pGlow;
       ctx.beginPath();
-      ctx.ellipse(gX + 130, gY + 120, 18, 30, 0, 0, Math.PI * 2);
-      ctx.ellipse(gX + 130, gY + 80, 12, 14, 0, 0, Math.PI * 2);
-      ctx.ellipse(gX + 220, gY + 125, 20, 32, 0, 0, Math.PI * 2);
-      ctx.ellipse(gX + 220, gY + 82, 13, 15, 0, 0, Math.PI * 2);
+      ctx.ellipse(720, floorY + 65, 240, 50, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // 4. RUA ASFALTADA MOLHADA, MEIO-FIO E CALÇADA
-      const streetGrad = ctx.createLinearGradient(0, 1440, 0, H);
-      streetGrad.addColorStop(0, '#0a101d');
-      streetGrad.addColorStop(0.4, '#060a12');
-      streetGrad.addColorStop(1, '#020408');
-      ctx.fillStyle = streetGrad;
-      ctx.fillRect(0, 1440, W, H - 1440);
-
-      // Faixas de pedestres
-      ctx.fillStyle = 'rgba(203, 213, 225, 0.18)';
-      for (let s = 0; s < 7; s++) {
-        ctx.fillRect(120 + s * 130, 1580, 75, 240);
-      }
-
-      // Reflexos na água acumulada na rua
-      const puddleGrad = ctx.createRadialGradient(W * 0.45, 1720, 10, W * 0.45, 1720, 260);
-      puddleGrad.addColorStop(0, 'rgba(56, 189, 248, 0.28)');
-      puddleGrad.addColorStop(0.6, 'rgba(253, 224, 71, 0.15)');
-      puddleGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = puddleGrad;
-      ctx.beginPath();
-      ctx.ellipse(W * 0.45, 1720, 340, 65, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Moto do entregador caída na rua molhada
-      const mbX = 460;
-      const mbY = 1680;
+      // Moto de entrega caída no asfalto molhado ao fundo
+      const bikeX = 740;
+      const bikeY = floorY + 45;
       ctx.save();
-      ctx.translate(mbX, mbY);
-      ctx.rotate(0.35);
+      ctx.translate(bikeX, bikeY);
+      ctx.rotate(0.32);
       ctx.fillStyle = '#090d16';
       ctx.beginPath();
-      ctx.arc(-45, 15, 24, 0, Math.PI * 2);
-      ctx.arc(45, 12, 24, 0, Math.PI * 2);
+      ctx.arc(-42, 12, 24, 0, Math.PI * 2);
+      ctx.arc(42, 10, 24, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = '#dc2626';
-      ctx.fillRect(-35, -28, 55, 32);
-      ctx.fillStyle = '#991b1b';
-      ctx.fillRect(-65, -42, 45, 30);
-      const blinkOn = Math.sin(t * 14) > 0;
-      if (blinkOn) {
-        const ambGlow = ctx.createRadialGradient(55, 5, 2, 55, 5, 140);
-        ambGlow.addColorStop(0, 'rgba(245, 158, 11, 0.95)');
-        ambGlow.addColorStop(0.35, 'rgba(245, 158, 11, 0.45)');
-        ambGlow.addColorStop(1, 'rgba(245, 158, 11, 0)');
-        ctx.fillStyle = ambGlow;
+      ctx.fillRect(-32, -26, 52, 30);
+      // Pisca-alerta âmbar pulsando
+      const blinkAmber = Math.sin(t * 16) > 0;
+      if (blinkAmber) {
+        const bg = ctx.createRadialGradient(50, 5, 2, 50, 5, 120);
+        bg.addColorStop(0, 'rgba(245, 158, 11, 0.95)');
+        bg.addColorStop(0.4, 'rgba(245, 158, 11, 0.35)');
+        bg.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = bg;
         ctx.beginPath();
-        ctx.arc(55, 5, 140, 0, Math.PI * 2);
+        ctx.arc(50, 5, 120, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.restore();
 
-      // 5. A IGNIÇÃO DO HOLOFOTE DE 1000W (VISÃO DE LONGE — CONE GIGANTESCO RASGANDO A NEBLINA)
-      const spotMountX = gX + gW - 35;
-      const spotMountY = gY + 12;
-
-      ctx.globalCompositeOperation = 'screen';
-
-      const beamTargetX = W + 200;
-      const beamTargetY = 1750;
-
-      const beamGrad = ctx.createLinearGradient(spotMountX, spotMountY, beamTargetX, beamTargetY);
-      beamGrad.addColorStop(0, `rgba(255, 255, 255, ${0.98 + ignitionFlash * 0.5})`);
-      beamGrad.addColorStop(0.2, `rgba(254, 240, 138, ${0.82 + ignitionFlash * 0.3})`);
-      beamGrad.addColorStop(0.65, 'rgba(56, 189, 248, 0.45)');
-      beamGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
-
-      ctx.fillStyle = beamGrad;
+      // 2. A MASSA NEGRA COLOSSAL E TENTÁCULOS SE APROXIMANDO DO LUCAS
+      const shadowX = 880;
+      const shadowY = 960;
+      const shadowPulse = Math.sin(t * 3.5) * 20;
+      const colossusGrad = ctx.createRadialGradient(shadowX, shadowY, 20, shadowX, shadowY, 520);
+      colossusGrad.addColorStop(0, 'rgba(0, 0, 0, 0.99)');
+      colossusGrad.addColorStop(0.5, 'rgba(6, 10, 22, 0.92)');
+      colossusGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = colossusGrad;
       ctx.beginPath();
-      ctx.moveTo(spotMountX, spotMountY - 15);
-      ctx.lineTo(beamTargetX, beamTargetY - 320);
-      ctx.lineTo(beamTargetX, beamTargetY + 380);
-      ctx.lineTo(spotMountX, spotMountY + 25);
-      ctx.closePath();
+      ctx.ellipse(shadowX + shadowPulse, shadowY, 380, 680, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Flare gigante na lente do holofote
-      const flareGrad = ctx.createRadialGradient(spotMountX, spotMountY, 4, spotMountX, spotMountY, 180 + ignitionFlash * 220);
-      flareGrad.addColorStop(0, '#ffffff');
-      flareGrad.addColorStop(0.2, 'rgba(254, 240, 138, 0.95)');
-      flareGrad.addColorStop(0.55, 'rgba(56, 189, 248, 0.45)');
-      flareGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = flareGrad;
-      ctx.beginPath();
-      ctx.arc(spotMountX, spotMountY, 180 + ignitionFlash * 220, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Anamorphic horizontal streak
-      ctx.fillStyle = 'rgba(125, 211, 252, 0.75)';
-      ctx.beginPath();
-      ctx.ellipse(spotMountX, spotMountY, 420 + ignitionFlash * 300, 6, 0.05, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Partículas volumétricas na névoa
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-      for (let p = 0; p < 65; p++) {
-        const pFrac = ((p * 0.015 + t * 0.12) % 1);
-        const px = spotMountX + pFrac * (beamTargetX - spotMountX) + Math.sin(t * 4 + p) * 15;
-        const py = spotMountY + pFrac * (beamTargetY - spotMountY) + Math.cos(t * 3 + p) * (40 + pFrac * 120);
+      // Tentáculos da sombra serpenteando
+      ctx.strokeStyle = 'rgba(2, 4, 10, 0.96)';
+      ctx.lineCap = 'round';
+      for (let k = 0; k < 6; k++) {
+        ctx.lineWidth = 26 - k * 3.2;
+        const ty = 760 + k * 85;
+        const reach = Math.sin(t * 4.8 + k * 1.3) * 65;
         ctx.beginPath();
-        ctx.arc(px, py, 1.2 + (p % 3) * 0.8, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.moveTo(W + 60, ty);
+        ctx.quadraticCurveTo(
+          780 + Math.cos(t * 5 + k) * 45,
+          ty + Math.sin(t * 5 + k) * 35,
+          620 - reach,
+          ty + 20
+        );
+        ctx.stroke();
       }
 
-      ctx.globalCompositeOperation = 'source-over';
+      // Olhos carmesins cintilando na escuridão
+      const crimsonEyes = [
+        { dx: 780, dy: 740, r: 5.5 },
+        { dx: 890, dy: 660, r: 4.2 },
+        { dx: 950, dy: 830, r: 4.8 },
+        { dx: 740, dy: 880, r: 3.8 }
+      ];
+      crimsonEyes.forEach((ce, idx) => {
+        const eyePulse = 0.65 + Math.sin(t * 8 + idx * 2.1) * 0.35;
+        ctx.fillStyle = `rgba(239, 68, 68, ${eyePulse})`;
+        ctx.shadowColor = '#ef4444';
+        ctx.shadowBlur = 18;
+        ctx.beginPath();
+        ctx.arc(ce.dx, ce.dy, ce.r, 0, Math.PI * 2);
+        ctx.arc(ce.dx + 22, ce.dy - 2, ce.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.shadowBlur = 0;
 
-      // 6. CHUVA TORRENCIAL DIAGONAL
-      ctx.strokeStyle = 'rgba(186, 230, 253, 0.28)';
+      // 3. O INTERIOR DA GUARITA (LADO ESQUERDO DO VIDRO: x < 380)
+      const insideGrad = ctx.createLinearGradient(0, 0, 380, H);
+      insideGrad.addColorStop(0, '#0c1524');
+      insideGrad.addColorStop(0.5, '#132137');
+      insideGrad.addColorStop(1, '#080d17');
+      ctx.fillStyle = insideGrad;
+      ctx.fillRect(0, 0, 380, floorY);
+
+      // Piso interno da guarita
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, floorY - 24, 380, H - floorY + 24);
+
+      // Luz quente acolhedora da guarita com alerta de emergência
+      const warmInterior = ctx.createLinearGradient(0, 400, 380, 1200);
+      warmInterior.addColorStop(0, 'rgba(254, 240, 138, 0.22)');
+      warmInterior.addColorStop(0.7, 'rgba(56, 189, 248, 0.15)');
+      warmInterior.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = warmInterior;
+      ctx.fillRect(0, 0, 380, floorY);
+
+      // Bancada de controle da guarita na frente dos personagens
+      ctx.fillStyle = '#090d16';
+      ctx.fillRect(0, floorY - 55, 380, 50);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(0, floorY - 55, 380, 50);
+
+      // Personagens reais dentro da guarita olhando pelo vidro em 3/4
+      const svValX = valdir.x, svValY = valdir.y, svValScale = valdir.scale, svValFlip = valdir.flipX;
+      valdir.x = 130;
+      valdir.y = floorY - 50;
+      valdir.scale = 2.0;
+      valdir.flipX = false;
+      valdir.emotion = 'panicked';
+      valdir.pose = 'hands_desk';
+      valdir.draw(ctx);
+      valdir.x = svValX; valdir.y = svValY; valdir.scale = svValScale; valdir.flipX = svValFlip;
+
+      const svVocX = voce.x, svVocY = voce.y, svVocScale = voce.scale, svVocFlip = voce.flipX;
+      voce.x = 250;
+      voce.y = floorY - 55;
+      voce.scale = 2.0;
+      voce.flipX = false;
+      voce.emotion = 'panicked';
+      voce.pose = 'step_back';
+      voce.draw(ctx);
+      voce.x = svVocX; voce.y = svVocY; voce.scale = svVocScale; voce.flipX = svVocFlip;
+
+      // Silhuetas dos 3 ferrolhos mecânicos trancados do lado de dentro junto ao marco do vidro
+      for (let bolt = 0; bolt < 3; bolt++) {
+        const by = 860 + bolt * 170;
+        ctx.fillStyle = '#0f172a';
+        ctx.strokeStyle = '#64748b';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.roundRect(260, by, 115, 26, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#ef4444';
+        ctx.shadowColor = '#ef4444';
+        ctx.shadowBlur = 6;
+        ctx.beginPath();
+        ctx.arc(280, by + 13, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      // 4. PERSONAGEM MODULAR LUCAS (ENTREGADOR) EM PERFIL ESPALMANDO NO VIDRO
+      const bangWave = Math.sin(t * 11.5);
+      const isImpacting = bangWave > 0.45;
+      const lungeX = isImpacting ? -18 : 0;
+
+      const svLucX = lucas.x, svLucY = lucas.y, svLucScale = lucas.scale, svLucFlip = lucas.flipX, svLucView = lucas.viewMode, svLucPose = lucas.pose;
+      lucas.x = 550 + lungeX;
+      lucas.y = floorY - 20;
+      lucas.scale = 2.45;
+      lucas.flipX = true; // face LEFT towards the ballistic glass!
+      lucas.viewMode = 'profile';
+      lucas.emotion = 'desperate';
+      lucas.pose = isImpacting ? 'bang_gate' : 'hands_glass';
+      lucas.mouthOpen = Math.max(0.35, lucasMouth !== undefined ? lucasMouth : (0.5 + 0.35 * Math.sin(t * 16)));
+      lucas.draw(ctx);
+      lucas.x = svLucX; lucas.y = svLucY; lucas.scale = svLucScale; lucas.flipX = svLucFlip; lucas.viewMode = svLucView; lucas.pose = svLucPose;
+
+      // 5. A LÂMINA DE VIDRO BLINDADO EM PERFIL (x ≈ 375 a 415)
+      const glassX = 390;
+      const glassW = 34;
+      // Requadro metálico da guarita
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(glassX - 18, 0, glassW + 36, floorY);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(glassX - 18, 0, glassW + 36, floorY);
+
+      // O vidro blindado com refração ciano/esmeralda
+      const glassGrad = ctx.createLinearGradient(glassX, 0, glassX + glassW, 0);
+      glassGrad.addColorStop(0, 'rgba(6, 182, 212, 0.45)');
+      glassGrad.addColorStop(0.3, 'rgba(16, 185, 129, 0.28)');
+      glassGrad.addColorStop(0.7, 'rgba(255, 255, 255, 0.35)');
+      glassGrad.addColorStop(1, 'rgba(6, 182, 212, 0.55)');
+      ctx.fillStyle = glassGrad;
+      ctx.fillRect(glassX, 0, glassW, floorY);
+
+      // Linhas de frisos internos das lâminas laminadas (vidro balístico multicamadas)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      for (let r = 0; r < 90; r++) {
-        const rx = ((r * 67 + t * 450) % (W + 200)) - 100;
-        const ry = (r * 39 + t * 880) % H;
-        ctx.moveTo(rx, ry);
-        ctx.lineTo(rx - 15, ry + 32);
+      ctx.moveTo(glassX + 11, 0);
+      ctx.lineTo(glassX + 11, floorY);
+      ctx.moveTo(glassX + 23, 0);
+      ctx.lineTo(glassX + 23, floorY);
+      ctx.stroke();
+
+      // PONTOS DE IMPACTO DAS MÃOS DO LUCAS (ONDE ELE BATE)
+      const hitY1 = 1010;
+      const hitY2 = 1110;
+
+      // Vapor da respiração desesperada no vidro
+      const breathPulse = 0.55 + Math.sin(t * 10) * 0.25;
+      const breathGrad = ctx.createRadialGradient(glassX + 34, 940, 4, glassX + 34, 940, 75);
+      breathGrad.addColorStop(0, `rgba(241, 245, 249, ${breathPulse})`);
+      breathGrad.addColorStop(0.5, `rgba(226, 232, 240, ${breathPulse * 0.4})`);
+      breathGrad.addColorStop(1, 'rgba(241, 245, 249, 0)');
+      ctx.fillStyle = breathGrad;
+      ctx.beginPath();
+      ctx.arc(glassX + 34, 940, 75, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Marcas de mãos condensadas na vidraça
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.beginPath();
+      ctx.ellipse(glassX + 34, hitY1, 14, 22, 0.15, 0, Math.PI * 2);
+      ctx.ellipse(glassX + 34, hitY2, 13, 20, -0.15, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Teias de aranha profundas nas camadas do vidro blindado
+      const drawWebLateral = (cx, cy, r, numLines) => {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.strokeStyle = isImpacting ? 'rgba(255, 255, 255, 0.98)' : 'rgba(203, 213, 225, 0.85)';
+        ctx.shadowColor = isImpacting ? '#38bdf8' : 'rgba(0,0,0,0)';
+        ctx.shadowBlur = isImpacting ? 14 : 0;
+        ctx.lineWidth = 1.8;
+        for (let l = 0; l < numLines; l++) {
+          const ang = (l / numLines) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * (r * 1.6));
+          ctx.stroke();
+        }
+        for (const frac of [0.35, 0.68, 0.95]) {
+          ctx.beginPath();
+          ctx.ellipse(0, 0, r * frac, (r * 1.6) * frac, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      };
+      drawWebLateral(glassX + 16, hitY1, 55, 9);
+      drawWebLateral(glassX + 16, hitY2, 65, 11);
+
+      // Ondas de choque luminosas se estiver impactando
+      if (isImpacting) {
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.75)';
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.arc(glassX + 34, hitY1, 45, -Math.PI * 0.5, Math.PI * 0.5);
+        ctx.arc(glassX + 34, hitY2, 55, -Math.PI * 0.5, Math.PI * 0.5);
+        ctx.stroke();
+      }
+
+      // 6. CHUVA TORRENCIAL DIAGONAL E GOTAS ESCORRENDO NO VIDRO
+      ctx.strokeStyle = 'rgba(186, 230, 253, 0.35)';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      for (let cr = 0; cr < 85; cr++) {
+        const cx = ((cr * 47 + t * 580) % (W - 360)) + 360;
+        const cy = (cr * 53 + t * 960) % H;
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx - 18, cy + 38);
       }
       ctx.stroke();
 
-      // Flash na tela
-      if (ignitionFlash > 0.05) {
-        ctx.fillStyle = `rgba(255, 255, 255, ${ignitionFlash * 0.6})`;
-        ctx.fillRect(0, 0, W, H);
+      // Gotas escorrendo verticalmente na face externa do vidro
+      ctx.strokeStyle = 'rgba(224, 242, 254, 0.65)';
+      ctx.lineWidth = 2.0;
+      ctx.beginPath();
+      for (let g = 0; g < 15; g++) {
+        const gx = glassX + 33;
+        const gy = ((g * 110 + t * 220) % (floorY - 200)) + 100;
+        ctx.moveTo(gx, gy);
+        ctx.lineTo(gx, gy + 18);
+      }
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // 4.7. PLANO 7A: INTERFONE MACRO CINEMATOGRÁFICO (CLOSE-UP EXTREMO NO TERMINAL COM EQUALIZADOR E ALERTA)
+    function drawIntercomMacroShot(ctx) {
+      // 1. Fundo da parede de concreto industrial da guarita
+      const wallGrad = ctx.createLinearGradient(0, 0, W, H);
+      wallGrad.addColorStop(0, '#070b14');
+      wallGrad.addColorStop(0.5, '#0c1322');
+      wallGrad.addColorStop(1, '#05080f');
+      ctx.fillStyle = wallGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Eletrodutos de aço correndo verticalmente na parede
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(110, 0, 36, H);
+      ctx.fillRect(934, 0, 36, H);
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(114, 0, 8, H);
+      ctx.fillRect(938, 0, 8, H);
+
+      // Pulso de sirene de emergência avermelhado no ambiente
+      const sirenPulse = 0.5 + Math.sin(t * 8.5) * 0.5;
+      const redAmb = ctx.createRadialGradient(W / 2, H * 0.42, 50, W / 2, H * 0.42, 750);
+      redAmb.addColorStop(0, `rgba(239, 68, 68, ${0.28 * sirenPulse})`);
+      redAmb.addColorStop(0.7, `rgba(185, 28, 28, ${0.12 * sirenPulse})`);
+      redAmb.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = redAmb;
+      ctx.fillRect(0, 0, W, H);
+
+      // 2. Chassi do Interfone Predial Industrial
+      const boxW = 820;
+      const boxH = 1120;
+      const boxX = (W - boxW) / 2;
+      const boxY = (H - boxH) / 2 - 40;
+
+      // Sombra projetada do chassi
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+      ctx.beginPath();
+      ctx.roundRect(boxX + 25, boxY + 30, boxW, boxH, 28);
+      ctx.fill();
+
+      // Corpo metálico escovado
+      const plateGrad = ctx.createLinearGradient(boxX, boxY, boxX + boxW, boxY + boxH);
+      plateGrad.addColorStop(0, '#1e293b');
+      plateGrad.addColorStop(0.3, '#0f172a');
+      plateGrad.addColorStop(0.7, '#1e293b');
+      plateGrad.addColorStop(1, '#0f172a');
+      ctx.fillStyle = plateGrad;
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxW, boxH, 24);
+      ctx.fill();
+      ctx.stroke();
+
+      // Parafusos sextavados nos 4 cantos
+      const screwCoords = [
+        [boxX + 34, boxY + 34],
+        [boxX + boxW - 34, boxY + 34],
+        [boxX + 34, boxY + boxH - 34],
+        [boxX + boxW - 34, boxY + boxH - 34]
+      ];
+      ctx.fillStyle = '#64748b';
+      screwCoords.forEach(([sx, sy]) => {
+        ctx.beginPath();
+        ctx.arc(sx, sy, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(sx - 7, sy - 2, 14, 4);
+        ctx.fillStyle = '#64748b';
+      });
+
+      // Cabeçalho da Placa
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '900 24px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('SOLARIS RESIDENCE • BLOCO C', W / 2, boxY + 68);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '700 15px "JetBrains Mono", monospace';
+      ctx.fillText('SISTEMA DE INTERFONIA TÁTICA DE EMERGÊNCIA • MOD. V-900', W / 2, boxY + 98);
+
+      // 3. Display Digital OLED Central
+      const dX = boxX + 60;
+      const dY = boxY + 130;
+      const dW = boxW - 120;
+      const dH = 360;
+
+      ctx.fillStyle = '#030712';
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 3;
+      ctx.shadowColor = '#38bdf8';
+      ctx.shadowBlur = 14;
+      ctx.beginPath();
+      ctx.roundRect(dX, dY, dW, dH, 16);
+      ctx.fill();
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // Linha de Scan CRT no display
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.04)';
+      for (let sy = dY; sy < dY + dH; sy += 6) {
+        ctx.fillRect(dX, sy, dW, 2);
+      }
+
+      // Alerta de Chamada no Display
+      ctx.fillStyle = '#f43f5e';
+      ctx.font = '900 20px "JetBrains Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('● CHAMADA ATIVA DE EMERGÊNCIA', dX + 30, dY + 45);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 38px "Inter", "Segoe UI", sans-serif';
+      ctx.fillText('APT 304 — DONA CAMILA', dX + 30, dY + 98);
+
+      ctx.fillStyle = '#fbbf24';
+      ctx.font = '700 18px "JetBrains Mono", monospace';
+      ctx.fillText('STATUS: QUEDA DE TENSÃO / ESTRUTURA COMPROMETIDA', dX + 30, dY + 138);
+
+      // Equalizador de Áudio da Voz da Camila (20 barras dançantes em tempo real)
+      const eqX = dX + 30;
+      const eqY = dY + 175;
+      const eqW = dW - 60;
+      const numBars = 20;
+      const barW = (eqW - (numBars - 1) * 8) / numBars;
+
+      for (let b = 0; b < numBars; b++) {
+        const barH = 20 + Math.abs(Math.sin(t * 14 + b * 0.45) * Math.cos(t * 8 + b * 0.2)) * 120;
+        const bx = eqX + b * (barW + 8);
+        const by = eqY + 140 - barH;
+
+        const barGrad = ctx.createLinearGradient(bx, by, bx, eqY + 140);
+        barGrad.addColorStop(0, '#ef4444');
+        barGrad.addColorStop(0.4, '#f59e0b');
+        barGrad.addColorStop(1, '#38bdf8');
+        ctx.fillStyle = barGrad;
+        ctx.beginPath();
+        ctx.roundRect(bx, by, barW, barH, 4);
+        ctx.fill();
+      }
+
+      // 4. Grade do Alto-Falante (Speaker Grille com Ondas de Pressão Sonora)
+      const spkY = boxY + 540;
+      const spkW = boxW - 140;
+      const spkX = boxX + 70;
+
+      ctx.fillStyle = '#020617';
+      ctx.beginPath();
+      ctx.roundRect(spkX, spkY, spkW, 260, 16);
+      ctx.fill();
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Ranhuras horizontais do falante
+      for (let s = spkY + 24; s <= spkY + 236; s += 16) {
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(spkX + 24, s, spkW - 48, 6);
+      }
+
+      // Ondas acústicas vibrando para fora do falante
+      const acousticPhase = (t * 5.2) % 1;
+      for (let ac = 0; ac < 3; ac++) {
+        const ap = (acousticPhase + ac * 0.33) % 1;
+        const aAlpha = (1 - ap) * 0.6;
+        ctx.strokeStyle = `rgba(192, 132, 252, ${aAlpha})`;
+        ctx.lineWidth = 3.5 * (1 - ap);
+        ctx.beginPath();
+        ctx.arc(W / 2, spkY + 130, 40 + ap * 220, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // 5. Botões Táteis e Painel de Interfonia Inferior
+      const btnRowY = boxY + 840;
+      const btnLabels = ['PORTARIA', 'ELEVADOR', 'PORTÃO', 'ALARME'];
+      const btnW = (boxW - 140 - 3 * 20) / 4;
+      btnLabels.forEach((lbl, idx) => {
+        const bx = boxX + 70 + idx * (btnW + 20);
+        ctx.fillStyle = idx === 3 ? '#991b1b' : '#1e293b';
+        ctx.strokeStyle = idx === 3 ? '#ef4444' : '#475569';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(bx, btnRowY, btnW, 75, 10);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = idx === 3 ? '#ffffff' : '#94a3b8';
+        ctx.font = '800 13px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(lbl, bx + btnW / 2, btnRowY + 44);
+      });
+
+      // 6. Cabo Espiral do Monofone Vibrando no Lado Direito
+      ctx.strokeStyle = '#090d16';
+      ctx.lineWidth = 14;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(boxX + boxW - 20, boxY + 360);
+      for (let c = 0; c < 12; c++) {
+        const cy = boxY + 380 + c * 52;
+        const cx = boxX + boxW + 28 + Math.sin(t * 12 + c * 0.8) * 16;
+        ctx.lineTo(cx, cy);
+      }
+      ctx.stroke();
+    }
+
+    // 5. CFTV CAM 02 EM TELA CHEIA: A CRIATURA DE 2.20M FUGINDO DA MASSA NEGRA COLOSSAL
+    // ============================================================
+    // CFTV CAM 02 — RECONSTRUÇÃO 2.5D COM PROFUNDIDADE REAL
+    // Uma câmera de segurança de verdade NÃO é um desenho chapado: ela tem
+    // três planos focais e a profundidade nasce daí — não da cor.
+    //   PLANO 3 (fundo)   : rua em perspectiva, postes, massa negra (menor, mais claro)
+    //   PLANO 2 (foco)    : criatura de 2,20 m com volume e sombra projetada
+    //   PLANO 1 (frente)  : grade da eclusa dominando o quadro (grossa, fora de foco)
+    // ============================================================
+
+    /** PLANO 3 — Fundo: rua em perspectiva, postes apagando e a massa negra avançando. */
+    function drawCCTVDeepBackground(ctx, massAdvance) {
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.62);
+      skyGrad.addColorStop(0, '#010307');
+      skyGrad.addColorStop(0.45, '#040814');
+      skyGrad.addColorStop(1, '#070f1e');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Prédios distantes: menores e mais azulados = perspectiva atmosférica real
+      const farBuildings = [
+        [30, H * 0.30, 150, H * 0.34], [205, H * 0.24, 190, H * 0.40],
+        [430, H * 0.27, 165, H * 0.37], [625, H * 0.22, 200, H * 0.42],
+        [860, H * 0.29, 165, H * 0.35]
+      ];
+      farBuildings.forEach(([bx, by, bw, bh], i) => {
+        ctx.fillStyle = i % 2 === 0 ? '#04070f' : '#050912';
+        ctx.fillRect(bx, by, bw, bh);
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.05)';
+        ctx.lineWidth = 1;
+        for (let wy = by + 30; wy < by + bh - 40; wy += 44) {
+          for (let wx = bx + 18; wx < bx + bw - 24; wx += 38) {
+            ctx.strokeRect(wx, wy, 16, 20);
+          }
+        }
+      });
+
+      // Postes com halo morrendo conforme a massa avança
+      const poleFade = Math.max(0, 1 - massAdvance * 1.3);
+      [[120, 0.62], [960, 0.58]].forEach(([px, py]) => {
+        ctx.fillStyle = '#0a1020';
+        ctx.fillRect(px, H * py - 260, 7, 300);
+        ctx.strokeStyle = '#0d1526';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(px, H * py - 260);
+        ctx.lineTo(px + 54, H * py - 272);
+        ctx.stroke();
+        if (poleFade > 0.05) {
+          const lampGlow = ctx.createRadialGradient(px + 54, H * py - 268, 4, px + 54, H * py - 268, 120);
+          lampGlow.addColorStop(0, 'rgba(253, 224, 71, ' + (0.24 * poleFade).toFixed(3) + ')');
+          lampGlow.addColorStop(1, 'rgba(253, 224, 71, 0)');
+          ctx.fillStyle = lampGlow;
+          ctx.beginPath();
+          ctx.arc(px + 54, H * py - 268, 120, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      // Rua em perspectiva — converge para o ponto de fuga
+      const horizon = H * 0.50;
+      const roadGrad = ctx.createLinearGradient(0, horizon, 0, H);
+      roadGrad.addColorStop(0, '#050a14');
+      roadGrad.addColorStop(0.45, '#080e1b');
+      roadGrad.addColorStop(1, '#03060d');
+      ctx.fillStyle = roadGrad;
+      ctx.fillRect(0, horizon, W, H - horizon);
+
+      // Guia da calçada
+      ctx.fillStyle = '#0d1424';
+      ctx.fillRect(0, horizon + 30, W, 28);
+
+      // Faixa central tracejada em perspectiva
+      ctx.strokeStyle = 'rgba(234, 179, 8, 0.14)';
+      ctx.lineWidth = 5;
+      ctx.setLineDash([34, 26]);
+      ctx.beginPath();
+      ctx.moveTo(W * 0.5, horizon + 40);
+      ctx.lineTo(W * 0.5, H);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Reflexos molhados em escalas crescentes (perspectiva)
+      for (let r = 0; r < 3; r++) {
+        const ry = horizon + 140 + r * 240;
+        const rw = 100 + r * 130;
+        const reflGrad = ctx.createRadialGradient(W * 0.5, ry, 6, W * 0.5, ry, rw);
+        reflGrad.addColorStop(0, 'rgba(56, 189, 248, ' + (0.10 - r * 0.02).toFixed(3) + ')');
+        reflGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = reflGrad;
+        ctx.beginPath();
+        ctx.ellipse(W * 0.5, ry, rw, 26 + r * 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // A MASSA NEGRA engolindo a rua
+      const wallTop = H * 0.30 + massAdvance * H * 0.13;
+      const massGrad = ctx.createLinearGradient(0, wallTop - 260, 0, wallTop + 300);
+      massGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      massGrad.addColorStop(0.35, 'rgba(0, 0, 0, 0.80)');
+      massGrad.addColorStop(0.72, 'rgba(1, 2, 8, 0.99)');
+      massGrad.addColorStop(1, 'rgba(0, 0, 0, 1)');
+      ctx.fillStyle = massGrad;
+      ctx.fillRect(0, wallTop - 260, W, H - wallTop + 260);
+
+      // Volutas viscosas com escalas mistas (profundidade entre elas)
+      for (let i = 0; i < 12; i++) {
+        const depth = 0.45 + (i % 4) * 0.18;
+        const bx = -60 + i * 105 + Math.sin(t * 1.1 + i * 0.7) * 34;
+        const by = wallTop + Math.cos(t * 1.5 + i * 1.2) * 30 * depth;
+        ctx.fillStyle = 'rgba(0, 0, 0, ' + (0.5 + depth * 0.45).toFixed(3) + ')';
+        ctx.beginPath();
+        ctx.ellipse(bx, by, 74 * depth + 26, 58 * depth + 20, Math.sin(t * 0.9 + i) * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Tentáculos esticando para frente
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.95)';
+      ctx.lineCap = 'round';
+      for (let tn = 0; tn < 8; tn++) {
+        const reach = 90 + Math.abs(Math.sin(t * 0.8 + tn * 1.4)) * 200;
+        const baseX = 40 + tn * 140;
+        ctx.lineWidth = 20 - tn * 1.6;
+        ctx.beginPath();
+        ctx.moveTo(baseX, wallTop + 40);
+        ctx.quadraticCurveTo(
+          baseX + Math.sin(t * 1.3 + tn) * 70,
+          wallTop + 100 + reach * 0.45,
+          baseX + Math.cos(t * 0.9 + tn) * 110,
+          wallTop + 90 + reach
+        );
+        ctx.stroke();
+      }
+
+      // Olhos carmesins na massa — escalas diferentes = profundidade entre eles
+      for (let e = 0; e < 6; e++) {
+        const depth = 0.6 + (e % 3) * 0.22;
+        const ex = 90 + e * 170 + Math.sin(t * 1.4 + e) * 26;
+        const ey = wallTop + 20 + (e % 2) * 52 * depth;
+        const blink = Math.max(0, Math.sin(t * 3.1 + e * 1.9));
+        if (blink <= 0.3) continue;
+        ctx.fillStyle = 'rgba(239, 68, 68, ' + (blink * 0.85).toFixed(3) + ')';
+        ctx.shadowColor = '#ef4444';
+        ctx.shadowBlur = 20 * depth;
+        ctx.beginPath();
+        ctx.ellipse(ex, ey, 13 * depth, 5 * depth * blink, 0.12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    /** PLANO 2 — Criatura de 2,20 m: volume por sombra projetada e luz de recorte. */
+    function drawCCTVCreature(ctx) {
+      const cx = W * 0.5 + Math.sin(t * 13) * 3;
+      const cy = H * 0.575;
+      const breath = Math.sin(t * 5.5) * 7;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      // Sombra no asfalto: ancora a criatura no chão
+      const groundShadow = ctx.createRadialGradient(0, 372, 10, 0, 372, 210);
+      groundShadow.addColorStop(0, 'rgba(0, 0, 0, 0.85)');
+      groundShadow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = groundShadow;
+      ctx.beginPath();
+      ctx.ellipse(0, 372, 210, 44, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Corpo com gradiente direcional (escuro à esquerda, iluminado à direita)
+      const bodyPath = new Path2D();
+      bodyPath.ellipse(0, 40, 128 + breath, 268, 0, 0, Math.PI * 2);
+
+      const bodyFill = ctx.createLinearGradient(-140, -140, 140, 260);
+      bodyFill.addColorStop(0, '#01030a');
+      bodyFill.addColorStop(0.45, '#0a1524');
+      bodyFill.addColorStop(0.75, '#122238');
+      bodyFill.addColorStop(1, '#1e3550');
+      ctx.fillStyle = bodyFill;
+      ctx.fill(bodyPath);
+
+      ctx.save();
+      ctx.clip(bodyPath);
+      // Recorte de luz vindo do holofote (cria volume)
+      const rim = ctx.createLinearGradient(40, 0, 175, 0);
+      rim.addColorStop(0, 'rgba(226, 232, 240, 0)');
+      rim.addColorStop(0.65, 'rgba(186, 230, 253, 0.30)');
+      rim.addColorStop(1, 'rgba(240, 249, 255, 0.75)');
+      ctx.fillStyle = rim;
+      ctx.fillRect(-160, -260, 340, 560);
+
+      // Escamas acompanhando a curvatura do tronco
+      ctx.strokeStyle = 'rgba(148, 197, 253, 0.16)';
+      ctx.lineWidth = 2.5;
+      for (let r = -3; r <= 3; r++) {
+        ctx.beginPath();
+        ctx.ellipse(0, -10 + Math.abs(r) * 24, 92 + Math.abs(r) * 11, 46, 0, Math.PI * 0.12, Math.PI * 0.88);
+        ctx.stroke();
+      }
+
+      // Placas/contra-luz
+      ctx.strokeStyle = 'rgba(203, 213, 225, 0.10)';
+      ctx.lineWidth = 6;
+      for (let rib = 0; rib < 4; rib++) {
+        ctx.beginPath();
+        ctx.moveTo(-58 + rib * 4, 10 + rib * 54);
+        ctx.quadraticCurveTo(0, 42 + rib * 54, 58 - rib * 4, 10 + rib * 54);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      ctx.strokeStyle = 'rgba(186, 230, 253, 0.55)';
+      ctx.lineWidth = 2.2;
+      ctx.stroke(bodyPath);
+
+      // CABEÇA
+      ctx.save();
+      ctx.translate(0, -196 + breath * 0.4);
+      ctx.rotate(Math.sin(t * 8.5) * 0.06 - 0.05);
+
+      const headPath = new Path2D();
+      headPath.ellipse(0, 0, 62, 80, 0, 0, Math.PI * 2);
+      const headFill = ctx.createLinearGradient(-62, -60, 62, 70);
+      headFill.addColorStop(0, '#02050d');
+      headFill.addColorStop(0.55, '#0b1826');
+      headFill.addColorStop(1, '#1b3048');
+      ctx.fillStyle = headFill;
+      ctx.fill(headPath);
+      ctx.strokeStyle = 'rgba(203, 213, 225, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.stroke(headPath);
+
+      // Cristas ósseas
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
+      ctx.lineWidth = 3;
+      [-1, 1].forEach(s => {
+        ctx.beginPath();
+        ctx.moveTo(s * 18, -66);
+        ctx.quadraticCurveTo(s * 40, -84, s * 52, -58);
+        ctx.stroke();
+      });
+
+      // Olhos ofuscados (pálpebra semicerrada pelo feixe)
+      const squint = 0.42 + Math.sin(t * 6.5) * 0.16;
+      [-25, 25].forEach((ex2, i) => {
+        const eyeGlow = ctx.createRadialGradient(ex2, -12, 2, ex2, -12, 34);
+        eyeGlow.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+        eyeGlow.addColorStop(0.25, 'rgba(248, 113, 113, 0.9)');
+        eyeGlow.addColorStop(1, 'rgba(239, 68, 68, 0)');
+        ctx.fillStyle = eyeGlow;
+        ctx.beginPath();
+        ctx.ellipse(ex2, -12, 26, 26, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ef4444';
+        ctx.shadowColor = '#ef4444';
+        ctx.shadowBlur = 28;
+        ctx.beginPath();
+        ctx.ellipse(ex2, -12, 13, 9.5 * squint, i ? 0.14 : -0.14, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#1a0505';
+        ctx.beginPath();
+        ctx.ellipse(ex2, -12, 3.2, 7.5 * squint, 0, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Boca em silvo com profundidade
+      const snarl = Math.sin(t * 16) * 5;
+      const mouthPath = new Path2D();
+      mouthPath.ellipse(0, 34, 28, 16 + snarl, 0, 0, Math.PI * 2);
+      const mouthFill = ctx.createRadialGradient(0, 34, 2, 0, 34, 30);
+      mouthFill.addColorStop(0, '#000000');
+      mouthFill.addColorStop(0.7, '#2a0505');
+      mouthFill.addColorStop(1, '#4a0a0a');
+      ctx.fillStyle = mouthFill;
+      ctx.fill(mouthPath);
+
+      ctx.fillStyle = '#e8eef5';
+      for (let f = -4; f <= 4; f++) {
+        const fx = f * 6.2;
+        const len = 10 - Math.abs(f) * 1.1;
+        ctx.beginPath();
+        ctx.moveTo(fx - 2.6, 20 - snarl * 0.4);
+        ctx.lineTo(fx, 20 + len);
+        ctx.lineTo(fx + 2.6, 20 - snarl * 0.4);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.fillStyle = 'rgba(226, 232, 240, 0.75)';
+      for (let f = -3; f <= 3; f++) {
+        const fx = f * 6.4;
+        ctx.beginPath();
+        ctx.moveTo(fx - 2.2, 48 + snarl * 0.4);
+        ctx.lineTo(fx, 40);
+        ctx.lineTo(fx + 2.2, 48 + snarl * 0.4);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Vapor/saliva do silvo
+      ctx.strokeStyle = 'rgba(226, 232, 240, ' + (0.18 + Math.sin(t * 9) * 0.1).toFixed(3) + ')';
+      ctx.lineWidth = 1.6;
+      for (let v = 0; v < 5; v++) {
+        const vp = ((t * 0.9 + v * 0.2) % 1);
+        ctx.beginPath();
+        ctx.moveTo(-14 + v * 7, 48);
+        ctx.quadraticCurveTo(-20 + v * 9 + vp * 10, 62 + vp * 26, -26 + v * 11, 78 + vp * 34);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Braços protegendo os olhos do feixe
+      const guard = Math.sin(t * 6.2) * 8;
+      [-1, 1].forEach((side, i) => {
+        ctx.save();
+        ctx.translate(side * 92, -138 + (i ? -guard : guard));
+        ctx.rotate(side * 0.52);
+
+        const armPath = new Path2D();
+        armPath.ellipse(0, 0, 34, 124, 0, 0, Math.PI * 2);
+        const armFill = ctx.createLinearGradient(-34, -80, 34, 90);
+        armFill.addColorStop(0, '#02050c');
+        armFill.addColorStop(0.6, '#0d1a2a');
+        armFill.addColorStop(1, '#20374f');
+        ctx.fillStyle = armFill;
+        ctx.fill(armPath);
+        ctx.strokeStyle = 'rgba(186, 230, 253, 0.42)';
+        ctx.lineWidth = 2;
+        ctx.stroke(armPath);
+
+        ctx.strokeStyle = 'rgba(226, 232, 240, 0.7)';
+        ctx.lineWidth = 2.6;
+        for (let c = -1; c <= 1; c++) {
+          ctx.beginPath();
+          ctx.moveTo(c * 13, -118);
+          ctx.quadraticCurveTo(c * 18, -138, c * 21, -150);
+          ctx.stroke();
+        }
+        ctx.restore();
+      });
+
+      ctx.restore();
+    }
+
+    /** PLANO 1 — Grade da eclusa: o objeto mais próximo da lente (grosso, fora de foco). */
+    function drawCCTVGateForeground(ctx) {
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+      ctx.shadowBlur = 26;
+
+      // Duas barras dominam o quadro (câmera posicionada atrás da grade)
+      const bars = [
+        { x: 178, w: 46 },
+        { x: 402, w: 26 },
+        { x: 700, w: 26 },
+        { x: 930, w: 46 }
+      ];
+      bars.forEach((bar, i) => {
+        const strain = Math.sin(t * 15 + i) * 2.4;
+        const skew = (bar.x - W / 2) * 0.008;
+        const barGrad = ctx.createLinearGradient(bar.x - bar.w / 2, 0, bar.x + bar.w / 2, 0);
+        barGrad.addColorStop(0, '#04070e');
+        barGrad.addColorStop(0.28, '#1e2a3c');
+        barGrad.addColorStop(0.62, '#4a5b70');
+        barGrad.addColorStop(1, '#070c15');
+        ctx.fillStyle = barGrad;
+        ctx.beginPath();
+        ctx.moveTo(bar.x - bar.w / 2 + skew + strain, -40);
+        ctx.lineTo(bar.x + bar.w / 2 + skew + strain, -40);
+        ctx.lineTo(bar.x + bar.w / 2 - skew - strain, H + 40);
+        ctx.lineTo(bar.x - bar.w / 2 - skew - strain, H + 40);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(203, 213, 225, 0.14)';
+        ctx.fillRect(bar.x - bar.w * 0.14 + skew, -40, bar.w * 0.12, H + 80);
+      });
+      ctx.shadowBlur = 0;
+
+      // Travessas horizontais — a de baixo é a mais próxima (mais grossa)
+      [{ y: H * 0.285, h: 26 }, { y: H * 0.735, h: 40 }].forEach(({ y, h }) => {
+        const railGrad = ctx.createLinearGradient(0, y - h / 2, 0, y + h / 2);
+        railGrad.addColorStop(0, '#050912');
+        railGrad.addColorStop(0.35, '#334155');
+        railGrad.addColorStop(0.55, '#64748b');
+        railGrad.addColorStop(1, '#050912');
+        ctx.fillStyle = railGrad;
+        ctx.fillRect(-40, y - h / 2, W + 80, h);
+
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.4)';
+        for (let rv = 0; rv < 9; rv++) {
+          ctx.beginPath();
+          ctx.arc(60 + rv * 120, y, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      // Marcas de garra (continuidade do Ep. 02)
+      ctx.strokeStyle = 'rgba(226, 232, 240, 0.22)';
+      ctx.lineWidth = 3;
+      for (let g = 0; g < 5; g++) {
+        const gx = 250 + g * 150;
+        for (let k = 0; k < 3; k++) {
+          ctx.beginPath();
+          ctx.moveTo(gx + k * 11, H * 0.735 - 16);
+          ctx.lineTo(gx + k * 11 - 16, H * 0.735 + 16);
+          ctx.stroke();
+        }
+      }
+
+      // Gotas na lente (câmera exposta à chuva)
+      ctx.fillStyle = 'rgba(186, 230, 253, 0.10)';
+      for (let d = 0; d < 14; d++) {
+        const dx = ((d * 97 + t * 22) % W);
+        const dy = ((d * 173 + t * 55) % H);
+        ctx.beginPath();
+        ctx.ellipse(dx, dy, 2.5, 5.5, 0, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       ctx.restore();
     }
 
-    // 5. CFTV CAM 02 EM TELA CHEIA: A CRIATURA DE 2.20M FUGINDO DA MASSA NEGRA COLOSSAL
     function drawCCTVFullscreen(ctx) {
       ctx.save();
 
-      const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
-      skyGrad.addColorStop(0, '#010307');
-      skyGrad.addColorStop(0.5, '#040917');
-      skyGrad.addColorStop(1, '#02040a');
-      ctx.fillStyle = skyGrad;
-      ctx.fillRect(0, 0, W, H);
-
-      // A MASSA NEGRA COLOSSAL ENGOLINDO A RUA E OS POSTES AO FUNDO
       const massAdvance = Math.min(1, Math.max(0, (t - CCTV_START) / Math.max(1, CCTV_END - CCTV_START)));
-      const wallY = H * 0.34 + massAdvance * 110;
 
-      const voidGrad = ctx.createLinearGradient(0, 0, 0, wallY + 320);
-      voidGrad.addColorStop(0, '#000000');
-      voidGrad.addColorStop(0.75, 'rgba(2, 4, 12, 0.98)');
-      voidGrad.addColorStop(1, 'rgba(2, 6, 23, 0)');
-      ctx.fillStyle = voidGrad;
-      ctx.fillRect(0, 0, W, wallY + 320);
+      // PLANO 3: fundo
+      drawCCTVDeepBackground(ctx, massAdvance);
 
-      ctx.fillStyle = '#010206';
-      for (let i = 0; i < 9; i++) {
-        const tx = (i / 8) * W + Math.sin(t * 2.5 + i) * 45;
-        const ty = wallY + 120 + Math.cos(t * 3.2 + i * 1.4) * 55;
-        const radX = 95 + (i % 3) * 35;
-        const radY = 190 + Math.sin(t * 4 + i) * 45;
-        ctx.beginPath();
-        ctx.ellipse(tx, ty, radX, radY, Math.sin(t * 1.8 + i) * 0.25, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      for (let e = 0; e < 6; e++) {
-        const ex = 220 + e * 130 + Math.sin(t * 2 + e) * 20;
-        const ey = wallY - 20 + (e % 3) * 55;
-        const blink = Math.max(0, Math.sin(t * 4.5 + e * 1.9));
-        if (blink > 0.2) {
-          ctx.fillStyle = `rgba(239, 68, 68, ${blink * 0.75})`;
-          ctx.shadowColor = '#ef4444';
-          ctx.shadowBlur = 18;
-          ctx.beginPath();
-          ctx.ellipse(ex, ey, 14, 5 * blink, 0, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-      ctx.shadowBlur = 0;
-
-      // FEIXE VOLUMÉTRICO DO HOLOFOTE DE 1000W ATINGINDO A ECLUSA EM CHEIO
-      const spotGrad = ctx.createRadialGradient(W * 0.5, H * 0.54, 30, W * 0.5, H * 0.54, 620);
-      spotGrad.addColorStop(0, 'rgba(255, 255, 255, 0.96)');
-      spotGrad.addColorStop(0.25, 'rgba(254, 249, 195, 0.72)');
-      spotGrad.addColorStop(0.58, 'rgba(56, 189, 248, 0.35)');
-      spotGrad.addColorStop(1, 'rgba(2, 6, 23, 0)');
-      ctx.fillStyle = spotGrad;
+      // HAZE do feixe de 1000W entre o fundo e a criatura (luz volumétrica real)
+      ctx.globalCompositeOperation = 'screen';
+      const hazeGrad = ctx.createRadialGradient(W * 0.52, H * 0.36, 40, W * 0.5, H * 0.56, 780);
+      hazeGrad.addColorStop(0, 'rgba(255, 255, 255, 0.55)');
+      hazeGrad.addColorStop(0.22, 'rgba(254, 249, 195, 0.34)');
+      hazeGrad.addColorStop(0.55, 'rgba(56, 189, 248, 0.14)');
+      hazeGrad.addColorStop(1, 'rgba(2, 6, 23, 0)');
+      ctx.fillStyle = hazeGrad;
       ctx.fillRect(0, 0, W, H);
 
-      // A CRIATURA DE 2.20M EM PÂNICO, OFUSCADA PELA LUZ E OLHANDO PARA TRÁS
-      const cx = W * 0.5 + Math.sin(t * 14) * 4;
-      const cy = H * 0.58;
-      const breath = Math.sin(t * 6) * 8;
-
-      ctx.save();
-      ctx.translate(cx, cy);
-
-      ctx.fillStyle = '#070d19';
-      ctx.strokeStyle = '#7dd3fc';
-      ctx.lineWidth = 3;
+      // Cone do feixe (vindo de cima, à direita da guarita)
+      const coneGrad = ctx.createLinearGradient(W * 0.9, -80, W * 0.42, H * 0.9);
+      coneGrad.addColorStop(0, 'rgba(255, 255, 255, 0.42)');
+      coneGrad.addColorStop(0.45, 'rgba(254, 249, 195, 0.20)');
+      coneGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+      ctx.fillStyle = coneGrad;
       ctx.beginPath();
-      ctx.ellipse(0, 20, 155 + breath, 250, 0, 0, Math.PI * 2);
+      ctx.moveTo(W * 0.86, -20);
+      ctx.lineTo(W * 0.96, -20);
+      ctx.lineTo(W * 0.72, H);
+      ctx.lineTo(W * 0.10, H);
+      ctx.closePath();
       ctx.fill();
-      ctx.stroke();
+      ctx.globalCompositeOperation = 'source-over';
 
-      ctx.strokeStyle = 'rgba(186, 230, 253, 0.45)';
-      ctx.lineWidth = 4;
-      for (let r = -2; r <= 2; r++) {
-        ctx.beginPath();
-        ctx.arc(r * 36, 10 + Math.abs(r) * 14, 55, Math.PI * 0.2, Math.PI * 0.8);
-        ctx.stroke();
-      }
+      // PLANO 2: criatura nítida
+      drawCCTVCreature(ctx);
 
-      const headShake = Math.sin(t * 9) * 0.08;
-      ctx.save();
-      ctx.translate(0, -195 + breath * 0.5);
-      ctx.rotate(headShake);
+      // PLANO 1: grade na frente (oclusão)
+      drawCCTVGateForeground(ctx);
 
-      ctx.fillStyle = '#030712';
-      ctx.strokeStyle = '#bae6fd';
+      // Retículo biométrico rastreando a criatura
+      const boxW = 520;
+      const boxH = 620;
+      const boxCx = W * 0.5;
+      const boxCy = H * 0.55;
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.75)';
       ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 68, 86, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = '#ef4444';
-      ctx.shadowColor = '#ef4444';
-      ctx.shadowBlur = 30;
-      ctx.beginPath();
-      ctx.ellipse(-26, -14, 14, 10, -0.15, 0, Math.PI * 2);
-      ctx.ellipse(26, -14, 14, 10, 0.15, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(-26, -14, 3.5, 0, Math.PI * 2);
-      ctx.arc(26, -14, 3.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#450a0a';
-      ctx.beginPath();
-      ctx.roundRect(-30, 26, 60, 32 + Math.sin(t * 18) * 6, 8);
-      ctx.fill();
-
-      ctx.fillStyle = '#f8fafc';
-      for (let f = -4; f <= 4; f++) {
+      ctx.setLineDash([18, 12]);
+      ctx.strokeRect(boxCx - boxW / 2, boxCy - boxH / 2, boxW, boxH);
+      ctx.setLineDash([]);
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 4.5;
+      const cs = 28;
+      [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sy]) => {
+        const px = boxCx + sx * boxW / 2;
+        const py = boxCy + sy * boxH / 2;
         ctx.beginPath();
-        ctx.moveTo(f * 6.5 - 3, 26);
-        ctx.lineTo(f * 6.5, 38);
-        ctx.lineTo(f * 6.5 + 3, 26);
-        ctx.closePath();
-        ctx.fill();
-      }
-      ctx.restore();
-
-      const armGuard = Math.sin(t * 7) * 10;
-      ctx.fillStyle = '#0f172a';
-      ctx.strokeStyle = '#e0f2fe';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.ellipse(-95, -135 + armGuard, 42, 135, -0.55, 0, Math.PI * 2);
-      ctx.ellipse(95, -135 - armGuard, 42, 135, 0.55, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.restore();
-
-      // PORTÃO DE FERRO FORJADO DA ECLUSA EM PRIMEIRO PLANO
-      for (let bx = 95; bx < W - 80; bx += 78) {
-        const bend = (bx > 350 && bx < 730) ? Math.sin(t * 16) * 4 : 0;
-        const barGrad = ctx.createLinearGradient(bx - 10, 0, bx + 10, 0);
-        barGrad.addColorStop(0, '#090e1a');
-        barGrad.addColorStop(0.5, '#475569');
-        barGrad.addColorStop(1, '#090e1a');
-        ctx.fillStyle = barGrad;
-        ctx.fillRect(bx - 9 + bend, 0, 18, H);
-      }
-
-      [H * 0.36, H * 0.68].forEach(ty => {
-        ctx.fillStyle = '#0f172a';
-        ctx.strokeStyle = '#475569';
-        ctx.lineWidth = 3;
-        ctx.fillRect(0, ty - 14, W, 28);
-        ctx.strokeRect(0, ty - 14, W, 28);
+        ctx.moveTo(px - sx * cs, py);
+        ctx.lineTo(px, py);
+        ctx.lineTo(px, py - sy * cs);
+        ctx.stroke();
       });
 
-      const boxX = W * 0.5 - 290;
-      const boxY = H * 0.36;
-      ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = 3;
-      ctx.setLineDash([18, 10]);
-      ctx.strokeRect(boxX, boxY, 580, 520);
-      ctx.setLineDash([]);
-
+      // HUD superior
       ctx.fillStyle = 'rgba(2, 6, 23, 0.86)';
       ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
       ctx.lineWidth = 2;
@@ -1532,6 +2177,7 @@
       ctx.fill();
       ctx.stroke();
 
+      ctx.textAlign = 'left';
       ctx.fillStyle = '#ef4444';
       ctx.font = '800 30px "JetBrains Mono", monospace';
       ctx.fillText('🔴 REC • CFTV CAM 02 (ECLUSA EXTERNA)', 75, 100);
@@ -1541,15 +2187,759 @@
       ctx.fillStyle = '#fde047';
       ctx.fillText('⚠️ ALERTA CRÍTICO: MASSA NEGRA ENGOLINDO A RUA ATRÁS!', 75, 182);
 
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-      for (let y = 0; y < H; y += 6) {
+      // Telemetria biométrica
+      const distM = (4.2 - massAdvance * 1.1).toFixed(1);
+      ctx.fillStyle = '#ef4444';
+      ctx.font = '800 22px "JetBrains Mono", monospace';
+      ctx.fillText('ALVO NÃO-HUMANO (2.20m)', 60, H * 0.845);
+      ctx.fillStyle = '#fca5a5';
+      ctx.font = '700 19px "JetBrains Mono", monospace';
+      ctx.fillText('DISTÂNCIA: ' + distM + 'm • EM FUGA', 60, H * 0.845 + 30);
+      ctx.fillText('STATUS: PROTEÇÃO OCULAR / PÂNICO', 60, H * 0.845 + 58);
+
+      // Vinheta periférica (lente CCTV)
+      const vigGrad = ctx.createRadialGradient(W * 0.5, H * 0.5, H * 0.34, W * 0.5, H * 0.5, H * 0.74);
+      vigGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      vigGrad.addColorStop(1, 'rgba(2, 6, 23, 0.78)');
+      ctx.fillStyle = vigGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Scanlines CRT
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.14)';
+      for (let y = 0; y < H; y += 4) {
         ctx.fillRect(0, y, W, 2);
       }
+      // Barra de varredura
       if (Math.sin(t * 19) > 0.82) {
         const gy = (t * 900) % H;
-        ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.10)';
         ctx.fillRect(0, gy, W, 18);
       }
+
+      ctx.restore();
+    }
+
+    // ============================================================
+    // 5.9 PLANO 3A-MACRO: A MÃO DE SEU VALDIR PUXANDO A ALAVANCA DO QUADRO 1000W
+    // Cena de ação isolada, como o roteiro pede: mostra a AÇÃO, simples e direta.
+    // Profundidade: parede (fundo) -> quadro (meio) -> alavanca e mão (frente, nítidas).
+    // ============================================================
+    function drawLeverMacroShot(ctx) {
+      const pullStart = LEVER_PULL_AT;
+      // 0 = alavanca para cima (desligada) | 1 = totalmente para baixo (ligada)
+      const pullRaw = Math.min(1, Math.max(0, (t - pullStart) / 0.42));
+      const pull = pullRaw < 0 ? 0 : (1 - Math.pow(1 - pullRaw, 2.4)); // inércia mecânica
+      const engaged = pullRaw >= 1;
+
+      // Fosforescência do capacitor acende junto com o fim do curso
+      const glow = engaged ? Math.min(1, (t - pullStart - 0.42) / 0.25) : pull * 0.35;
+
+      ctx.save();
+
+      // ── PLANO 3: PAREDE DE CONCRETO (desfocada, mais escura) ──
+      const wallGrad = ctx.createLinearGradient(0, 0, W, H);
+      wallGrad.addColorStop(0, '#05080f');
+      wallGrad.addColorStop(0.5, '#0a1019');
+      wallGrad.addColorStop(1, '#040609');
+      ctx.fillStyle = wallGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Textura de concreto e juntas de forma
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.05)';
+      ctx.lineWidth = 2;
+      for (let jy = 0; jy < H; jy += 190) {
+        ctx.beginPath();
+        ctx.moveTo(0, jy);
+        ctx.lineTo(W, jy);
+        ctx.stroke();
+      }
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+      for (let s = 0; s < 90; s++) {
+        const sx = (s * 137) % W;
+        const sy = (s * 211) % H;
+        ctx.fillRect(sx, sy, 3, 3);
+      }
+
+      // Eletroduto vertical e caixa de passagem (segundo plano)
+      ctx.fillStyle = '#131c2b';
+      ctx.fillRect(96, 0, 44, H);
+      ctx.fillStyle = '#1c2839';
+      ctx.fillRect(101, 0, 10, H);
+
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(74, 210, 88, 130, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      // ── PLANO 2: O QUADRO ELÉTRICO (focado, com volume e rebites) ──
+      const boxW = 620;
+      const boxH = 860;
+      const boxX = (W - boxW) / 2;
+      const boxY = (H - boxH) / 2 - 90;
+
+      // Sombra projetada na parede (afasta o quadro da superfície = profundidade)
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.72)';
+      ctx.beginPath();
+      ctx.roundRect(boxX + 26, boxY + 34, boxW, boxH, 22);
+      ctx.fill();
+
+      // Chapa de aço pintada de cinza industrial
+      const plateGrad = ctx.createLinearGradient(boxX, boxY, boxX + boxW, boxY + boxH);
+      plateGrad.addColorStop(0, '#3b4759');
+      plateGrad.addColorStop(0.28, '#222d3d');
+      plateGrad.addColorStop(0.72, '#17202d');
+      plateGrad.addColorStop(1, '#2b3648');
+      ctx.fillStyle = plateGrad;
+      ctx.strokeStyle = '#5b6b80';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxW, boxH, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      // Bisel interno (reforça a espessura da chapa)
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.30)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(boxX + 14, boxY + 14, boxW - 28, boxH - 28, 12);
+      ctx.stroke();
+
+      // Rebites sextavados nos cantos
+      ctx.fillStyle = '#8296ac';
+      [[boxX + 40, boxY + 40], [boxX + boxW - 40, boxY + 40],
+       [boxX + 40, boxY + boxH - 40], [boxX + boxW - 40, boxY + boxH - 40]].forEach(([rx, ry]) => {
+        ctx.beginPath();
+        ctx.arc(rx, ry, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#101823';
+        ctx.fillRect(rx - 8, ry - 2, 16, 4);
+        ctx.fillStyle = '#8296ac';
+      });
+
+      // Placa de identificação do reator auxiliar
+      ctx.fillStyle = '#fde68a';
+      ctx.fillRect(boxX + 40, boxY + 46, boxW - 80, 74);
+      ctx.fillStyle = '#1c1917';
+      ctx.font = '900 30px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('REATOR AUXILIAR · 1000W', boxX + boxW / 2, boxY + 82);
+      ctx.font = '700 19px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#78350f';
+      ctx.fillText('CIRCUITO DE EMERGÊNCIA — NÃO DESLIGAR', boxX + boxW / 2, boxY + 108);
+
+      // ── PLACA DE ADVERTÊNCIA (padrão NR-10) ──
+      const warnY = boxY + 152;
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath();
+      ctx.moveTo(boxX + 92, warnY + 96);
+      ctx.lineTo(boxX + 152, warnY - 6);
+      ctx.lineTo(boxX + 212, warnY + 96);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#111827';
+      ctx.lineWidth = 6;
+      ctx.stroke();
+      ctx.fillStyle = '#111827';
+      ctx.font = '900 56px "JetBrains Mono", monospace';
+      ctx.fillText('⚡', boxX + 152, warnY + 68);
+
+      // ── PLACAS DE VOLTAGEM ──
+      ctx.fillStyle = '#0b111b';
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(boxX + 250, warnY - 4, 300, 104, 10);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '800 34px "JetBrains Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('220V / 1000W', boxX + 268, warnY + 38);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '700 19px "JetBrains Mono", monospace';
+      ctx.fillText('FASE + NEUTRO + TERRA', boxX + 268, warnY + 68);
+
+      // ── O TRILHO E A ALAVANCA (o ponto de contato da ação) ──
+      const leverCx = boxX + boxW * 0.5;
+      const leverTop = boxY + 330;
+      const travel = 210; // percurso da alavanca
+
+      // Trilho de rasgo onde a alavanca corre
+      ctx.fillStyle = '#070c14';
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(leverCx - 26, leverTop - 30, 52, travel + 70, 22);
+      ctx.fill();
+      ctx.stroke();
+
+      // Alavanca (haste vermelha com empunhadura preta) — desce ao ser puxada
+      const leverY = leverTop + pull * travel;
+      ctx.save();
+      ctx.translate(leverCx, leverY);
+
+      // Haste
+      const rodGrad = ctx.createLinearGradient(-11, 0, 11, 0);
+      rodGrad.addColorStop(0, '#7f1d1d');
+      rodGrad.addColorStop(0.45, '#ef4444');
+      rodGrad.addColorStop(1, '#7f1d1d');
+      ctx.fillStyle = rodGrad;
+      ctx.strokeStyle = '#450a0a';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(-11, -10, 22, 96, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      // Empunhadura emborrachada
+      ctx.fillStyle = '#0b0f16';
+      ctx.beginPath();
+      ctx.ellipse(0, 92, 34, 30, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      // Ranhuras da empunhadura
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.3)';
+      ctx.lineWidth = 2;
+      for (let h = 0; h < 4; h++) {
+        ctx.beginPath();
+        ctx.moveTo(-24 + h * 3, 78 + h * 10);
+        ctx.lineTo(24 - h * 3, 78 + h * 10);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // ── LEDS DE ESTADO: 3 fases que acendem em sequência quando a chave fecha ──
+      const ledBankY = boxY + boxH - 190;
+      for (let l = 0; l < 3; l++) {
+        const leadOn = engaged && glow > (l * 0.22);
+        const lx = boxX + 130 + l * 180;
+        ctx.fillStyle = '#070c14';
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(lx, ledBankY, 40, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        if (leadOn) {
+          const ledGlow = ctx.createRadialGradient(lx, ledBankY, 3, lx, ledBankY, 62);
+          ledGlow.addColorStop(0, 'rgba(190, 255, 210, 1)');
+          ledGlow.addColorStop(0.3, 'rgba(34, 197, 94, 0.85)');
+          ledGlow.addColorStop(1, 'rgba(34, 197, 94, 0)');
+          ctx.fillStyle = ledGlow;
+          ctx.beginPath();
+          ctx.arc(lx, ledBankY, 62, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#bbf7d0';
+          ctx.shadowColor = '#22c55e';
+          ctx.shadowBlur = 26;
+          ctx.beginPath();
+          ctx.arc(lx, ledBankY, 22, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        } else {
+          ctx.fillStyle = '#12301f';
+          ctx.beginPath();
+          ctx.arc(lx, ledBankY, 22, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Rótulos dos LEDs
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '700 17px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ['R', 'S', 'T'].forEach((ph, l) => {
+        ctx.fillText('FASE ' + ph, boxX + 130 + l * 180, ledBankY + 72);
+      });
+
+      // ── PLANO 1: A MÃO (mais próxima da lente — nítida, grande, com sombra própria) ──
+      // A mão acompanha a alavanca: desce junto com a empunhadura.
+      const handX = leverCx + 6;
+      const handY = leverY + 86;
+
+      ctx.save();
+      ctx.translate(handX, handY);
+
+      // Manga da camisa social azul-clara (perspectiva: vem de baixo à direita)
+      const sleeveGrad = ctx.createLinearGradient(-40, 40, 150, 260);
+      sleeveGrad.addColorStop(0, '#cbd5e1');
+      sleeveGrad.addColorStop(0.6, '#94a3b8');
+      sleeveGrad.addColorStop(1, '#64748b');
+      ctx.fillStyle = sleeveGrad;
+      ctx.beginPath();
+      ctx.moveTo(-58, 44);
+      ctx.quadraticCurveTo(20, 30, 96, 118);
+      ctx.quadraticCurveTo(150, 190, 128, 300);
+      ctx.lineTo(-64, 300);
+      ctx.quadraticCurveTo(-96, 190, -58, 44);
+      ctx.closePath();
+      ctx.fill();
+
+      // Dobras do tecido
+      ctx.strokeStyle = 'rgba(71, 85, 105, 0.32)';
+      ctx.lineWidth = 3;
+      for (let f = 0; f < 4; f++) {
+        ctx.beginPath();
+        ctx.moveTo(-44 + f * 34, 70);
+        ctx.quadraticCurveTo(-10 + f * 34, 150, 6 + f * 30, 286);
+        ctx.stroke();
+      }
+
+      // Cúpula do punho da camisa
+      ctx.fillStyle = '#e2e8f0';
+      ctx.beginPath();
+      ctx.moveTo(-42, 52);
+      ctx.quadraticCurveTo(16, 34, 84, 104);
+      ctx.lineTo(52, 138);
+      ctx.quadraticCurveTo(-4, 78, -58, 86);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#334155';
+      ctx.beginPath();
+      ctx.arc(52, 112, 7, 0, Math.PI * 2);
+      ctx.fill();
+
+      // MÃO — dedos envolvendo a empunhadura (4 dedos visíveis + polegar)
+      const skinGrad = ctx.createLinearGradient(-60, 0, 60, 90);
+      skinGrad.addColorStop(0, '#d8976c');
+      skinGrad.addColorStop(0.6, '#c6865c');
+      skinGrad.addColorStop(1, '#a96b43');
+
+      // Dorso da mão
+      ctx.fillStyle = skinGrad;
+      ctx.beginPath();
+      ctx.moveTo(-52, 24);
+      ctx.quadraticCurveTo(6, -14, 62, 26);
+      ctx.quadraticCurveTo(76, 62, 44, 92);
+      ctx.quadraticCurveTo(-10, 104, -54, 72);
+      ctx.quadraticCurveTo(-70, 46, -52, 24);
+      ctx.closePath();
+      ctx.fill();
+
+      // Dedos curvados em volta da empunhadura (compressão ao puxar)
+      const gripTense = 1 + pull * 0.10;
+      for (let d = 0; d < 4; d++) {
+        const fy = 16 + d * 21;
+        const fw = 46 - d * 3;
+        ctx.fillStyle = d % 2 === 0 ? '#c6865c' : '#d8976c';
+        ctx.beginPath();
+        ctx.roundRect(-52 + d * 2, fy, fw * gripTense, 17, 8);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(120, 63, 34, 0.5)';
+        ctx.lineWidth = 1.6;
+        ctx.stroke();
+      }
+
+      // Polegar cruzando a frente
+      ctx.fillStyle = '#d8976c';
+      ctx.beginPath();
+      ctx.moveTo(40, 18);
+      ctx.quadraticCurveTo(78, 34, 70, 70);
+      ctx.quadraticCurveTo(58, 84, 40, 72);
+      ctx.quadraticCurveTo(46, 44, 40, 18);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(120, 63, 34, 0.45)';
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+
+      // Nós dos dedos e tendões (esforço visível)
+      ctx.fillStyle = 'rgba(140, 83, 50, 0.55)';
+      for (let d = 0; d < 4; d++) {
+        ctx.beginPath();
+        ctx.arc(-6 + d * 5, 26 + d * 21, 3.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Veias em relevo com o esforço de puxar
+      if (pull > 0.3) {
+        ctx.strokeStyle = 'rgba(120, 63, 94, ' + (0.30 * pull).toFixed(2) + ')';
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        ctx.moveTo(-34, 46);
+        ctx.quadraticCurveTo(-10, 58, 18, 52);
+        ctx.stroke();
+      }
+
+      // Iluminação dura do capacitor subindo pela mão
+      if (glow > 0.02) {
+        const handGlow = ctx.createRadialGradient(10, 46, 6, 10, 46, 130);
+        handGlow.addColorStop(0, 'rgba(187, 247, 208, ' + (0.30 * glow).toFixed(2) + ')');
+        handGlow.addColorStop(1, 'rgba(34, 197, 94, 0)');
+        ctx.fillStyle = handGlow;
+        ctx.beginPath();
+        ctx.arc(10, 46, 130, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+
+      // ── ARCO ELÉTRICO DO CONTATO (no instante em que a chave fecha) ──
+      const arcT = t - pullStart - 0.42;
+      if (arcT > 0 && arcT < 0.55) {
+        const arcA = 1 - arcT / 0.55;
+        const arcX = leverCx + 30;
+        const arcY = leverTop + travel - 24;
+        ctx.save();
+        ctx.strokeStyle = 'rgba(224, 242, 254, ' + arcA.toFixed(2) + ')';
+        ctx.shadowColor = '#38bdf8';
+        ctx.shadowBlur = 34;
+        ctx.lineWidth = 3.5;
+        for (let a = 0; a < 6; a++) {
+          const ang = (a / 6) * Math.PI * 2 + arcT * 14;
+          const len = 34 + Math.sin(arcT * 40 + a) * 26;
+          ctx.beginPath();
+          ctx.moveTo(arcX, arcY);
+          ctx.lineTo(arcX + Math.cos(ang) * len * 0.55, arcY + Math.sin(ang) * len * 0.55);
+          ctx.lineTo(arcX + Math.cos(ang + 0.2) * len, arcY + Math.sin(ang - 0.2) * len);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // Flash de contato no quadro inteiro
+        ctx.fillStyle = 'rgba(224, 242, 254, ' + (arcA * 0.30).toFixed(2) + ')';
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      // ── HUD do plano (rótulo discreto, sem poluir) ──
+      ctx.fillStyle = 'rgba(2, 6, 23, 0.88)';
+      ctx.strokeStyle = engaged ? 'rgba(34, 197, 94, 0.7)' : 'rgba(239, 68, 68, 0.55)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.roundRect(64, H - 232, W - 128, 132, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = engaged ? '#22c55e' : '#f59e0b';
+      ctx.font = '800 27px "JetBrains Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(engaged ? '● CIRCUITO FECHADO — REATOR ARMADO' : '○ PUXANDO ALAVANCA DO REATOR', 96, H - 186);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '700 21px "JetBrains Mono", monospace';
+      ctx.fillText('CARGA: 1000W  •  CAPACITOR CARREGANDO', 96, H - 148);
+      ctx.fillText('SEU VALDIR — GUARITA BLOCO C', 96, H - 116);
+
+      // Vinheta
+      const mvig = ctx.createRadialGradient(W / 2, H / 2, H * 0.30, W / 2, H / 2, H * 0.72);
+      mvig.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      mvig.addColorStop(1, 'rgba(2, 6, 23, 0.72)');
+      ctx.fillStyle = mvig;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.restore();
+    }
+
+    // ============================================================
+    // 5.95 PLANO 3B-EXTERNO: A LUZ DE 1000W ACENDENDO VISTA DE FORA
+    // Mostra a CONSEQUÊNCIA do que a mão acabou de fazer: o feixe nasce no
+    // teto da guarita e varre a rua, cortando a neblina. É a "cena de ação
+    // simples" pedida — a ação (puxar a chave) já foi mostrada; agora vemos o efeito.
+    // Profundidade: prédio ao fundo -> guarita e poste no meio -> grade e chuva na frente.
+    // ============================================================
+    function drawExteriorLightOnShot(ctx) {
+      const sinceOn = Math.max(0, t - SPOTLIGHT_START);
+      // Ignição: o capacitor carrega e a lâmpada estala antes de estabilizar
+      const warmup = Math.min(1, sinceOn / 0.55);
+      const stutter = warmup < 1
+        ? (Math.sin(sinceOn * 46) > -0.15 ? 1 : 0.25) * warmup
+        : 1;
+      const beamPower = stutter;
+
+      ctx.save();
+
+      // ── CAMADA 0: CÉU E PRÉDIOS VIZINHOS (mais distante = mais azulado) ──
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.58);
+      skyGrad.addColorStop(0, '#010204');
+      skyGrad.addColorStop(0.55, '#050b16');
+      skyGrad.addColorStop(1, '#0a1424');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      const farTowers = [
+        [20, H * 0.20, 170, H * 0.36], [230, H * 0.14, 210, H * 0.42],
+        [880, H * 0.17, 190, H * 0.39]
+      ];
+      farTowers.forEach(([bx, by, bw, bh], i) => {
+        ctx.fillStyle = i % 2 ? '#040811' : '#03060d';
+        ctx.fillRect(bx, by, bw, bh);
+        // Janelas todas apagadas (apagão)
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.05)';
+        ctx.lineWidth = 1;
+        for (let wy = by + 34; wy < by + bh - 40; wy += 46) {
+          for (let wx = bx + 20; wx < bx + bw - 26; wx += 40) {
+            ctx.strokeRect(wx, wy, 17, 21);
+          }
+        }
+      });
+
+      // ── CAMADA 1: FACHADA DO SOLARIS (bloco de 8 andares, ao fundo) ──
+      const fX = 150;
+      const fY = 120;
+      const fW = 780;
+      const fH = 900;
+      const facGrad = ctx.createLinearGradient(fX, fY, fX + fW, fY + fH);
+      facGrad.addColorStop(0, '#101a28');
+      facGrad.addColorStop(0.45, '#0b1421');
+      facGrad.addColorStop(1, '#060c15');
+      ctx.fillStyle = facGrad;
+      ctx.fillRect(fX, fY, fW, fH);
+
+      // Lajes e varandas por pavimento
+      for (let fl = 0; fl <= 8; fl++) {
+        const ly = fY + fl * (fH / 8);
+        ctx.strokeStyle = 'rgba(71, 85, 105, 0.55)';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(fX, ly);
+        ctx.lineTo(fX + fW, ly);
+        ctx.stroke();
+
+        if (fl < 8) {
+          // Janelas — escuras, exceto a do 3º andar (Dona Camila, com vela)
+          for (let wc = 0; wc < 4; wc++) {
+            const wx = fX + 54 + wc * 175;
+            const wy = ly + 26;
+            const isCamila = fl === 2 && wc === 2;
+            if (isCamila) {
+              const candle = 0.55 + Math.sin(t * 5.5) * 0.2;
+              ctx.fillStyle = 'rgba(251, 191, 36, ' + (candle * 0.55).toFixed(2) + ')';
+              ctx.fillRect(wx, wy, 82, 56);
+              const cGlow = ctx.createRadialGradient(wx + 41, wy + 28, 4, wx + 41, wy + 28, 110);
+              cGlow.addColorStop(0, 'rgba(251, 191, 36, ' + (candle * 0.30).toFixed(2) + ')');
+              cGlow.addColorStop(1, 'rgba(251, 191, 36, 0)');
+              ctx.fillStyle = cGlow;
+              ctx.beginPath();
+              ctx.arc(wx + 41, wy + 28, 110, 0, Math.PI * 2);
+              ctx.fill();
+            } else {
+              ctx.fillStyle = '#050a12';
+              ctx.fillRect(wx, wy, 82, 56);
+            }
+            ctx.strokeStyle = 'rgba(71, 85, 105, 0.7)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(wx, wy, 82, 56);
+          }
+        }
+      }
+
+      // Letreiro do condomínio
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '900 30px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = '#38bdf8';
+      ctx.shadowBlur = 16;
+      ctx.fillText('SOLARIS · BLOCO C', fX + fW / 2, fY - 34);
+      ctx.shadowBlur = 0;
+
+      // ── CAMADA 2: A RUA EM PERSPECTIVA (converge ao ponto de fuga) ──
+      const roadY = H * 0.585;
+      const roadGrad = ctx.createLinearGradient(0, roadY, 0, H);
+      roadGrad.addColorStop(0, '#070b14');
+      roadGrad.addColorStop(0.5, '#0a1019');
+      roadGrad.addColorStop(1, '#04070c');
+      ctx.fillStyle = roadGrad;
+      ctx.fillRect(0, roadY, W, H - roadY);
+
+      // Guia da calçada
+      ctx.fillStyle = '#141d2c';
+      ctx.fillRect(0, roadY - 26, W, 30);
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.18)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, roadY - 26);
+      ctx.lineTo(W, roadY - 26);
+      ctx.stroke();
+
+      // Faixa central em perspectiva
+      ctx.strokeStyle = 'rgba(234, 179, 8, 0.16)';
+      ctx.setLineDash([40, 30]);
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.52, roadY + 60);
+      ctx.lineTo(W * 0.52, H);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // ── CAMADA 3: GUARITA COM O HOLOFOTE NO TETO ──
+      const gX = 700;
+      const gY = roadY - 322;
+      const gW = 296;
+      const gH = 292;
+
+      ctx.fillStyle = '#141d2c';
+      ctx.fillRect(gX, gY, gW, gH);
+      ctx.strokeStyle = '#3b4a5e';
+      ctx.lineWidth = 5;
+      ctx.strokeRect(gX, gY, gW, gH);
+
+      // Vidro da guarita com luz interna fraca
+      const gGlass = ctx.createLinearGradient(gX + 20, gY + 26, gX + gW - 20, gY + gH - 40);
+      gGlass.addColorStop(0, 'rgba(15, 40, 62, 0.9)');
+      gGlass.addColorStop(0.5, 'rgba(10, 22, 38, 0.85)');
+      gGlass.addColorStop(1, 'rgba(6, 12, 22, 0.95)');
+      ctx.fillStyle = gGlass;
+      ctx.fillRect(gX + 20, gY + 26, gW - 40, gH - 66);
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(gX + 20, gY + 26, gW - 40, gH - 66);
+
+      // Silhuetas dos dois dentro (sem detalhe: são reflexo à distância)
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.beginPath();
+      ctx.ellipse(gX + 100, gY + 170, 26, 48, 0, 0, Math.PI * 2);
+      ctx.ellipse(gX + 100, gY + 108, 17, 20, 0, 0, Math.PI * 2);
+      ctx.ellipse(gX + 196, gY + 176, 28, 50, 0, 0, Math.PI * 2);
+      ctx.ellipse(gX + 196, gY + 110, 18, 21, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // O HOLOFOTE montado no teto — a lâmpada que acabou de acender
+      const sX = gX + gW - 46;
+      const sY = gY - 16;
+      ctx.fillStyle = '#2b3648';
+      ctx.fillRect(sX - 16, sY, 46, 14);
+      ctx.strokeStyle = '#5b6b80';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(sX - 16, sY, 46, 14);
+
+      // ── O FEIXE DE 1000W (additivo, com varredura real) ──
+      ctx.globalCompositeOperation = 'screen';
+
+      const sweep = Math.sin(t * 0.85) * 150;          // varredura lateral
+      const tipX = -260;
+      const tipY = roadY + 300 + sweep;
+
+      // Halo de neblina iluminada (o volume de ar dentro do feixe)
+      const haloGrad = ctx.createRadialGradient(sX - 120, sY + 240, 40, sX - 300, sY + 400, 640);
+      haloGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (0.52 * beamPower).toFixed(3) + ')');
+      haloGrad.addColorStop(0.3, 'rgba(254, 249, 195, ' + (0.30 * beamPower).toFixed(3) + ')');
+      haloGrad.addColorStop(0.7, 'rgba(56, 189, 248, ' + (0.11 * beamPower).toFixed(3) + ')');
+      haloGrad.addColorStop(1, 'rgba(2, 6, 23, 0)');
+      ctx.fillStyle = haloGrad;
+      ctx.beginPath();
+      ctx.moveTo(sX, sY + 4);
+      ctx.lineTo(tipX, tipY - 300);
+      ctx.lineTo(tipX, tipY + 340);
+      ctx.lineTo(sX, sY + 18);
+      ctx.closePath();
+      ctx.fill();
+
+      // Núcleo do feixe
+      const coreGrad = ctx.createLinearGradient(sX, sY, tipX, tipY);
+      coreGrad.addColorStop(0, 'rgba(255, 255, 255, ' + (0.95 * beamPower).toFixed(3) + ')');
+      coreGrad.addColorStop(0.28, 'rgba(254, 249, 195, ' + (0.62 * beamPower).toFixed(3) + ')');
+      coreGrad.addColorStop(0.7, 'rgba(125, 211, 252, ' + (0.24 * beamPower).toFixed(3) + ')');
+      coreGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+      ctx.fillStyle = coreGrad;
+      ctx.beginPath();
+      ctx.moveTo(sX, sY + 6);
+      ctx.lineTo(tipX, tipY - 110);
+      ctx.lineTo(tipX, tipY + 130);
+      ctx.lineTo(sX, sY + 14);
+      ctx.closePath();
+      ctx.fill();
+
+      // A lente incandescente e o flare anamórfico
+      const lensGrad = ctx.createRadialGradient(sX, sY + 7, 2, sX, sY + 7, 120 + warmup * 60);
+      lensGrad.addColorStop(0, 'rgba(255, 255, 255, ' + beamPower.toFixed(3) + ')');
+      lensGrad.addColorStop(0.22, 'rgba(254, 240, 138, ' + (0.9 * beamPower).toFixed(3) + ')');
+      lensGrad.addColorStop(0.6, 'rgba(56, 189, 248, ' + (0.4 * beamPower).toFixed(3) + ')');
+      lensGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = lensGrad;
+      ctx.beginPath();
+      ctx.arc(sX, sY + 7, 120 + warmup * 60, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(186, 230, 253, ' + (0.55 * beamPower).toFixed(3) + ')';
+      ctx.beginPath();
+      ctx.ellipse(sX, sY + 7, 240 + warmup * 120, 4.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Poeira e gotas suspensas dentro do feixe
+      for (let p = 0; p < 54; p++) {
+        const frac = (p * 0.019 + t * 0.10) % 1;
+        const px = sX + (tipX - sX) * frac + Math.sin(t * 3 + p) * 14;
+        const spread = 26 + frac * 190;
+        const py = sY + (tipY - sY) * frac + Math.cos(t * 2.2 + p * 1.6) * spread;
+        const pAlpha = (1 - frac * 0.65) * beamPower * (0.4 + 0.35 * Math.sin(t * 7 + p));
+        ctx.fillStyle = p % 3 === 0
+          ? 'rgba(254, 240, 138, ' + pAlpha.toFixed(3) + ')'
+          : 'rgba(224, 242, 254, ' + pAlpha.toFixed(3) + ')';
+        ctx.beginPath();
+        ctx.arc(px, py, 1.2 + (p % 3) * 0.7, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.globalCompositeOperation = 'source-over';
+
+      // A rua iluminada pelo feixe (poça de luz no asfalto molhado)
+      const poolGrad = ctx.createRadialGradient(sX - 340, roadY + 250, 20, sX - 340, roadY + 250, 420);
+      poolGrad.addColorStop(0, 'rgba(254, 249, 195, ' + (0.22 * beamPower).toFixed(3) + ')');
+      poolGrad.addColorStop(0.5, 'rgba(56, 189, 248, ' + (0.09 * beamPower).toFixed(3) + ')');
+      poolGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = poolGrad;
+      ctx.beginPath();
+      ctx.ellipse(sX - 340, roadY + 250, 420, 92, -0.05, 0, Math.PI * 2);
+      ctx.fill();
+
+      // ── CAMADA 4: GRADE DA ECLUSA EM PRIMEIRO PLANO (oclusão, desfocada) ──
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,0.9)';
+      ctx.shadowBlur = 18;
+      [{ x: 96, w: 34 }, { x: 466, w: 22 }, { x: 1004, w: 34 }].forEach((bar) => {
+        const bg = ctx.createLinearGradient(bar.x - bar.w / 2, 0, bar.x + bar.w / 2, 0);
+        bg.addColorStop(0, '#03060b');
+        bg.addColorStop(0.55, '#3d4d61');
+        bg.addColorStop(1, '#05090f');
+        ctx.fillStyle = bg;
+        ctx.fillRect(bar.x - bar.w / 2, -20, bar.w, H + 40);
+      });
+      ctx.restore();
+
+      // ── CHUVA (mais forte na frente = profundidade) ──
+      ctx.strokeStyle = 'rgba(186, 230, 253, 0.26)';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      for (let r = 0; r < 110; r++) {
+        const rx = ((r * 73 + t * 520) % (W + 220)) - 110;
+        const ry = (r * 41 + t * 990) % H;
+        const len = 20 + (r % 5) * 9;
+        ctx.moveTo(rx, ry);
+        ctx.lineTo(rx - 13, ry + len);
+      }
+      ctx.stroke();
+
+      // Flash de ignição — tela quase branca por 1 frame de cada estalo
+      if (warmup < 1) {
+        const flash = (1 - warmup) * (stutter > 0.8 ? 0.34 : 0.10);
+        ctx.fillStyle = 'rgba(226, 242, 254, ' + flash.toFixed(3) + ')';
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      // ── HUD discreto ──
+      ctx.fillStyle = 'rgba(2, 6, 23, 0.85)';
+      ctx.strokeStyle = 'rgba(253, 224, 71, 0.55)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.roundRect(64, H - 216, W - 128, 118, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#fde047';
+      ctx.font = '800 27px "JetBrains Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('🔦 HOLOFOTE 1000W — ATIVADO', 96, H - 172);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '700 21px "JetBrains Mono", monospace';
+      ctx.fillText('FEIXE CORTANDO A NEBLINA • ALCANCE: 42m', 96, H - 138);
+      ctx.fillText('GUARITA BLOCO C — VISTA EXTERNA', 96, H - 108);
 
       ctx.restore();
     }
@@ -1787,6 +3177,8 @@
 
     // 9. DIREÇÃO DE CÂMERA CINEMATOGRÁFICA UNIFICADA (Espaço Contínuo + Profundidade 2.5D Real)
     let activeScenario = 'portaria';
+    // Exposto para os testes de QA (verify_continuity.mjs) conferirem o corte de plano
+    Object.defineProperty(window, 'activeScenario', { get: () => activeScenario });
 
     function directScene(time) {
       if (time >= 0.2 && time <= 6.6) {
@@ -1798,12 +3190,32 @@
       spotlightActive = (time >= SPOTLIGHT_START);
       cctvActive = (time >= 28.8 && time < 35.5);
 
-      if (time >= DECISION_START) {
+      if (time >= 70.4) {
         decisionOverlay.style.display = 'flex';
-        const rem = Math.max(0, TOTAL_DURATION - time);
-        const remPct = (rem / (TOTAL_DURATION - DECISION_START)) * 100;
-        timerFill.style.width = remPct + '%';
-        countdownPill.innerText = `⏳ ${rem.toFixed(1)}s PARA DECIDIR`;
+        const card1 = document.getElementById('cardOption1');
+        const card2 = document.getElementById('cardOption2');
+
+        if (time < 75.8) {
+          // Destaca a Opção 1 enquanto o narrador/personagem introduz salvar Lucas
+          if (card1) { card1.classList.add('highlighted'); card1.classList.remove('dimmed'); }
+          if (card2) { card2.classList.add('dimmed'); card2.classList.remove('highlighted'); }
+          timerFill.style.width = '100%';
+          countdownPill.innerText = '🚪 OPÇÃO 1 EM DESTAQUE (SALVAR LUCAS)';
+        } else if (time < 81.1) {
+          // Destaca a Opção 2 enquanto o dilema introduz a cerca de 10.000V
+          if (card2) { card2.classList.add('highlighted'); card2.classList.remove('dimmed'); }
+          if (card1) { card1.classList.add('dimmed'); card1.classList.remove('highlighted'); }
+          timerFill.style.width = '100%';
+          countdownPill.innerText = '⚡ OPÇÃO 2 EM DESTAQUE (CERCA DE 10.000V)';
+        } else {
+          // Votação aberta para o público com contagem regressiva
+          if (card1) card1.classList.remove('dimmed', 'highlighted');
+          if (card2) card2.classList.remove('dimmed', 'highlighted');
+          const rem = Math.max(0, TOTAL_DURATION - time);
+          const remPct = (rem / (TOTAL_DURATION - 81.1)) * 100;
+          timerFill.style.width = remPct + '%';
+          countdownPill.innerText = `⏳ ${rem.toFixed(1)}s PARA DECIDIR`;
+        }
       } else {
         decisionOverlay.style.display = 'none';
       }
@@ -1838,27 +3250,39 @@
         activeScenario = 'portaria';
         cam.panTo(265 + swayX * 0.6, 415 + swayY * 0.6, 2.85, 0.35);
         voce.emotion = 'determined';
-        voce.pose = 'pointing';
+        voce.pose = 'pointing_valdir';
         valdir.emotion = 'serious';
         valdir.pose = 'hands_desk';
-      } else if (time < 15.2) {
-        // PLANO 3A (13.7s - 15.2s): SEU VALDIR PUXA A ALAVANCA DO REATOR AUXILIAR (Close tenso com força muscular)
+      } else if (time < LEVER_MACRO_START) {
+        // PLANO 3A (13.77s - 15.62s): SEU VALDIR CAMINHA ATÉ O QUADRO ELÉTRICO
+        // Ele se desloca de verdade (bancada -> parede lateral) e o rig entra em
+        // perfil enquanto anda, voltando a frontal ao parar. Câmera acompanha o passo.
         activeScenario = 'portaria';
-        cam.panTo(330 + swayX * 0.4, 415 + swayY * 0.4, 3.25, 0.35);
-        valdir.pose = 'pulling_lever';
+        cam.panTo((valdir.x + 20) + swayX * 0.3, 415 + swayY * 0.3, 3.3, 0.28);
         valdir.emotion = 'focused';
         voce.pose = 'step_back';
         voce.emotion = 'tense';
-        if (time >= 14.8 && time <= 15.1) cam.shake(0.35);
-      } else if (time < 20.8) {
-        // PLANO 3B (15.2s - 20.8s): VISÃO EXTERNA DISTANTE DO EDIFÍCIO SOLARIS & EXPLOSÃO DO HOLOFOTE DE 1000W
-        activeScenario = 'exterior';
+      } else if (time < EXTERIOR_LIGHT_START) {
+        // PLANO 3A-MACRO (15.62s - 16.40s): CLOSE-UP DA MÃO NA ALAVANCA DO REATOR 1000W
+        // Cena de ação isolada: só a mão, a alavanca e o quadro. Ação simples e legível.
+        activeScenario = 'lever_macro';
+        valdir.pose = 'pulling_lever';
+        valdir.emotion = 'focused';
+        if (time >= LEVER_PULL_AT + 0.42 && time <= LEVER_PULL_AT + 0.55) cam.shake(0.5);
+        if (time >= LEVER_PULL_AT + 0.42 && time <= LEVER_PULL_AT + 0.72) cam.shake(0.22);
+      } else if (time < 21.4) {
+        // PLANO 3B-EXTERNO (16.40s - 21.4s): A LUZ ACENDE VISTA DE FORA DO PRÉDIO
+        // Consequência direta do plano anterior: o feixe nasce no teto da guarita
+        // e varre a rua em perspectiva, cortando a neblina.
+        activeScenario = 'exterior_light';
+        if (Math.abs(time - EXTERIOR_LIGHT_START) < 0.14) cam.shake(0.3);
       } else if (time < 25.4) {
-        // PLANO 4A (20.8s - 25.4s): O FEIXE DE 1000W CORTA A RUA NA NEBLINA (Câmera foca a rua lá fora)
+        // PLANO 4A (21.4s - 25.4s): REAÇÃO EM PLANO MÉDIO 2-SHOT DENTRO DA GUARITA ILUMINADA
         activeScenario = 'portaria';
-        cam.panTo(95 + swayX * 0.8, 410 + swayY * 0.8, 2.65, 0.4);
+        cam.panTo(250 + swayX * 0.5, 415 + swayY * 0.5, 2.75, 0.35);
         valdir.pose = 'hands_desk';
         valdir.emotion = 'focused';
+        voce.pose = 'pointing_window';
         voce.emotion = 'shocked';
       } else if (time < 28.8) {
         // PLANO 4B (25.4s - 28.8s): PUSH-IN DRAMÁTICO PARA A TELA DO MONITOR CFTV ("Mas o que a câmera 2 revela...")
@@ -1875,30 +3299,28 @@
         cam.panTo(330, 415, 3.4, 0.15);
         valdir.emotion = 'panicked';
       } else if (time < 44.2) {
-        // PLANO 6 (36.6s - 44.2s): LUCAS ESPANCANDO O VIDRO BLINDADO (Câmera colada no vidro trincado)
-        activeScenario = 'portaria';
-        cam.panTo(115 + swayX * 0.5, 415 + swayY * 0.5, 3.3, 0.3);
-        lucas.pose = 'bang_gate';
-        lucas.emotion = 'terrified';
-        voce.emotion = 'shocked';
-        voce.pose = 'gesturing_urgent';
-        valdir.emotion = 'panicked';
-        valdir.pose = 'holding_switch';
+        // PLANO 6 (36.6s - 44.2s): LUCAS NO VIDRO BLINDADO (VISÃO LATERAL CINEMATOGRÁFICA EM PERFIL 3/4)
+        activeScenario = 'lucas_lateral';
+        if (Math.sin(time * 11.5) > 0.45) cam.shake(0.24);
+      } else if (time < 47.6) {
+        // PLANO 7A (44.2s - 47.6s): INTERFONE PREDIAL EM CLOSE EXTREMO (Chiado, LED vermelho pulsando e sirene predial)
+        activeScenario = 'intercom_macro';
+        scenario.alarmActive = true;
       } else if (time < 51.4) {
-        // PLANO 7 (44.2s - 51.4s): DONA CAMILA NO INTERFONE PREDIAL (Foco no interfone chiando com LED vermelho)
+        // PLANO 7B (47.6s - 51.4s): CORTE RÁPIDO — REAÇÃO DO SEU VALDIR E VOCÊ AO ALERTA DA DONA CAMILA
         activeScenario = 'portaria';
-        cam.panTo(185 + swayX * 0.5, 385 + swayY * 0.5, 3.0, 0.3);
+        cam.panTo(260 + swayX * 0.4, 415 + swayY * 0.4, 3.0, 0.25);
         voce.emotion = 'panicked';
-        voce.pose = 'gesturing_urgent';
-        valdir.emotion = 'tense';
+        voce.pose = 'listening';
+        valdir.emotion = 'panicked';
         valdir.pose = 'hands_desk';
         scenario.alarmActive = true;
       } else if (time < 60.0) {
         // PLANO 8 (51.4s - 60.0s): VOCÊ IMPLORA PARA SALVAR O LUCAS (Você em direção aos 3 ferrolhos)
         activeScenario = 'portaria';
         cam.panTo(165 + swayX * 0.6, 420 + swayY * 0.6, 2.9, 0.35);
-        voce.emotion = 'shocked';
-        voce.pose = 'pointing';
+        voce.emotion = 'panicked';
+        voce.pose = 'gesturing_urgent';
         valdir.emotion = 'serious';
         valdir.pose = 'holding_switch';
         scenario.alarmActive = true;
@@ -1929,7 +3351,9 @@
 
     // 10. MOTOR DE RENDERIZAÇÃO PRINCIPAL (60 FPS)
     function renderFrame() {
-      t = audio.currentTime;
+      if (playing) {
+        t = audio.currentTime;
+      }
       directScene(t);
 
       const pct = (t / TOTAL_DURATION) * 100;
@@ -1959,6 +3383,9 @@
         }
       }
 
+      // DESLOCAMENTO REAL: o Valdir caminha até o quadro elétrico antes de puxar a chave
+      updateValdirWalk(t);
+
       valdir.update(1 / 60, valdirMouth, 0.5);
       voce.update(1 / 60, voceMouth, 0.5);
       lucas.update(1 / 60, lucasMouth);
@@ -1967,8 +3394,14 @@
 
       if (cctvActive) {
         drawCCTVFullscreen(ctx);
-      } else if (activeScenario === 'exterior') {
-        drawExteriorDistantShot(ctx);
+      } else if (activeScenario === 'lucas_lateral') {
+        drawLucasLateralShot(ctx, lucasMouth);
+      } else if (activeScenario === 'intercom_macro') {
+        drawIntercomMacroShot(ctx);
+      } else if (activeScenario === 'lever_macro') {
+        drawLeverMacroShot(ctx);
+      } else if (activeScenario === 'exterior_light') {
+        drawExteriorLightOnShot(ctx);
       } else {
         // Atualiza a física de câmera e portaria unificada
         scenario.update(1 / 60);
@@ -2011,6 +3444,8 @@
     window.renderAt = function(sec) {
       audio.currentTime = sec;
       t = sec;
+      directScene(t);
+      if (cam.tfx !== undefined) cam.cut(cam.tfx, cam.tfy, cam.tzoom);
       renderFrame();
     };
 
