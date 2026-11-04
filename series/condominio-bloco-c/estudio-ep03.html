@@ -664,36 +664,42 @@
       ctx.fillText('3/3 TRAVADO', doorX + doorW * 0.5, doorY + 33);
       ctx.restore();
 
-      // 2. Quadro da Cerca de 10.000V e Cabo Sobrecarregado soltando Faíscas Azuis (Clímax >= 44s)
-      if (t >= 44.0) {
+      // 2. Quadro Elétrico Industrial: Reator Auxiliar 1000W (13s a 22s) e Disjuntor 10kV (>= 44s)
+      if (t >= 13.0) {
         ctx.save();
         const boxX = 368;
         const boxY = 395;
 
-        // Caixa do Disjuntor de Alta Tensão 10kV na Guarita
+        const isReactorMode = (t < 30.0);
+        const boxBorderColor = isReactorMode ? '#38bdf8' : '#f59e0b';
+        const boxLabel = isReactorMode ? '💡1000W' : '⚡10kV';
+
+        // Caixa do Disjuntor Industrial na Guarita
         ctx.fillStyle = '#0f172a';
-        ctx.strokeStyle = '#f59e0b';
+        ctx.strokeStyle = boxBorderColor;
         ctx.lineWidth = 1.8;
         ctx.beginPath();
         ctx.roundRect(boxX, boxY, 34, 46, 4);
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = '#f59e0b';
+        ctx.fillStyle = boxBorderColor;
         ctx.font = '800 6.5px monospace';
         ctx.textAlign = 'center';
-        ctx.fillText('⚡10kV', boxX + 17, boxY + 13);
+        ctx.fillText(boxLabel, boxX + 17, boxY + 13);
 
-        // Chave Alavanca Vermelha
-        ctx.strokeStyle = '#ef4444';
+        // Chave Alavanca Industrial (Puxada para baixo quando ativada)
+        const leverPulled = (t >= 14.8);
+        const leverAngle = leverPulled ? 28 : 16;
+        ctx.strokeStyle = isReactorMode ? '#38bdf8' : '#ef4444';
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(boxX + 17, boxY + 28);
-        ctx.lineTo(boxX + 26, boxY + 18 + Math.sin(t * 20) * 1.5);
+        ctx.lineTo(boxX + 26, boxY + leverAngle + (leverPulled ? Math.sin(t * 20) * 1.0 : 0));
         ctx.stroke();
 
-        // Faíscas e Arcos Voltaicos de Sobrecarga no Cabo do Holofote / Cerca
-        const sparkBurst = Math.sin(t * 17) > -0.2;
+        // Faíscas e Arcos Voltaicos de Sobrecarga
+        const sparkBurst = (t >= 14.7 && t < 15.4) || (t >= 44.0 && Math.sin(t * 17) > -0.2);
         if (sparkBurst) {
           const sx = 352;
           const sy = 432;
@@ -1114,6 +1120,246 @@
       ctx.restore();
     }
 
+    // 4.5. VISÃO DE LONGE DA FACHADA DO SOLARIS: ATIVAÇÃO DO HOLOFOTE DE 1000W NA NEBLINA
+    function drawExteriorDistantShot(ctx) {
+      ctx.save();
+      const timeSinceOn = Math.max(0, t - SPOTLIGHT_START);
+      const ignitionFlash = timeSinceOn < 0.35 ? (1 - timeSinceOn / 0.35) : 0;
+
+      // 1. CÉU NOTURNO E PRÉDIOS URBANOS DISTANTES COM RELÂMPAGO DIFUSO
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.55);
+      skyGrad.addColorStop(0, '#02040a');
+      skyGrad.addColorStop(0.5, '#060d1a');
+      skyGrad.addColorStop(1, '#091322');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Silhuetas dos edifícios vizinhos na escuridão
+      ctx.fillStyle = '#030712';
+      const cityBuildings = [
+        [40, 320, 140, 800], [210, 260, 160, 860], [400, 380, 120, 740],
+        [820, 290, 150, 830], [990, 340, 120, 780]
+      ];
+      cityBuildings.forEach(([bx, by, bw, bh]) => {
+        ctx.fillRect(bx, by, bw, bh);
+        ctx.fillStyle = 'rgba(253, 224, 71, 0.08)';
+        for (let wy = by + 40; wy < by + bh - 100; wy += 55) {
+          for (let wx = bx + 20; wx < bx + bw - 25; wx += 42) {
+            if ((wx * 7 + wy * 13) % 4 === 0) ctx.fillRect(wx, wy, 12, 16);
+          }
+        }
+        ctx.fillStyle = '#030712';
+      });
+
+      // 2. FACHADA BRUTALISTA DO CONDOMÍNIO SOLARIS (BLOCO C — 8 ANDARES)
+      const facX = 220;
+      const facY = 160;
+      const facW = 640;
+      const facH = 1180;
+      const facGrad = ctx.createLinearGradient(facX, facY, facX + facW, facY + facH);
+      facGrad.addColorStop(0, '#111827');
+      facGrad.addColorStop(0.4, '#0f172a');
+      facGrad.addColorStop(1, '#090d16');
+      ctx.fillStyle = facGrad;
+      ctx.fillRect(facX, facY, facW, facH);
+
+      // Frisos horizontais entre pavimentos
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 2.5;
+      for (let f = 0; f < 8; f++) {
+        const fy = facY + f * 145;
+        ctx.beginPath();
+        ctx.moveTo(facX, fy);
+        ctx.lineTo(facX + facW, fy);
+        ctx.stroke();
+
+        // Varandas com parapeito
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(facX + 40, fy + 80, facW - 80, 50);
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(facX + 40, fy + 80, facW - 80, 50);
+
+        // Janelas do bloco residencial
+        for (let wcol = 0; wcol < 3; wcol++) {
+          const wx = facX + 75 + wcol * 180;
+          const wy = fy + 24;
+          const isLit = (f + wcol) % 3 === 1;
+          ctx.fillStyle = isLit ? 'rgba(254, 240, 138, 0.25)' : '#070b14';
+          ctx.fillRect(wx, wy, 70, 48);
+          ctx.strokeStyle = '#1e293b';
+          ctx.lineWidth = 1.2;
+          ctx.strokeRect(wx, wy, 70, 48);
+        }
+      }
+
+      // Letreiro Luminoso "CONDOMÍNIO SOLARIS · BLOCO C"
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '800 24px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = '#38bdf8';
+      ctx.shadowBlur = 18;
+      ctx.fillText('CONDOMÍNIO SOLARIS · BLOCO C', facX + facW * 0.5, facY - 25);
+      ctx.shadowBlur = 0;
+
+      // 3. ESTRUTURA DA GUARITA NO TÉRREO
+      const gX = 180;
+      const gY = 1100;
+      const gW = 340;
+      const gH = 340;
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(gX, gY, gW, gH);
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(gX, gY, gW, gH);
+
+      // Janela panorâmica da guarita
+      const winGrad = ctx.createLinearGradient(gX + 25, gY + 30, gX + gW - 25, gY + 220);
+      winGrad.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
+      winGrad.addColorStop(0.5, 'rgba(6, 182, 212, 0.25)');
+      winGrad.addColorStop(1, 'rgba(2, 6, 23, 0.85)');
+      ctx.fillStyle = winGrad;
+      ctx.fillRect(gX + 25, gY + 30, gW - 50, 190);
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(gX + 25, gY + 30, gW - 50, 190);
+
+      // Silhuetas do Seu Valdir e Você dentro da guarita
+      ctx.fillStyle = '#060a12';
+      ctx.beginPath();
+      ctx.ellipse(gX + 130, gY + 120, 18, 30, 0, 0, Math.PI * 2);
+      ctx.ellipse(gX + 130, gY + 80, 12, 14, 0, 0, Math.PI * 2);
+      ctx.ellipse(gX + 220, gY + 125, 20, 32, 0, 0, Math.PI * 2);
+      ctx.ellipse(gX + 220, gY + 82, 13, 15, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 4. RUA ASFALTADA MOLHADA, MEIO-FIO E CALÇADA
+      const streetGrad = ctx.createLinearGradient(0, 1440, 0, H);
+      streetGrad.addColorStop(0, '#0a101d');
+      streetGrad.addColorStop(0.4, '#060a12');
+      streetGrad.addColorStop(1, '#020408');
+      ctx.fillStyle = streetGrad;
+      ctx.fillRect(0, 1440, W, H - 1440);
+
+      // Faixas de pedestres
+      ctx.fillStyle = 'rgba(203, 213, 225, 0.18)';
+      for (let s = 0; s < 7; s++) {
+        ctx.fillRect(120 + s * 130, 1580, 75, 240);
+      }
+
+      // Reflexos na água acumulada na rua
+      const puddleGrad = ctx.createRadialGradient(W * 0.45, 1720, 10, W * 0.45, 1720, 260);
+      puddleGrad.addColorStop(0, 'rgba(56, 189, 248, 0.28)');
+      puddleGrad.addColorStop(0.6, 'rgba(253, 224, 71, 0.15)');
+      puddleGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = puddleGrad;
+      ctx.beginPath();
+      ctx.ellipse(W * 0.45, 1720, 340, 65, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Moto do entregador caída na rua molhada
+      const mbX = 460;
+      const mbY = 1680;
+      ctx.save();
+      ctx.translate(mbX, mbY);
+      ctx.rotate(0.35);
+      ctx.fillStyle = '#090d16';
+      ctx.beginPath();
+      ctx.arc(-45, 15, 24, 0, Math.PI * 2);
+      ctx.arc(45, 12, 24, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#dc2626';
+      ctx.fillRect(-35, -28, 55, 32);
+      ctx.fillStyle = '#991b1b';
+      ctx.fillRect(-65, -42, 45, 30);
+      const blinkOn = Math.sin(t * 14) > 0;
+      if (blinkOn) {
+        const ambGlow = ctx.createRadialGradient(55, 5, 2, 55, 5, 140);
+        ambGlow.addColorStop(0, 'rgba(245, 158, 11, 0.95)');
+        ambGlow.addColorStop(0.35, 'rgba(245, 158, 11, 0.45)');
+        ambGlow.addColorStop(1, 'rgba(245, 158, 11, 0)');
+        ctx.fillStyle = ambGlow;
+        ctx.beginPath();
+        ctx.arc(55, 5, 140, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // 5. A IGNIÇÃO DO HOLOFOTE DE 1000W (VISÃO DE LONGE — CONE GIGANTESCO RASGANDO A NEBLINA)
+      const spotMountX = gX + gW - 35;
+      const spotMountY = gY + 12;
+
+      ctx.globalCompositeOperation = 'screen';
+
+      const beamTargetX = W + 200;
+      const beamTargetY = 1750;
+
+      const beamGrad = ctx.createLinearGradient(spotMountX, spotMountY, beamTargetX, beamTargetY);
+      beamGrad.addColorStop(0, `rgba(255, 255, 255, ${0.98 + ignitionFlash * 0.5})`);
+      beamGrad.addColorStop(0.2, `rgba(254, 240, 138, ${0.82 + ignitionFlash * 0.3})`);
+      beamGrad.addColorStop(0.65, 'rgba(56, 189, 248, 0.45)');
+      beamGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+
+      ctx.fillStyle = beamGrad;
+      ctx.beginPath();
+      ctx.moveTo(spotMountX, spotMountY - 15);
+      ctx.lineTo(beamTargetX, beamTargetY - 320);
+      ctx.lineTo(beamTargetX, beamTargetY + 380);
+      ctx.lineTo(spotMountX, spotMountY + 25);
+      ctx.closePath();
+      ctx.fill();
+
+      // Flare gigante na lente do holofote
+      const flareGrad = ctx.createRadialGradient(spotMountX, spotMountY, 4, spotMountX, spotMountY, 180 + ignitionFlash * 220);
+      flareGrad.addColorStop(0, '#ffffff');
+      flareGrad.addColorStop(0.2, 'rgba(254, 240, 138, 0.95)');
+      flareGrad.addColorStop(0.55, 'rgba(56, 189, 248, 0.45)');
+      flareGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = flareGrad;
+      ctx.beginPath();
+      ctx.arc(spotMountX, spotMountY, 180 + ignitionFlash * 220, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Anamorphic horizontal streak
+      ctx.fillStyle = 'rgba(125, 211, 252, 0.75)';
+      ctx.beginPath();
+      ctx.ellipse(spotMountX, spotMountY, 420 + ignitionFlash * 300, 6, 0.05, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Partículas volumétricas na névoa
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      for (let p = 0; p < 65; p++) {
+        const pFrac = ((p * 0.015 + t * 0.12) % 1);
+        const px = spotMountX + pFrac * (beamTargetX - spotMountX) + Math.sin(t * 4 + p) * 15;
+        const py = spotMountY + pFrac * (beamTargetY - spotMountY) + Math.cos(t * 3 + p) * (40 + pFrac * 120);
+        ctx.beginPath();
+        ctx.arc(px, py, 1.2 + (p % 3) * 0.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.globalCompositeOperation = 'source-over';
+
+      // 6. CHUVA TORRENCIAL DIAGONAL
+      ctx.strokeStyle = 'rgba(186, 230, 253, 0.28)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      for (let r = 0; r < 90; r++) {
+        const rx = ((r * 67 + t * 450) % (W + 200)) - 100;
+        const ry = (r * 39 + t * 880) % H;
+        ctx.moveTo(rx, ry);
+        ctx.lineTo(rx - 15, ry + 32);
+      }
+      ctx.stroke();
+
+      // Flash na tela
+      if (ignitionFlash > 0.05) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${ignitionFlash * 0.6})`;
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      ctx.restore();
+    }
+
     // 5. CFTV CAM 02 EM TELA CHEIA: A CRIATURA DE 2.20M FUGINDO DA MASSA NEGRA COLOSSAL
     function drawCCTVFullscreen(ctx) {
       ctx.save();
@@ -1362,11 +1608,40 @@
       }
     }
 
-    // 7. HUD TÁTICO SUPERIOR
+    // 7. HUD TÁTICO & VIEWFINDER ÓPTICO CINEMATOGRÁFICO 2.5D
     function drawTacticalHUD(ctx) {
       if (t >= DECISION_START || cctvActive) return;
 
       ctx.save();
+
+      // 1. Vinheta Óptica de Lente Cinema (Bordas escuras 2.5D para foco visceral)
+      const vigGrad = ctx.createRadialGradient(W * 0.5, H * 0.5, W * 0.45, W * 0.5, H * 0.5, W * 0.88);
+      vigGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      vigGrad.addColorStop(1, 'rgba(2, 6, 18, 0.65)');
+      ctx.fillStyle = vigGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // 2. Brackets de Foco de Câmera nos 4 Cantos (Viewfinder Profissional)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.lineWidth = 2.5;
+      const bLen = 32;
+      const mPad = 35;
+      // Top-Left
+      ctx.beginPath(); ctx.moveTo(mPad, mPad + bLen); ctx.lineTo(mPad, mPad); ctx.lineTo(mPad + bLen, mPad); ctx.stroke();
+      // Top-Right
+      ctx.beginPath(); ctx.moveTo(W - mPad - bLen, mPad); ctx.lineTo(W - mPad, mPad); ctx.lineTo(W - mPad, mPad + bLen); ctx.stroke();
+      // Bottom-Left
+      ctx.beginPath(); ctx.moveTo(mPad, H - mPad - bLen); ctx.lineTo(mPad, H - mPad); ctx.lineTo(mPad + bLen, H - mPad); ctx.stroke();
+      // Bottom-Right
+      ctx.beginPath(); ctx.moveTo(W - mPad - bLen, H - mPad); ctx.lineTo(W - mPad, H - mPad); ctx.lineTo(W - mPad, H - mPad - bLen); ctx.stroke();
+
+      // 3. Mira Óptica Central Sutil
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.5 - 14, H * 0.5); ctx.lineTo(W * 0.5 + 14, H * 0.5);
+      ctx.moveTo(W * 0.5, H * 0.5 - 14); ctx.lineTo(W * 0.5, H * 0.5 + 14);
+      ctx.stroke();
 
       // Badge 1: Relógio e Episódio
       ctx.fillStyle = 'rgba(2, 6, 23, 0.88)';
@@ -1414,6 +1689,23 @@
       ctx.fillStyle = '#ecfdf5';
       ctx.font = '800 20px "JetBrains Mono", monospace';
       ctx.fillText('🔒 3/3 FERROLHOS', 760, 118);
+
+      // 4. Tag de Localização Óptica da Câmera
+      let camLocTag = 'INT • GUARITA BLINDADA (LOBBY)';
+      if (activeScenario === 'exterior') camLocTag = 'EXT • FACHADA SOLARIS (VISÃO GERAL 1000W)';
+
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.roundRect(60, 155, 490, 38, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '700 16px "JetBrains Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(`📡 ${camLocTag}`, 75, 179);
 
       ctx.restore();
     }
@@ -1549,19 +1841,23 @@
         voce.pose = 'pointing';
         valdir.emotion = 'serious';
         valdir.pose = 'hands_desk';
-      } else if (time < 21.4) {
-        // PLANO 3 (13.7s - 21.4s): SEU VALDIR ACIONA O REATOR AUXILIAR & IGNIÇÃO DO FAROL EXTERNO
+      } else if (time < 15.2) {
+        // PLANO 3A (13.7s - 15.2s): SEU VALDIR PUXA A ALAVANCA DO REATOR AUXILIAR (Close tenso com força muscular)
         activeScenario = 'portaria';
-        cam.panTo(325 + swayX * 0.5, 415 + swayY * 0.5, 2.95, 0.3);
-        valdir.pose = 'holding_spotlight';
+        cam.panTo(330 + swayX * 0.4, 415 + swayY * 0.4, 3.25, 0.35);
+        valdir.pose = 'pulling_lever';
         valdir.emotion = 'focused';
         voce.pose = 'step_back';
         voce.emotion = 'tense';
-        if (Math.abs(time - SPOTLIGHT_START) < 0.14) cam.shake(0.48);
+        if (time >= 14.8 && time <= 15.1) cam.shake(0.35);
+      } else if (time < 20.8) {
+        // PLANO 3B (15.2s - 20.8s): VISÃO EXTERNA DISTANTE DO EDIFÍCIO SOLARIS & EXPLOSÃO DO HOLOFOTE DE 1000W
+        activeScenario = 'exterior';
       } else if (time < 25.4) {
-        // PLANO 4A (21.4s - 25.4s): O FEIXE DE 1000W CORTA A RUA NA NEBLINA (Câmera foca a rua lá fora)
+        // PLANO 4A (20.8s - 25.4s): O FEIXE DE 1000W CORTA A RUA NA NEBLINA (Câmera foca a rua lá fora)
         activeScenario = 'portaria';
         cam.panTo(95 + swayX * 0.8, 410 + swayY * 0.8, 2.65, 0.4);
+        valdir.pose = 'hands_desk';
         valdir.emotion = 'focused';
         voce.emotion = 'shocked';
       } else if (time < 28.8) {
@@ -1671,6 +1967,8 @@
 
       if (cctvActive) {
         drawCCTVFullscreen(ctx);
+      } else if (activeScenario === 'exterior') {
+        drawExteriorDistantShot(ctx);
       } else {
         // Atualiza a física de câmera e portaria unificada
         scenario.update(1 / 60);

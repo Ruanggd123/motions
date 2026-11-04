@@ -783,10 +783,10 @@
       } else if (this.pose === 'hands_desk') {
         leftUpperAngle = -0.08;
         leftForeAngle = -0.72;
-      } else if (this.pose === 'holding_spotlight') {
-        // Mão esquerda firme no corpo do farol de mil watts
-        leftUpperAngle = -0.60;
-        leftForeAngle = -1.22;
+      } else if (this.pose === 'holding_spotlight' || this.pose === 'pulling_lever') {
+        // Mão esquerda firme apoiando na carcaça do quadro ou painel de comando
+        leftUpperAngle = -0.45;
+        leftForeAngle = -1.18;
       } else if (this.pose === 'holding_switch') {
         // Mão esquerda apoiada na alavanca do quadro de alta tensão
         leftUpperAngle = -0.28;
@@ -820,9 +820,15 @@
         this._drawRadioTalkArm(ctx);
       } else if (this.pose === 'point_monitors') {
         this._drawRadioTalkArm(ctx, true);
+      } else if (this.pose === 'pulling_lever') {
+        // Braço dianteiro puxando com força a alavanca industrial de cima para baixo
+        const pullProgress = Math.min(1.0, Math.max(0, (this.time * 2.4) % 1.6));
+        const armAngle = -1.25 + pullProgress * 0.95; // de cima (-1.25 rad) para baixo (-0.30 rad)
+        const elbowBend = -0.45 - pullProgress * 0.75;
+        this._drawArticulatedArm(ctx, armAngle, elbowBend, true, false, true);
       } else if (this.pose === 'holding_spotlight') {
-        // Braço dianteiro sustentando o farol de mil watts contra o peito
-        this._drawArticulatedArm(ctx, -0.66, -1.24, true, false, false);
+        // Braço dianteiro orientando o refletor externo na janela
+        this._drawArticulatedArm(ctx, -0.72, -0.85, true, false, false);
       } else if (this.pose === 'holding_switch') {
         // Braço dianteiro avançando para a chave geral de 10kV
         this._drawArticulatedArm(ctx, -1.34, -0.34, true, false, true);
