@@ -34,6 +34,9 @@
       this.walkDir = options.walkDir || 1; // 1 = direita, -1 = esquerda
       this._prevX = this.x;
 
+      // Estado do farol tático que ele segura na pose 'holding_spotlight'
+      this.spotlightOn = options.spotlightOn === true;
+
       // Expressão e Ciclos Fisiológicos Naturais
       this.mouthOpen = 0;
       this.mouthWide = 0.5;
@@ -542,45 +545,74 @@
         ctx.arc(22, -13, 1.2, 0, Math.PI * 2);
         ctx.fill();
       } else {
-        // Caminhada Normal: balanço natural dos braços
-        const armSwing = isWalk ? Math.sin(phi) * 0.35 : 0;
+        // ── PERFIL PARA TODAS AS DEMAIS POSES ──
+        // BUGFIX: o perfil só tratava 'radio_talk'. Em 'hands_desk',
+        // 'pulling_lever', 'holding_spotlight' e 'holding_switch' os braços
+        // caíam no balanço de caminhada e ficavam pendurados atrás do tronco —
+        // daí a mão "aparecendo do lado errado". Agora cada pose tem o seu
+        // braço dianteiro desenhado NA FRENTE do tronco, sempre voltado +X.
+        const armSwing = isWalk ? Math.sin(phi) * 0.32 : 0;
 
-        // Braço Traseiro
+        // Braço traseiro (sempre atrás, com leve balanço)
         ctx.save();
         ctx.rotate(-armSwing);
         ctx.fillStyle = '#0f172a';
         ctx.beginPath();
         ctx.moveTo(-2, -6);
-        ctx.lineTo(-4, 18);
-        ctx.lineTo(2, 38);
-        ctx.lineTo(6, 36);
-        ctx.lineTo(2, 16);
+        ctx.lineTo(-5, 16);
+        ctx.lineTo(-1, 34);
+        ctx.lineTo(4, 33);
+        ctx.lineTo(1, 15);
         ctx.closePath();
         ctx.fill();
         ctx.restore();
 
-        // Braço Dianteiro
-        ctx.save();
-        ctx.rotate(armSwing);
-        const armGrad = ctx.createLinearGradient(0, -6, 0, 40);
-        armGrad.addColorStop(0, '#1e293b');
-        armGrad.addColorStop(1, '#0f172a');
-        ctx.fillStyle = armGrad;
-        ctx.beginPath();
-        ctx.moveTo(2, -6);
-        ctx.lineTo(4, 18);
-        ctx.lineTo(-2, 38);
-        ctx.lineTo(2, 40);
-        ctx.lineTo(8, 18);
-        ctx.closePath();
-        ctx.fill();
+        // Braço dianteiro: posição depende da POSE, não só da caminhada
+        const s = this._profilePoseArm();
+        if (s) {
+          ctx.save();
+          ctx.rotate(s.shoulder + armSwing * 0.5);
+          // Manga superior (camisa social azul-clara)
+          const sleeve = ctx.createLinearGradient(0, 0, 14, s.upperLen);
+          sleeve.addColorStop(0, '#cbd5e1');
+          sleeve.addColorStop(1, '#94a3b8');
+          ctx.fillStyle = sleeve;
+          ctx.beginPath();
+          ctx.moveTo(-5, -3);
+          ctx.lineTo(6, -2);
+          ctx.lineTo(9, s.upperLen);
+          ctx.lineTo(-3, s.upperLen);
+          ctx.closePath();
+          ctx.fill();
 
-        // Mão relaxada
-        ctx.fillStyle = '#946340';
-        ctx.beginPath();
-        ctx.arc(0, 42, 3.5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
+          // Antebraço a partir do cotovelo
+          ctx.translate(3, s.upperLen);
+          ctx.rotate(s.elbow);
+          const fore = ctx.createLinearGradient(0, 0, 8, s.foreLen);
+          fore.addColorStop(0, '#94a3b8');
+          fore.addColorStop(1, '#cbd5e1');
+          ctx.fillStyle = fore;
+          ctx.beginPath();
+          ctx.moveTo(-4, 0);
+          ctx.lineTo(5, 0);
+          ctx.lineTo(6, s.foreLen);
+          ctx.lineTo(-3, s.foreLen);
+          ctx.closePath();
+          ctx.fill();
+
+          // Punho e mão
+          ctx.translate(1, s.foreLen);
+          ctx.fillStyle = '#e2e8f0';
+          ctx.fillRect(-4, -2, 9, 6);
+          ctx.fillStyle = '#c6865c';
+          ctx.beginPath();
+          ctx.roundRect(-4, 4, 9, 12, 4);
+          ctx.fill();
+
+          // Prop próprio da pose (alavanca / farol / chave / bancada)
+          if (s.prop) s.prop(ctx);
+          ctx.restore();
+        }
       }
 
       ctx.restore(); // Fim Braços
@@ -591,6 +623,126 @@
       ctx.translate(4, 62 + hipBob);
       this._drawProfileLeg(ctx, legFront.th, legFront.kn, legFront.ft, false);
       ctx.restore();
+    }
+
+    /**
+     * Ângulos do braço dianteiro EM PERFIL para cada pose.
+     * Convenção do Canvas 2D num membro vertical: ângulo NEGATIVO gira o membro
+     * para FRENTE (+X). O antebraço soma ao ângulo do braço.
+     * Tudo é medido a partir do ombro, em radianos.
+     */
+    _profilePoseArm() {
+      const upperLen = 30;
+      const foreLen = 28;
+
+      switch (this.pose) {
+        case 'pulling_lever':
+          // Braço erguido à frente, puxando a alavanca do quadro para baixo
+          return {
+            shoulder: -0.62, elbow: -0.30, upperLen, foreLen,
+            prop: (c) => {
+              // Alavanca vermelha que desce junto com a mão
+              c.save();
+              c.translate(6, 10);
+              const leverGrad = c.createLinearGradient(-4, 0, 4, 0);
+              leverGrad.addColorStop(0, '#7f1d1d');
+              leverGrad.addColorStop(0.5, '#ef4444');
+              leverGrad.addColorStop(1, '#7f1d1d');
+              c.fillStyle = leverGrad;
+              c.beginPath();
+              c.roundRect(-4, -6, 8, 34, 3);
+              c.fill();
+              c.strokeStyle = '#450a0a';
+              c.lineWidth = 1.2;
+              c.stroke();
+              c.fillStyle = '#0b0f16';
+              c.beginPath();
+              c.ellipse(0, 30, 8, 7, 0, 0, Math.PI * 2);
+              c.fill();
+              c.restore();
+            }
+          };
+
+        case 'holding_spotlight':
+          // Segura o farol tático junto ao peito
+          return {
+            shoulder: -0.48, elbow: -1.05, upperLen, foreLen,
+            prop: (c) => {
+              c.save();
+              c.translate(4, 10);
+              const barrel = c.createLinearGradient(0, -8, 0, 8);
+              barrel.addColorStop(0, '#94a3b8');
+              barrel.addColorStop(0.55, '#64748b');
+              barrel.addColorStop(1, '#334155');
+              c.fillStyle = barrel;
+              c.beginPath();
+              c.roundRect(-12, -7, 34, 14, 5);
+              c.fill();
+              c.fillStyle = '#0f172a';
+              c.beginPath();
+              c.roundRect(22, -9, 7, 18, 3);
+              c.fill();
+              if (this.spotlightOn) {
+                const lens = c.createRadialGradient(29, 0, 1, 29, 0, 16);
+                lens.addColorStop(0, 'rgba(255,255,255,0.95)');
+                lens.addColorStop(0.4, 'rgba(254,249,195,0.7)');
+                lens.addColorStop(1, 'rgba(56,189,248,0)');
+                c.fillStyle = lens;
+                c.beginPath();
+                c.arc(29, 0, 16, 0, Math.PI * 2);
+                c.fill();
+              }
+              c.restore();
+            }
+          };
+
+        case 'holding_switch':
+          // Mão estendida na chave geral de alta tensão
+          return {
+            shoulder: -1.22, elbow: -0.12, upperLen, foreLen,
+            prop: (c) => {
+              c.save();
+              c.translate(6, 6);
+              c.fillStyle = '#0f172a';
+              c.strokeStyle = '#f59e0b';
+              c.lineWidth = 1.4;
+              c.beginPath();
+              c.roundRect(-9, -10, 22, 24, 3);
+              c.fill();
+              c.stroke();
+              c.strokeStyle = '#ef4444';
+              c.lineWidth = 2.4;
+              c.beginPath();
+              c.moveTo(2, 10);
+              c.lineTo(9, 0);
+              c.stroke();
+              c.restore();
+            }
+          };
+
+        case 'hands_desk':
+          // Mão apoiada na bancada, logo à frente do quadril
+          return {
+            shoulder: -0.16, elbow: -0.92, upperLen, foreLen,
+            prop: null
+          };
+
+        case 'point_monitors':
+          // Aponta para os monitores CFTV (na parede à frente)
+          return {
+            shoulder: -1.05, elbow: 0.06, upperLen, foreLen,
+            prop: (c) => {
+              // Dedo indicador estendido
+              c.fillStyle = '#c6865c';
+              c.beginPath();
+              c.roundRect(2, 12, 3.4, 11, 1.6);
+              c.fill();
+            }
+          };
+
+        default:
+          return null;
+      }
     }
 
     /**
@@ -796,7 +948,17 @@
         leftUpperAngle = -0.12;
         leftForeAngle = -0.55;
       }
-      this._drawArticulatedArm(ctx, leftUpperAngle, leftForeAngle, false, false, this.pose === 'point_monitors');
+
+      // ORDEM DE CAMADAS CORRIGIDA: nas poses em que o braço esquerdo vem À FRENTE
+      // do corpo (aponta, apoia no balcão, segura equipamento), ele não pode ser
+      // desenhado junto do ombro traseiro — senão a mão some atrás do tronco.
+      // Empurramos o desenho dele para depois da cabeça (bloco 6-B).
+      const leftArmInFront = ['point_monitors', 'hands_desk', 'holding_spotlight',
+        'holding_switch', 'radio_talk'].includes(this.pose);
+
+      if (!leftArmInFront) {
+        this._drawArticulatedArm(ctx, leftUpperAngle, leftForeAngle, false, false, false);
+      }
       ctx.restore();
 
       // 4. TRONCO, CAMISA SOCIAL & COLETE MARINHO DE ALFAIATARIA
@@ -836,6 +998,16 @@
         this._drawDeskArm(ctx);
       }
       ctx.restore();
+
+      // 6-B. BRAÇO ESQUERDO À FRENTE (desenhado por cima de tronco e cabeça)
+      // Sem isso a mão esquerda fica atrás do colete em poses de apoio/gesto.
+      if (leftArmInFront) {
+        ctx.save();
+        ctx.translate(-24 + hipSway * 0.5, -20 + hipBob);
+        ctx.rotate(torsoTilt);
+        this._drawArticulatedArm(ctx, leftUpperAngle, leftForeAngle, false, false, this.pose === 'point_monitors');
+        ctx.restore();
+      }
     }
 
     /**

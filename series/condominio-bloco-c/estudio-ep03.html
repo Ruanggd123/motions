@@ -295,17 +295,52 @@
 
     /* PAINEL LATERAL DE CONTROLE */
     .panel {
-      width: 360px;
+      width: 380px;
       max-height: calc(100vh - 40px);
-      overflow-y: auto;
-      padding-right: 6px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 0;
     }
-    .panel::-webkit-scrollbar { width: 5px; }
-    .panel::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.25); border-radius: 999px; }
-    .panel::-webkit-scrollbar-track { background: transparent; }
+    /* ── ABAS: transmissão / TikTok / elenco / cenas ── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 10px;
+      flex-shrink: 0;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 9px 6px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      border-radius: 8px 8px 0 0;
+      background: #0b111e;
+      color: #64748b;
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-bottom: none;
+      cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+    }
+    .tab-btn:hover { color: #cbd5e1; }
+    .tab-btn.active {
+      background: rgba(56, 189, 248, 0.14);
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.45);
+    }
+    .tab-pane {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      padding-right: 6px;
+      flex: 1;
+    }
+    .tab-pane.active { display: flex; }
+    .tab-pane::-webkit-scrollbar { width: 5px; }
+    .tab-pane::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.25); border-radius: 999px; }
+    .tab-pane::-webkit-scrollbar-track { background: transparent; }
     .card {
       background: #0b111e;
       border: 1px solid rgba(148, 163, 184, 0.16);
@@ -337,6 +372,90 @@
     }
     button:hover { border-color: #38bdf8; }
     button.primary { background: #10b981; color: #022c22; border-color: #34d399; }
+    button.on { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; color: #7dd3fc; }
+
+    /* Cena da biblioteca: cartão clicável */
+    .scene-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+      text-align: left;
+      padding: 8px 10px;
+      margin-top: 5px;
+      background: #0f172a;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+    .scene-item:hover { border-color: #38bdf8; color: #f8fafc; }
+    .scene-item .pin {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      flex-shrink: 0;
+    }
+    .scene-meta { font-size: 10.5px; color: #64748b; margin-top: 2px; }
+
+    /* Momento / fala do roteiro */
+    .beat {
+      padding: 7px 9px;
+      border-radius: 7px;
+      margin-top: 5px;
+      border-left: 3px solid rgba(148, 163, 184, 0.22);
+      font-size: 11.5px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .beat:hover { background: rgba(56, 189, 248, 0.07); }
+    .beat.active {
+      background: rgba(56, 189, 248, 0.14);
+      border-left-color: #38bdf8;
+      color: #f8fafc;
+    }
+    .beat b { color: #7dd3fc; }
+    .beat .who {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #94a3b8;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .voice-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      text-align: left;
+      padding: 8px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      background: #0f172a;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .voice-btn:hover { border-color: #38bdf8; }
+    .voice-btn.playing { border-color: #10b981; background: rgba(16, 185, 129, 0.14); }
+    .vbadge {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(148, 163, 184, 0.16);
+      color: #94a3b8;
+      flex-shrink: 0;
+    }
     .track {
       height: 8px;
       background: #020617;
@@ -409,46 +528,106 @@
     </div>
   </div>
 
-  <!-- PAINEL DE CONTROLE LATERAL -->
+  <!-- PAINEL DE CONTROLE LATERAL · 4 ABAS -->
   <div class="panel">
-    <div class="card">
-      <h2>🎬 Episódio 03: "O Feixe na Neblina"</h2>
-      <p><b>Duração:</b> <span id="panelDuration">99.9s</span> (VFX Remasterizado 60fps)</p>
-      <p><b>Continuidade:</b> Votos reais de @Melissa_12ofc e @Dark_Editorofc1</p>
-      <div class="row" style="margin-top: 10px;">
-        <button id="btnPlay" class="primary">▶ Reproduzir</button>
-        <button id="btnRestart">↺ Reiniciar</button>
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" data-tab="transmissao" role="tab">▶ Play</button>
+      <button class="tab-btn" data-tab="tiktok" role="tab">📱 TikTok</button>
+      <button class="tab-btn" data-tab="elenco" role="tab">🎭 Falas</button>
+      <button class="tab-btn" data-tab="cenas" role="tab">🎬 Cenas</button>
+    </div>
+
+    <!-- ══ ABA 1: TRANSMISSÃO ══ -->
+    <div class="tab-pane active" id="pane-transmissao">
+      <div class="card">
+        <h2>Episódio 03 · "O Feixe na Neblina"</h2>
+        <p><b>Duração:</b> <span id="panelDuration">97.6s</span> · 1080×1920 · 24 fps</p>
+        <div class="row" style="margin-top: 10px;">
+          <button id="btnPlay" class="primary">▶ Reproduzir</button>
+          <button id="btnRestart">↺ Reiniciar</button>
+        </div>
+        <div style="margin-top: 12px;">
+          <div class="track" id="track"><div class="fill" id="fill"></div></div>
+          <div class="time" id="time">00.0s / 97.6s</div>
+        </div>
       </div>
-      <div style="margin-top: 12px;">
-        <div class="track" id="track"><div class="fill" id="fill"></div></div>
-        <div class="time" id="time">00.0s / 99.9s</div>
+
+      <div class="card">
+        <h2>⏱️ Momentos do Episódio</h2>
+        <div id="beats"></div>
       </div>
     </div>
 
-    <div class="card">
-      <h2>🎭 Elenco Multi-Voz Oficial</h2>
-      <p>🎙️ <b>Narrador:</b> Voz Cinematográfica (Off-Screen)</p>
-      <p>🙋 <b>Você:</b> William Multilingual (Jovem Morador)</p>
-      <p>👴 <b>Seu Valdir:</b> Brian Multilingual (Porteiro)</p>
-      <p>🚴 <b>Lucas:</b> Remy Multilingual (Entregador Jovem)</p>
-      <p>👩 <b>Dona Camila:</b> Thalita (Interfone 304 DSP)</p>
+    <!-- ══ ABA 2: TIKTOK (ÁREA SEGURA + LEGENDAS) ══ -->
+    <div class="tab-pane" id="pane-tiktok">
+      <div class="card">
+        <h2>📱 Área Segura TikTok / Reels</h2>
+        <p style="font-size:11px; color:#94a3b8; margin-bottom:10px;">
+          Mostra o que a interface do app cobre. Tudo que estiver fora do retângulo
+          verde pode ficar escondido por botões, legendas e barra lateral.
+        </p>
+        <div class="row">
+          <button id="btnSafe">Zona segura</button>
+          <button id="btnSubs" class="on">Legendas</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Regiões Cobertas pelo App</h2>
+        <p style="font-size:11px; line-height:1.7;">
+          <span style="color:#ef4444;">■</span> Topo 200 px — nome do perfil e áudio<br>
+          <span style="color:#ef4444;">■</span> Base 360 px — legenda do app, CTA, botões<br>
+          <span style="color:#ef4444;">■</span> Direita 150 px — curtir, comentar, compartilhar<br>
+          <span style="color:#22c55e;">■</span> Retângulo verde — área 100% segura
+        </p>
+      </div>
     </div>
 
-    <div class="card">
-      <h2>⏱️ Saltos da Cena</h2>
-      <div style="display:flex; flex-direction:column; gap:4px;" id="cueButtons">
-        <button onclick="seekTo(0.5)">00s • 🏆 Comentários Reais (@Melissa/@Dark)</button>
-        <button onclick="seekTo(13.9)">14s • 🚶 Seu Valdir Caminha até o Quadro</button>
-        <button onclick="seekTo(15.8)">16s • ✋ Macro: Mão Puxando a Alavanca</button>
-        <button onclick="seekTo(17.0)">17s • 🔦 Luz Acende (Vista Externa)</button>
-        <button onclick="seekTo(28.9)">29s • 📹 CCTV CAM 02: Criatura & Massa Negra</button>
-        <button onclick="seekTo(36.7)">37s • 🚴 Lucas Espancando o Vidro Blindado</button>
-        <button onclick="seekTo(44.4)">44s • ☎️ Interfone Macro (Dona Camila)</button>
-        <button onclick="seekTo(62.5)">62s • ⚡ Sobrecarga & Cerca de 10kV</button>
-        <button onclick="seekTo(81.2)">81s • 🗳️ Você Decide o Fim (16.5s)</button>
+    <!-- ══ ABA 3: ELENCO E FALAS ══ -->
+    <div class="tab-pane" id="pane-elenco">
+      <div class="card">
+        <h2>🎭 Falas do Episódio</h2>
+        <p style="font-size:11px; color:#94a3b8; margin-bottom:8px;">
+          Clique numa fala para pular direto para o momento.
+        </p>
+        <div id="linesList"></div>
+      </div>
+
+      <div class="card">
+        <h2>🎙️ Vozes do Elenco</h2>
+        <p style="font-size:11px; color:#94a3b8; margin-bottom:8px;">
+          Ouça a amostra de cada personagem:
+        </p>
+        <div id="voiceList"></div>
+      </div>
+    </div>
+
+    <!-- ══ ABA 4: BIBLIOTECA DE CENAS ══ -->
+    <div class="tab-pane" id="pane-cenas">
+      <div class="card">
+        <h2>🎬 Cenas Reutilizáveis</h2>
+        <p style="font-size:11px; color:#94a3b8; margin-bottom:8px;">
+          Cada cena aprovada fica salva em <code>scenes/</code> e serve para os
+          próximos episódios. As marcadas com 🔒 estão travadas: nunca são
+          sobrescritas.
+        </p>
+        <div id="sceneList"></div>
+      </div>
+
+      <div class="card">
+        <h2>⏱️ Saltos Rápidos</h2>
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <button onclick="seekTo(13.9)">14s • Valdir caminha até o quadro</button>
+          <button onclick="seekTo(15.8)">16s • Mão puxa a alavanca</button>
+          <button onclick="seekTo(17.0)">17s • Luz acende (externa)</button>
+          <button onclick="seekTo(28.9)">29s • CCTV CAM 02</button>
+          <button onclick="seekTo(36.7)">37s • Lucas no vidro</button>
+          <button onclick="seekTo(81.2)">81s • Você decide o fim</button>
+        </div>
       </div>
     </div>
   </div>
+
 
   <audio id="audio" src="./audio/cena03_mix.mp3" preload="auto"></audio>
 
@@ -460,6 +639,14 @@
   <script src="./scenarios/ExteriorCondominio.js"></script>
   <script src="./scenarios/InteriorGuaritaLateral.js"></script>
   <script src="./engine/CameraRig2D.js"></script>
+  <!-- BIBLIOTECA DE CENAS REUTILIZÁVEIS: cada cena aprovada vira padrão para os
+       próximos episódios. O registry nunca sobrescreve cena PINADA. -->
+  <script src="./scenes/_registry.js"></script>
+  <script src="./scenes/alavanca-macro.js"></script>
+  <script src="./scenes/cctv-eclusa.js"></script>
+  <script src="./scenes/guarita-3-angulos.js"></script>
+  <script src="./scenes/lucas-chegada-costas.js"></script>
+  <script src="./scenes/grade-cedendo.js"></script>
 
   <script>
     const W = 1080;
@@ -509,6 +696,9 @@
     const LEVER_PULL_AT = 15.80;
     const LEVER_MACRO_START = 15.62;
     const EXTERIOR_LIGHT_START = 16.40;
+    // Corte de ação no clímax: a grade cedendo sob o impacto
+    const CLIMAX_SHOT_START = 66.2;
+    const CLIMAX_SHOT_END = 68.6;
 
     /** Interpolação com desaceleração (o porteiro apoia o pé com peso, não para seco). */
     function easeOutCubic(p) {
@@ -749,40 +939,33 @@
         ctx.lineTo(boxX + 26, boxY + leverAngle + (leverPulled ? Math.sin(t * 20) * 1.0 : 0));
         ctx.stroke();
 
-        // Faíscas e Arcos Voltaicos de Sobrecarga
-        const sparkBurst = (t >= 14.7 && t < 15.4) || (t >= 44.0 && Math.sin(t * 17) > -0.2);
-        if (sparkBurst) {
-          const sx = 352;
-          const sy = 432;
+        // ARCO DE CONTATO — só existe no instante em que a lâmina fecha o circuito.
+        // Antes havia raios saindo do nada por 0,7s e voltando no clímax, o que
+        // parecia efeito aleatório. Agora ele é curto (0,18s) e preso ao contato.
+        const contactT = t - LEVER_PULL_AT - 0.42;
+        if (contactT > 0 && contactT < 0.18) {
+          const arcFade = 1 - contactT / 0.18;
+          const sx = boxX + 26;
+          const sy = boxY + leverAngle;
 
-          // Brilho azul-elétrico intenso
-          const arcGlow = ctx.createRadialGradient(sx, sy, 2, sx, sy, 58);
-          arcGlow.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-          arcGlow.addColorStop(0.35, 'rgba(56, 189, 248, 0.65)');
+          const arcGlow = ctx.createRadialGradient(sx, sy, 2, sx, sy, 34);
+          arcGlow.addColorStop(0, `rgba(255, 255, 255, ${0.9 * arcFade})`);
+          arcGlow.addColorStop(0.35, `rgba(56, 189, 248, ${0.55 * arcFade})`);
           arcGlow.addColorStop(1, 'rgba(56, 189, 248, 0)');
           ctx.fillStyle = arcGlow;
           ctx.beginPath();
-          ctx.arc(sx, sy, 58, 0, Math.PI * 2);
+          ctx.arc(sx, sy, 34, 0, Math.PI * 2);
           ctx.fill();
 
-          // Raios elétricos ramificados
-          ctx.strokeStyle = '#e0f2fe';
+          // Um único arco curvo no contato (não um leque radial)
+          ctx.strokeStyle = `rgba(224, 242, 254, ${arcFade})`;
           ctx.shadowColor = '#38bdf8';
-          ctx.shadowBlur = 10;
-          ctx.lineWidth = 1.6;
-          for (let k = 0; k < 7; k++) {
-            const ang = (k / 7) * Math.PI * 2 + t * 35;
-            const len = 10 + ((t * 90 + k * 7) % 24);
-            const mx = sx + Math.cos(ang + 0.3) * (len * 0.5);
-            const my = sy + Math.sin(ang - 0.3) * (len * 0.5);
-            const ex = sx + Math.cos(ang) * len;
-            const ey = sy + Math.sin(ang) * len + 6;
-            ctx.beginPath();
-            ctx.moveTo(sx, sy);
-            ctx.lineTo(mx, my);
-            ctx.lineTo(ex, ey);
-            ctx.stroke();
-          }
+          ctx.shadowBlur = 8;
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.moveTo(sx, sy);
+          ctx.quadraticCurveTo(sx + 9, sy - 5, sx + 17, sy + 2);
+          ctx.stroke();
           ctx.shadowBlur = 0;
         }
         ctx.restore();
@@ -1416,40 +1599,38 @@
       ctx.ellipse(glassX + 34, hitY2, 13, 20, -0.15, 0, Math.PI * 2);
       ctx.fill();
 
-      // Teias de aranha profundas nas camadas do vidro blindado
-      const drawWebLateral = (cx, cy, r, numLines) => {
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.strokeStyle = isImpacting ? 'rgba(255, 255, 255, 0.98)' : 'rgba(203, 213, 225, 0.85)';
-        ctx.shadowColor = isImpacting ? '#38bdf8' : 'rgba(0,0,0,0)';
-        ctx.shadowBlur = isImpacting ? 14 : 0;
-        ctx.lineWidth = 1.8;
-        for (let l = 0; l < numLines; l++) {
-          const ang = (l / numLines) * Math.PI * 2;
-          ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * (r * 1.6));
-          ctx.stroke();
-        }
-        for (const frac of [0.35, 0.68, 0.95]) {
-          ctx.beginPath();
-          ctx.ellipse(0, 0, r * frac, (r * 1.6) * frac, 0, 0, Math.PI * 2);
-          ctx.stroke();
-        }
-        ctx.restore();
-      };
-      drawWebLateral(glassX + 16, hitY1, 55, 9);
-      drawWebLateral(glassX + 16, hitY2, 65, 11);
+      // COERÊNCIA FÍSICA DAS RACHADURAS
+      // Visto de perfil, um vidro laminado mostra apenas linhas internas de
+      // delaminação (fibra esticada entre as lâminas). A "teia de aranha" só é
+      // visível de frente — no Ep.02 ela existe na porta da guarita vista de
+      // frente. Aqui não desenhamos teia: só a trinca vertical e o empolamento
+      // do laminado no ponto de impacto, que é o correto em perfil.
+      const laminateShift = isImpacting ? 2.6 : 0;
 
-      // Ondas de choque luminosas se estiver impactando
-      if (isImpacting) {
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.75)';
-        ctx.lineWidth = 3.5;
+      // Trinca vertical de delaminação no interior do vidro
+      ctx.strokeStyle = isImpacting ? 'rgba(255, 255, 255, 0.55)' : 'rgba(203, 213, 225, 0.30)';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(glassX + 12, hitY1 - 70);
+      ctx.quadraticCurveTo(glassX + 12 + 4, hitY1, glassX + 12, hitY1 + 90);
+      ctx.stroke();
+
+      // Empolamento local das lâminas no ponto de pancada
+      [hitY1, hitY2].forEach((hy, i) => {
+        ctx.save();
+        ctx.translate(glassX + glassW * 0.5, hy);
+        ctx.strokeStyle = 'rgba(224, 242, 254, 0.42)';
+        ctx.lineWidth = 1.6;
         ctx.beginPath();
-        ctx.arc(glassX + 34, hitY1, 45, -Math.PI * 0.5, Math.PI * 0.5);
-        ctx.arc(glassX + 34, hitY2, 55, -Math.PI * 0.5, Math.PI * 0.5);
+        ctx.ellipse(0, 0, glassW * 0.42 + laminateShift, 46 + i * 8 + laminateShift * 2, 0, 0, Math.PI * 2);
         ctx.stroke();
-      }
+        // Pequena falha opaca no laminado
+        ctx.fillStyle = 'rgba(241, 245, 249, 0.10)';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, glassW * 0.34, 30 + i * 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
 
       // 6. CHUVA TORRENCIAL DIAGONAL E GOTAS ESCORRENDO NO VIDRO
       ctx.strokeStyle = 'rgba(186, 230, 253, 0.35)';
@@ -2041,24 +2222,20 @@
         { x: 930, w: 46 }
       ];
       bars.forEach((bar, i) => {
-        const strain = Math.sin(t * 15 + i) * 2.4;
-        const skew = (bar.x - W / 2) * 0.008;
         const barGrad = ctx.createLinearGradient(bar.x - bar.w / 2, 0, bar.x + bar.w / 2, 0);
         barGrad.addColorStop(0, '#04070e');
         barGrad.addColorStop(0.28, '#1e2a3c');
         barGrad.addColorStop(0.62, '#4a5b70');
         barGrad.addColorStop(1, '#070c15');
         ctx.fillStyle = barGrad;
-        ctx.beginPath();
-        ctx.moveTo(bar.x - bar.w / 2 + skew + strain, -40);
-        ctx.lineTo(bar.x + bar.w / 2 + skew + strain, -40);
-        ctx.lineTo(bar.x + bar.w / 2 - skew - strain, H + 40);
-        ctx.lineTo(bar.x - bar.w / 2 - skew - strain, H + 40);
-        ctx.closePath();
-        ctx.fill();
+        // Barras RIGOROSAMENTE VERTICAIS. Antes elas eram trapezoidais
+        // (largura diferente em cima e embaixo), o que lia como "barras
+        // diagonais" — uma grade de eclusa real tem prumada vertical.
+        ctx.fillRect(bar.x - bar.w / 2, -40, bar.w, H + 80);
 
+        // Reflexo especular na quina esquerda da barra
         ctx.fillStyle = 'rgba(203, 213, 225, 0.14)';
-        ctx.fillRect(bar.x - bar.w * 0.14 + skew, -40, bar.w * 0.12, H + 80);
+        ctx.fillRect(bar.x - bar.w * 0.16, -40, bar.w * 0.12, H + 80);
       });
       ctx.shadowBlur = 0;
 
@@ -2219,422 +2396,25 @@
       ctx.restore();
     }
 
-    // ============================================================
-    // 5.9 PLANO 3A-MACRO: A MÃO DE SEU VALDIR PUXANDO A ALAVANCA DO QUADRO 1000W
-    // Cena de ação isolada, como o roteiro pede: mostra a AÇÃO, simples e direta.
-    // Profundidade: parede (fundo) -> quadro (meio) -> alavanca e mão (frente, nítidas).
-    // ============================================================
+    // Cena da alavanca: implementação vive em scenes/alavanca-macro.js
+    // (biblioteca reutilizável, pinada). Aqui só conectamos o estado do episódio.
     function drawLeverMacroShot(ctx) {
-      const pullStart = LEVER_PULL_AT;
-      // 0 = alavanca para cima (desligada) | 1 = totalmente para baixo (ligada)
-      const pullRaw = Math.min(1, Math.max(0, (t - pullStart) / 0.42));
-      const pull = pullRaw < 0 ? 0 : (1 - Math.pow(1 - pullRaw, 2.4)); // inércia mecânica
-      const engaged = pullRaw >= 1;
-
-      // Fosforescência do capacitor acende junto com o fim do curso
-      const glow = engaged ? Math.min(1, (t - pullStart - 0.42) / 0.25) : pull * 0.35;
-
-      ctx.save();
-
-      // ── PLANO 3: PAREDE DE CONCRETO (desfocada, mais escura) ──
-      const wallGrad = ctx.createLinearGradient(0, 0, W, H);
-      wallGrad.addColorStop(0, '#05080f');
-      wallGrad.addColorStop(0.5, '#0a1019');
-      wallGrad.addColorStop(1, '#040609');
-      ctx.fillStyle = wallGrad;
-      ctx.fillRect(0, 0, W, H);
-
-      // Textura de concreto e juntas de forma
-      ctx.strokeStyle = 'rgba(148, 163, 184, 0.05)';
-      ctx.lineWidth = 2;
-      for (let jy = 0; jy < H; jy += 190) {
-        ctx.beginPath();
-        ctx.moveTo(0, jy);
-        ctx.lineTo(W, jy);
-        ctx.stroke();
-      }
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
-      for (let s = 0; s < 90; s++) {
-        const sx = (s * 137) % W;
-        const sy = (s * 211) % H;
-        ctx.fillRect(sx, sy, 3, 3);
-      }
-
-      // Eletroduto vertical e caixa de passagem (segundo plano)
-      ctx.fillStyle = '#131c2b';
-      ctx.fillRect(96, 0, 44, H);
-      ctx.fillStyle = '#1c2839';
-      ctx.fillRect(101, 0, 10, H);
-
-      ctx.fillStyle = '#0f172a';
-      ctx.strokeStyle = '#334155';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.roundRect(74, 210, 88, 130, 8);
-      ctx.fill();
-      ctx.stroke();
-
-      // ── PLANO 2: O QUADRO ELÉTRICO (focado, com volume e rebites) ──
-      const boxW = 620;
-      const boxH = 860;
-      const boxX = (W - boxW) / 2;
-      const boxY = (H - boxH) / 2 - 90;
-
-      // Sombra projetada na parede (afasta o quadro da superfície = profundidade)
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.72)';
-      ctx.beginPath();
-      ctx.roundRect(boxX + 26, boxY + 34, boxW, boxH, 22);
-      ctx.fill();
-
-      // Chapa de aço pintada de cinza industrial
-      const plateGrad = ctx.createLinearGradient(boxX, boxY, boxX + boxW, boxY + boxH);
-      plateGrad.addColorStop(0, '#3b4759');
-      plateGrad.addColorStop(0.28, '#222d3d');
-      plateGrad.addColorStop(0.72, '#17202d');
-      plateGrad.addColorStop(1, '#2b3648');
-      ctx.fillStyle = plateGrad;
-      ctx.strokeStyle = '#5b6b80';
-      ctx.lineWidth = 5;
-      ctx.beginPath();
-      ctx.roundRect(boxX, boxY, boxW, boxH, 18);
-      ctx.fill();
-      ctx.stroke();
-
-      // Bisel interno (reforça a espessura da chapa)
-      ctx.strokeStyle = 'rgba(148, 163, 184, 0.30)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.roundRect(boxX + 14, boxY + 14, boxW - 28, boxH - 28, 12);
-      ctx.stroke();
-
-      // Rebites sextavados nos cantos
-      ctx.fillStyle = '#8296ac';
-      [[boxX + 40, boxY + 40], [boxX + boxW - 40, boxY + 40],
-       [boxX + 40, boxY + boxH - 40], [boxX + boxW - 40, boxY + boxH - 40]].forEach(([rx, ry]) => {
-        ctx.beginPath();
-        ctx.arc(rx, ry, 12, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#101823';
-        ctx.fillRect(rx - 8, ry - 2, 16, 4);
-        ctx.fillStyle = '#8296ac';
+      const played = window.StudioScenes.play('alavanca_macro', ctx, {
+        W, H, t,
+        pullStart: LEVER_PULL_AT,
+        pullDuration: 0.42
       });
-
-      // Placa de identificação do reator auxiliar
-      ctx.fillStyle = '#fde68a';
-      ctx.fillRect(boxX + 40, boxY + 46, boxW - 80, 74);
-      ctx.fillStyle = '#1c1917';
-      ctx.font = '900 30px "JetBrains Mono", monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText('REATOR AUXILIAR · 1000W', boxX + boxW / 2, boxY + 82);
-      ctx.font = '700 19px "JetBrains Mono", monospace';
-      ctx.fillStyle = '#78350f';
-      ctx.fillText('CIRCUITO DE EMERGÊNCIA — NÃO DESLIGAR', boxX + boxW / 2, boxY + 108);
-
-      // ── PLACA DE ADVERTÊNCIA (padrão NR-10) ──
-      const warnY = boxY + 152;
-      ctx.fillStyle = '#facc15';
-      ctx.beginPath();
-      ctx.moveTo(boxX + 92, warnY + 96);
-      ctx.lineTo(boxX + 152, warnY - 6);
-      ctx.lineTo(boxX + 212, warnY + 96);
-      ctx.closePath();
-      ctx.fill();
-      ctx.strokeStyle = '#111827';
-      ctx.lineWidth = 6;
-      ctx.stroke();
-      ctx.fillStyle = '#111827';
-      ctx.font = '900 56px "JetBrains Mono", monospace';
-      ctx.fillText('⚡', boxX + 152, warnY + 68);
-
-      // ── PLACAS DE VOLTAGEM ──
-      ctx.fillStyle = '#0b111b';
-      ctx.strokeStyle = '#64748b';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.roundRect(boxX + 250, warnY - 4, 300, 104, 10);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = '800 34px "JetBrains Mono", monospace';
-      ctx.textAlign = 'left';
-      ctx.fillText('220V / 1000W', boxX + 268, warnY + 38);
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '700 19px "JetBrains Mono", monospace';
-      ctx.fillText('FASE + NEUTRO + TERRA', boxX + 268, warnY + 68);
-
-      // ── O TRILHO E A ALAVANCA (o ponto de contato da ação) ──
-      const leverCx = boxX + boxW * 0.5;
-      const leverTop = boxY + 330;
-      const travel = 210; // percurso da alavanca
-
-      // Trilho de rasgo onde a alavanca corre
-      ctx.fillStyle = '#070c14';
-      ctx.strokeStyle = '#475569';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.roundRect(leverCx - 26, leverTop - 30, 52, travel + 70, 22);
-      ctx.fill();
-      ctx.stroke();
-
-      // Alavanca (haste vermelha com empunhadura preta) — desce ao ser puxada
-      const leverY = leverTop + pull * travel;
-      ctx.save();
-      ctx.translate(leverCx, leverY);
-
-      // Haste
-      const rodGrad = ctx.createLinearGradient(-11, 0, 11, 0);
-      rodGrad.addColorStop(0, '#7f1d1d');
-      rodGrad.addColorStop(0.45, '#ef4444');
-      rodGrad.addColorStop(1, '#7f1d1d');
-      ctx.fillStyle = rodGrad;
-      ctx.strokeStyle = '#450a0a';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.roundRect(-11, -10, 22, 96, 8);
-      ctx.fill();
-      ctx.stroke();
-
-      // Empunhadura emborrachada
-      ctx.fillStyle = '#0b0f16';
-      ctx.beginPath();
-      ctx.ellipse(0, 92, 34, 30, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#334155';
-      ctx.lineWidth = 3;
-      ctx.stroke();
-      // Ranhuras da empunhadura
-      ctx.strokeStyle = 'rgba(148, 163, 184, 0.3)';
-      ctx.lineWidth = 2;
-      for (let h = 0; h < 4; h++) {
-        ctx.beginPath();
-        ctx.moveTo(-24 + h * 3, 78 + h * 10);
-        ctx.lineTo(24 - h * 3, 78 + h * 10);
-        ctx.stroke();
-      }
-      ctx.restore();
-
-      // ── LEDS DE ESTADO: 3 fases que acendem em sequência quando a chave fecha ──
-      const ledBankY = boxY + boxH - 190;
-      for (let l = 0; l < 3; l++) {
-        const leadOn = engaged && glow > (l * 0.22);
-        const lx = boxX + 130 + l * 180;
-        ctx.fillStyle = '#070c14';
-        ctx.strokeStyle = '#334155';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(lx, ledBankY, 40, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-
-        if (leadOn) {
-          const ledGlow = ctx.createRadialGradient(lx, ledBankY, 3, lx, ledBankY, 62);
-          ledGlow.addColorStop(0, 'rgba(190, 255, 210, 1)');
-          ledGlow.addColorStop(0.3, 'rgba(34, 197, 94, 0.85)');
-          ledGlow.addColorStop(1, 'rgba(34, 197, 94, 0)');
-          ctx.fillStyle = ledGlow;
-          ctx.beginPath();
-          ctx.arc(lx, ledBankY, 62, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = '#bbf7d0';
-          ctx.shadowColor = '#22c55e';
-          ctx.shadowBlur = 26;
-          ctx.beginPath();
-          ctx.arc(lx, ledBankY, 22, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.shadowBlur = 0;
-        } else {
-          ctx.fillStyle = '#12301f';
-          ctx.beginPath();
-          ctx.arc(lx, ledBankY, 22, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-
-      // Rótulos dos LEDs
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '700 17px "JetBrains Mono", monospace';
-      ctx.textAlign = 'center';
-      ['R', 'S', 'T'].forEach((ph, l) => {
-        ctx.fillText('FASE ' + ph, boxX + 130 + l * 180, ledBankY + 72);
-      });
-
-      // ── PLANO 1: A MÃO (mais próxima da lente — nítida, grande, com sombra própria) ──
-      // A mão acompanha a alavanca: desce junto com a empunhadura.
-      const handX = leverCx + 6;
-      const handY = leverY + 86;
-
-      ctx.save();
-      ctx.translate(handX, handY);
-
-      // Manga da camisa social azul-clara (perspectiva: vem de baixo à direita)
-      const sleeveGrad = ctx.createLinearGradient(-40, 40, 150, 260);
-      sleeveGrad.addColorStop(0, '#cbd5e1');
-      sleeveGrad.addColorStop(0.6, '#94a3b8');
-      sleeveGrad.addColorStop(1, '#64748b');
-      ctx.fillStyle = sleeveGrad;
-      ctx.beginPath();
-      ctx.moveTo(-58, 44);
-      ctx.quadraticCurveTo(20, 30, 96, 118);
-      ctx.quadraticCurveTo(150, 190, 128, 300);
-      ctx.lineTo(-64, 300);
-      ctx.quadraticCurveTo(-96, 190, -58, 44);
-      ctx.closePath();
-      ctx.fill();
-
-      // Dobras do tecido
-      ctx.strokeStyle = 'rgba(71, 85, 105, 0.32)';
-      ctx.lineWidth = 3;
-      for (let f = 0; f < 4; f++) {
-        ctx.beginPath();
-        ctx.moveTo(-44 + f * 34, 70);
-        ctx.quadraticCurveTo(-10 + f * 34, 150, 6 + f * 30, 286);
-        ctx.stroke();
-      }
-
-      // Cúpula do punho da camisa
-      ctx.fillStyle = '#e2e8f0';
-      ctx.beginPath();
-      ctx.moveTo(-42, 52);
-      ctx.quadraticCurveTo(16, 34, 84, 104);
-      ctx.lineTo(52, 138);
-      ctx.quadraticCurveTo(-4, 78, -58, 86);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = '#334155';
-      ctx.beginPath();
-      ctx.arc(52, 112, 7, 0, Math.PI * 2);
-      ctx.fill();
-
-      // MÃO — dedos envolvendo a empunhadura (4 dedos visíveis + polegar)
-      const skinGrad = ctx.createLinearGradient(-60, 0, 60, 90);
-      skinGrad.addColorStop(0, '#d8976c');
-      skinGrad.addColorStop(0.6, '#c6865c');
-      skinGrad.addColorStop(1, '#a96b43');
-
-      // Dorso da mão
-      ctx.fillStyle = skinGrad;
-      ctx.beginPath();
-      ctx.moveTo(-52, 24);
-      ctx.quadraticCurveTo(6, -14, 62, 26);
-      ctx.quadraticCurveTo(76, 62, 44, 92);
-      ctx.quadraticCurveTo(-10, 104, -54, 72);
-      ctx.quadraticCurveTo(-70, 46, -52, 24);
-      ctx.closePath();
-      ctx.fill();
-
-      // Dedos curvados em volta da empunhadura (compressão ao puxar)
-      const gripTense = 1 + pull * 0.10;
-      for (let d = 0; d < 4; d++) {
-        const fy = 16 + d * 21;
-        const fw = 46 - d * 3;
-        ctx.fillStyle = d % 2 === 0 ? '#c6865c' : '#d8976c';
-        ctx.beginPath();
-        ctx.roundRect(-52 + d * 2, fy, fw * gripTense, 17, 8);
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(120, 63, 34, 0.5)';
-        ctx.lineWidth = 1.6;
-        ctx.stroke();
-      }
-
-      // Polegar cruzando a frente
-      ctx.fillStyle = '#d8976c';
-      ctx.beginPath();
-      ctx.moveTo(40, 18);
-      ctx.quadraticCurveTo(78, 34, 70, 70);
-      ctx.quadraticCurveTo(58, 84, 40, 72);
-      ctx.quadraticCurveTo(46, 44, 40, 18);
-      ctx.closePath();
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(120, 63, 34, 0.45)';
-      ctx.lineWidth = 1.6;
-      ctx.stroke();
-
-      // Nós dos dedos e tendões (esforço visível)
-      ctx.fillStyle = 'rgba(140, 83, 50, 0.55)';
-      for (let d = 0; d < 4; d++) {
-        ctx.beginPath();
-        ctx.arc(-6 + d * 5, 26 + d * 21, 3.4, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Veias em relevo com o esforço de puxar
-      if (pull > 0.3) {
-        ctx.strokeStyle = 'rgba(120, 63, 94, ' + (0.30 * pull).toFixed(2) + ')';
-        ctx.lineWidth = 2.4;
-        ctx.beginPath();
-        ctx.moveTo(-34, 46);
-        ctx.quadraticCurveTo(-10, 58, 18, 52);
-        ctx.stroke();
-      }
-
-      // Iluminação dura do capacitor subindo pela mão
-      if (glow > 0.02) {
-        const handGlow = ctx.createRadialGradient(10, 46, 6, 10, 46, 130);
-        handGlow.addColorStop(0, 'rgba(187, 247, 208, ' + (0.30 * glow).toFixed(2) + ')');
-        handGlow.addColorStop(1, 'rgba(34, 197, 94, 0)');
-        ctx.fillStyle = handGlow;
-        ctx.beginPath();
-        ctx.arc(10, 46, 130, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      ctx.restore();
-
-      // ── ARCO ELÉTRICO DO CONTATO (no instante em que a chave fecha) ──
-      const arcT = t - pullStart - 0.42;
-      if (arcT > 0 && arcT < 0.55) {
-        const arcA = 1 - arcT / 0.55;
-        const arcX = leverCx + 30;
-        const arcY = leverTop + travel - 24;
+      if (!played) {
+        // Fallback defensivo: nunca deixa a tela preta se a biblioteca não carregar
         ctx.save();
-        ctx.strokeStyle = 'rgba(224, 242, 254, ' + arcA.toFixed(2) + ')';
-        ctx.shadowColor = '#38bdf8';
-        ctx.shadowBlur = 34;
-        ctx.lineWidth = 3.5;
-        for (let a = 0; a < 6; a++) {
-          const ang = (a / 6) * Math.PI * 2 + arcT * 14;
-          const len = 34 + Math.sin(arcT * 40 + a) * 26;
-          ctx.beginPath();
-          ctx.moveTo(arcX, arcY);
-          ctx.lineTo(arcX + Math.cos(ang) * len * 0.55, arcY + Math.sin(ang) * len * 0.55);
-          ctx.lineTo(arcX + Math.cos(ang + 0.2) * len, arcY + Math.sin(ang - 0.2) * len);
-          ctx.stroke();
-        }
-        ctx.restore();
-
-        // Flash de contato no quadro inteiro
-        ctx.fillStyle = 'rgba(224, 242, 254, ' + (arcA * 0.30).toFixed(2) + ')';
+        ctx.fillStyle = '#05080f';
         ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = '#f59e0b';
+        ctx.font = '800 28px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('CENA alavanca_macro NÃO REGISTRADA', W / 2, H / 2);
+        ctx.restore();
       }
-
-      // ── HUD do plano (rótulo discreto, sem poluir) ──
-      ctx.fillStyle = 'rgba(2, 6, 23, 0.88)';
-      ctx.strokeStyle = engaged ? 'rgba(34, 197, 94, 0.7)' : 'rgba(239, 68, 68, 0.55)';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.roundRect(64, H - 232, W - 128, 132, 16);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = engaged ? '#22c55e' : '#f59e0b';
-      ctx.font = '800 27px "JetBrains Mono", monospace';
-      ctx.textAlign = 'left';
-      ctx.fillText(engaged ? '● CIRCUITO FECHADO — REATOR ARMADO' : '○ PUXANDO ALAVANCA DO REATOR', 96, H - 186);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '700 21px "JetBrains Mono", monospace';
-      ctx.fillText('CARGA: 1000W  •  CAPACITOR CARREGANDO', 96, H - 148);
-      ctx.fillText('SEU VALDIR — GUARITA BLOCO C', 96, H - 116);
-
-      // Vinheta
-      const mvig = ctx.createRadialGradient(W / 2, H / 2, H * 0.30, W / 2, H / 2, H * 0.72);
-      mvig.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      mvig.addColorStop(1, 'rgba(2, 6, 23, 0.72)');
-      ctx.fillStyle = mvig;
-      ctx.fillRect(0, 0, W, H);
-
-      ctx.restore();
     }
 
     // ============================================================
@@ -2998,111 +2778,31 @@
       }
     }
 
-    // 7. HUD TÁTICO & VIEWFINDER ÓPTICO CINEMATOGRÁFICO 2.5D
+    /**
+     * HUD do episódio — reduzido a uma vinheta cinematográfica.
+     *
+     * MOTIVO DA REMOÇÃO: os antigos "badges" de texto (relógio "TER 23:44",
+     * "VIDRO BLINDADO: 34%", "3/3 FERROLHOS", tag de câmera, brackets de
+     * visor e mira central) ocupavam ~15% do quadro em cima da animação.
+     * Num vídeo vertical isso rouba área útil e distrai da cena. Ficou só
+     * a vinheta, que ajuda a focar sem parecer interface de software.
+     */
     function drawTacticalHUD(ctx) {
       if (t >= DECISION_START || cctvActive) return;
 
       ctx.save();
-
-      // 1. Vinheta Óptica de Lente Cinema (Bordas escuras 2.5D para foco visceral)
-      const vigGrad = ctx.createRadialGradient(W * 0.5, H * 0.5, W * 0.45, W * 0.5, H * 0.5, W * 0.88);
+      const vigGrad = ctx.createRadialGradient(W * 0.5, H * 0.5, W * 0.46, W * 0.5, H * 0.5, W * 0.90);
       vigGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      vigGrad.addColorStop(1, 'rgba(2, 6, 18, 0.65)');
+      vigGrad.addColorStop(1, 'rgba(2, 6, 18, 0.62)');
       ctx.fillStyle = vigGrad;
       ctx.fillRect(0, 0, W, H);
-
-      // 2. Brackets de Foco de Câmera nos 4 Cantos (Viewfinder Profissional)
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-      ctx.lineWidth = 2.5;
-      const bLen = 32;
-      const mPad = 35;
-      // Top-Left
-      ctx.beginPath(); ctx.moveTo(mPad, mPad + bLen); ctx.lineTo(mPad, mPad); ctx.lineTo(mPad + bLen, mPad); ctx.stroke();
-      // Top-Right
-      ctx.beginPath(); ctx.moveTo(W - mPad - bLen, mPad); ctx.lineTo(W - mPad, mPad); ctx.lineTo(W - mPad, mPad + bLen); ctx.stroke();
-      // Bottom-Left
-      ctx.beginPath(); ctx.moveTo(mPad, H - mPad - bLen); ctx.lineTo(mPad, H - mPad); ctx.lineTo(mPad + bLen, H - mPad); ctx.stroke();
-      // Bottom-Right
-      ctx.beginPath(); ctx.moveTo(W - mPad - bLen, H - mPad); ctx.lineTo(W - mPad, H - mPad); ctx.lineTo(W - mPad, H - mPad - bLen); ctx.stroke();
-
-      // 3. Mira Óptica Central Sutil
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.moveTo(W * 0.5 - 14, H * 0.5); ctx.lineTo(W * 0.5 + 14, H * 0.5);
-      ctx.moveTo(W * 0.5, H * 0.5 - 14); ctx.lineTo(W * 0.5, H * 0.5 + 14);
-      ctx.stroke();
-
-      // Badge 1: Relógio e Episódio
-      ctx.fillStyle = 'rgba(2, 6, 23, 0.88)';
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.roundRect(60, 90, 280, 54, 14);
-      ctx.fill();
-      ctx.stroke();
-
-      const recPulse = 0.5 + Math.sin(t * 6) * 0.5;
-      ctx.fillStyle = `rgba(239, 68, 68, ${recPulse})`;
-      ctx.beginPath();
-      ctx.arc(88, 117, 7, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#f8fafc';
-      ctx.font = '700 22px "JetBrains Mono", monospace';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('TER 23:44 • EP 3', 108, 118);
-
-      // Badge 2: Integridade do Vidro Trincado
-      const glassPct = t >= LUCAS_START ? Math.max(26, 34 - Math.floor((t - LUCAS_START) * 0.2)) : 34;
-      ctx.fillStyle = 'rgba(127, 29, 29, 0.90)';
-      ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.roundRect(360, 90, 360, 54, 14);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = '#fee2e2';
-      ctx.font = '800 20px "JetBrains Mono", monospace';
-      ctx.fillText(`⚠️ VIDRO BLINDADO: ${glassPct}%`, 380, 118);
-
-      // Badge 3: 3 Ferrolhos Travados
-      ctx.fillStyle = 'rgba(6, 78, 59, 0.90)';
-      ctx.strokeStyle = '#10b981';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.roundRect(740, 90, 280, 54, 14);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = '#ecfdf5';
-      ctx.font = '800 20px "JetBrains Mono", monospace';
-      ctx.fillText('🔒 3/3 FERROLHOS', 760, 118);
-
-      // 4. Tag de Localização Óptica da Câmera
-      let camLocTag = 'INT • GUARITA BLINDADA (LOBBY)';
-      if (activeScenario === 'exterior') camLocTag = 'EXT • FACHADA SOLARIS (VISÃO GERAL 1000W)';
-
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
-      ctx.lineWidth = 1.4;
-      ctx.beginPath();
-      ctx.roundRect(60, 155, 490, 38, 8);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = '700 16px "JetBrains Mono", monospace';
-      ctx.textAlign = 'left';
-      ctx.fillText(`📡 ${camLocTag}`, 75, 179);
-
       ctx.restore();
     }
 
     // 8. LEGENDAS DINÂMICAS COM EQUALIZADOR DE VOZ E BRILHO POR PERSONAGEM
     function drawDynamicSubtitles(ctx) {
       if (t >= DECISION_START) return;
+      if (!showSubs) return;
 
       let curDiag = null;
       if (T && T.dialogues) {
@@ -3246,13 +2946,16 @@
         valdir.pose = 'hands_desk';
         scenario.alarmActive = false;
       } else if (time < 13.7) {
-        // PLANO 2 (6.8s - 13.7s): VOCÊ COMANDA O HOLOFOTE (Plano Médio 2-shot dinâmico dentro da guarita)
-        activeScenario = 'portaria';
-        cam.panTo(265 + swayX * 0.6, 415 + swayY * 0.6, 2.85, 0.35);
+        // PLANO 2 (6.8s - 13.7s): VOCÊ COMANDA O HOLOFOTE
+        // ÂNGULO ALTERNATIVO: 3/4 — vê as duas paredes, os monitores e a janela
+        // ao mesmo tempo. Antes este plano era o mesmo frontal do anterior, e o
+        // episódio inteiro ficava achatado num só ponto de vista.
+        activeScenario = 'guarita_3q';
         voce.emotion = 'determined';
         voce.pose = 'pointing_valdir';
         valdir.emotion = 'serious';
         valdir.pose = 'hands_desk';
+        scenario.alarmActive = false;
       } else if (time < LEVER_MACRO_START) {
         // PLANO 3A (13.77s - 15.62s): SEU VALDIR CAMINHA ATÉ O QUADRO ELÉTRICO
         // Ele se desloca de verdade (bancada -> parede lateral) e o rig entra em
@@ -3298,8 +3001,17 @@
         activeScenario = 'portaria';
         cam.panTo(330, 415, 3.4, 0.15);
         valdir.emotion = 'panicked';
+      } else if (time < LUCAS_START + 1.55) {
+        // PLANO 5C: LUCAS CHEGANDO DE COSTAS (36.6s - 38.15s)
+        // Antes ele "aparecia" já colado no vidro. Aqui vemos a corrida: ele vem
+        // da neblina de costas, com a mochila térmica e o capacete na mão,
+        // fugindo da massa negra que avança atrás.
+        activeScenario = 'lucas_chegada';
+        lucas.pose = 'look_back';
+        lucas.emotion = 'terrified';
+        if (Math.sin(time * 9) > 0.6) cam.shake(0.16);
       } else if (time < 44.2) {
-        // PLANO 6 (36.6s - 44.2s): LUCAS NO VIDRO BLINDADO (VISÃO LATERAL CINEMATOGRÁFICA EM PERFIL 3/4)
+        // PLANO 6 (38.15s - 44.2s): LUCAS NO VIDRO BLINDADO (PERFIL 3/4, batendo)
         activeScenario = 'lucas_lateral';
         if (Math.sin(time * 11.5) > 0.45) cam.shake(0.24);
       } else if (time < 47.6) {
@@ -3307,9 +3019,11 @@
         activeScenario = 'intercom_macro';
         scenario.alarmActive = true;
       } else if (time < 51.4) {
-        // PLANO 7B (47.6s - 51.4s): CORTE RÁPIDO — REAÇÃO DO SEU VALDIR E VOCÊ AO ALERTA DA DONA CAMILA
-        activeScenario = 'portaria';
-        cam.panTo(260 + swayX * 0.4, 415 + swayY * 0.4, 3.0, 0.25);
+        // PLANO 7B (47.6s - 51.4s): REAÇÃO AO ALERTA DA DONA CAMILA
+        // ÂNGULO ALTERNATIVO: PERFIL PELA JANELA — a câmera vai para o lado e
+        // mostra Lucas do outro lado do vidro. Fecha o ciclo do plano 3/4 e faz
+        // o espectador sentir o espaço da guarita como um lugar real.
+        activeScenario = 'guarita_perfil';
         voce.emotion = 'panicked';
         voce.pose = 'listening';
         valdir.emotion = 'panicked';
@@ -3324,20 +3038,39 @@
         valdir.emotion = 'serious';
         valdir.pose = 'holding_switch';
         scenario.alarmActive = true;
+      } else if (time >= CLIMAX_SHOT_START && time < CLIMAX_SHOT_END) {
+        // PLANO 9-CORTE: A GRADE CEDENDO (66.2s - 68.6s)
+        // No meio do clímax, um corte seco para a prova física do perigo:
+        // o metal entortando e os rebites saltando. Depois volta pro quadro.
+        activeScenario = 'grade_cedendo';
+        scenario.alarmActive = true;
+        if (Math.sin(time * 17) > 0.55) cam.shake(0.30);
       } else if (time < 70.4) {
-        // PLANO 9 (60.0s - 70.4s): SEU VALDIR NO DISJUNTOR DE 10.000V (Plano holandês tenso com faíscas)
+        // PLANO 9 (60.0s - 70.4s): O CLÍMAX
+        // Câmera em push-in contínuo em direção ao quadro de 10kV — quanto mais
+        // perto do fim, mais fechado o plano. Tremor crescente e batidas de
+        // tensão ritmadas (não aleatórias), para o clímax escalar de verdade.
         activeScenario = 'portaria';
-        cam.panTo(315 + swayX * 0.6, 415 + swayY * 0.6, 2.85, 0.3);
+        const climaxP = Math.min(1, Math.max(0, (time - 60.0) / 10.4));
+        const pushZoom = 2.85 + climaxP * 0.85;          // 2.85 → 3.70
+        const tensionBeat = Math.pow(Math.max(0, Math.sin(time * 5.2)), 3);
+        cam.panTo((315 - climaxP * 34) + swayX * 0.6, 415 + swayY * 0.6, pushZoom, 0.3);
         valdir.pose = 'holding_switch';
-        valdir.emotion = 'panicked';
+        valdir.emotion = climaxP > 0.6 ? 'panicked' : 'focused';
         voce.pose = 'step_back';
         voce.emotion = 'panicked';
         scenario.alarmActive = true;
-        if (Math.sin(time * 8.5) > 0.75) cam.shake(0.14);
+        // Batida de tensão: tremor sincronizado com o pulso da luz
+        if (tensionBeat > 0.7) cam.shake(0.10 + climaxP * 0.16);
+        if (Math.sin(time * 8.5) > 0.9) cam.shake(0.14);
       } else if (time < 81.1) {
-        // PLANO 10 (70.4s - 81.1s): O GRANDE DILEMA (Dolly out lento mostrando porta, Lucas e 10kV)
+        // PLANO 10 (70.4s - 81.1s): O GRANDE DILEMA
+        // Dolly out lento e contínuo: a câmera se afasta revelando porta,
+        // Lucas preso e o quadro de 10kV juntos. É o "respiro" antes da votação.
         activeScenario = 'portaria';
-        cam.panTo(225 + swayX * 0.3, 400 + swayY * 0.3, 2.2, 0.25);
+        const outP = Math.min(1, Math.max(0, (time - 70.4) / 10.7));
+        const widenZoom = 3.40 - outP * 1.20;            // 3.40 → 2.20
+        cam.panTo(225 + swayX * 0.3, 400 + swayY * 0.3, widenZoom, 0.25);
         voce.emotion = 'panicked';
         valdir.emotion = 'panicked';
         scenario.alarmActive = true;
@@ -3402,6 +3135,46 @@
         drawLeverMacroShot(ctx);
       } else if (activeScenario === 'exterior_light') {
         drawExteriorLightOnShot(ctx);
+      } else if (activeScenario === 'grade_cedendo') {
+        // A grade entortando — evidência física do perigo no auge
+        const played = window.StudioScenes.play('grade_cedendo', ctx, {
+          W, H, t,
+          bendStart: CLIMAX_SHOT_START,
+          bendDuration: 2.4
+        });
+        if (!played) {
+          ctx.fillStyle = '#02050b';
+          ctx.fillRect(0, 0, W, H);
+        }
+      } else if (activeScenario === 'lucas_chegada') {
+        // O Lucas de costas, correndo até a guarita
+        const played = window.StudioScenes.play('lucas_chegada_costas', ctx, {
+          W, H, t,
+          runStart: LUCAS_START,
+          runDuration: 1.55
+        });
+        if (!played) {
+          ctx.fillStyle = '#02050b';
+          ctx.fillRect(0, 0, W, H);
+        }
+      } else if (activeScenario === 'guarita_3q' || activeScenario === 'guarita_perfil') {
+        // ── CENAS DE ÂNGULO ALTERNATIVO (biblioteca scenes/guarita-3-angulos.js) ──
+        // O mesmo espaço da guarita visto de outro ponto de vista. É o que dá
+        // profundidade e evita o episódio inteiro num único ângulo frontal.
+        const sceneName = activeScenario === 'guarita_3q' ? 'guarita_3q' : 'guarita_perfil_janela';
+        const played = window.StudioScenes.play(sceneName, ctx, {
+          W, H, t,
+          alarmActive: scenario.alarmActive,
+          spotlightOn: spotlightActive,
+          voce, valdir, lucas,
+          lucasHit: t >= LUCAS_START && Math.sin(t * 11.5) > 0.45,
+          lucasMouth
+        });
+        if (!played) {
+          // Fallback: nunca deixa a tela preta
+          ctx.fillStyle = '#05080f';
+          ctx.fillRect(0, 0, W, H);
+        }
       } else {
         // Atualiza a física de câmera e portaria unificada
         scenario.update(1 / 60);
@@ -3428,6 +3201,8 @@
       drawIntercomAndEmergencyOverlay(ctx);
       drawTacticalHUD(ctx);
       drawDynamicSubtitles(ctx);
+      drawSafeZone();
+      updatePanelHighlight(t);
     }
 
     function loop() {
@@ -3451,6 +3226,191 @@
 
     if (new URLSearchParams(window.location.search).get('render') === '1') {
       document.body.classList.add('render-mode');
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PAINEL DE ABAS: transmissão · TikTok · falas · biblioteca de cenas
+    // (estas abas existiam no Ep.02 e tinham sido perdidas na reescrita)
+    // ═══════════════════════════════════════════════════════════════
+
+    let showSafe = false;
+    let showSubs = true;
+
+    // ── Troca de aba ──
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const pane = document.getElementById('pane-' + btn.dataset.tab);
+        if (pane) pane.classList.add('active');
+      });
+    });
+
+    // ── Momentos do episódio (aba Transmissão) ──
+    const MOMENTS = [
+      { t: 0.5, label: 'Resultado da votação', who: 'Prova social', emoji: '🏆' },
+      { t: 6.9, label: 'Você manda acender o holofote', who: 'Você', emoji: '🙋' },
+      { t: 13.8, label: 'Valdir caminha até o quadro', who: 'Seu Valdir', emoji: '🚶' },
+      { t: 15.8, label: 'A mão puxa a alavanca', who: 'Seu Valdir', emoji: '✋' },
+      { t: 16.5, label: 'A luz acende e varre a rua', who: 'Exterior', emoji: '🔦' },
+      { t: 28.8, label: 'CCTV revela a criatura', who: 'CAM 02', emoji: '📹' },
+      { t: 36.7, label: 'Lucas bate no vidro', who: 'Lucas', emoji: '🚴' },
+      { t: 44.3, label: 'Camila no interfone', who: 'Dona Camila', emoji: '☎️' },
+      { t: 60.2, label: 'O dilema de 10 mil volts', who: 'Seu Valdir', emoji: '⚡' },
+      { t: 81.1, label: 'Você decide o fim', who: 'Votação', emoji: '🗳️' }
+    ];
+
+    const beatsEl = document.getElementById('beats');
+    if (beatsEl) {
+      MOMENTS.forEach((m) => {
+        const d = document.createElement('div');
+        d.className = 'beat';
+        d.dataset.t = m.t;
+        d.innerHTML = `<span class="who">${m.emoji} ${m.who} · ${m.t.toFixed(1)}s</span>${m.label}`;
+        d.addEventListener('click', () => seekTo(m.t));
+        beatsEl.appendChild(d);
+      });
+    }
+
+    // ── Falas do episódio (aba Elenco) ──
+    const SPEAKER_META = {
+      ruan: { nome: 'Narrador (Ruan)', emoji: '🎙️', cor: '#fbbf24' },
+      voce: { nome: 'Você (Morador 302)', emoji: '🙋', cor: '#38bdf8' },
+      valdir: { nome: 'Seu Valdir (Porteiro)', emoji: '👴', cor: '#f59e0b' },
+      lucas: { nome: 'Lucas (Entregador)', emoji: '🚴', cor: '#ef4444' },
+      camila: { nome: 'Dona Camila (304)', emoji: '👩', cor: '#c084fc' }
+    };
+
+    const linesEl = document.getElementById('linesList');
+    if (linesEl && T && Array.isArray(T.dialogues)) {
+      T.dialogues.forEach((d) => {
+        const meta = SPEAKER_META[d.speaker] || { nome: d.speaker, emoji: '🗣️', cor: '#94a3b8' };
+        const el = document.createElement('div');
+        el.className = 'beat';
+        el.style.borderLeftColor = meta.cor;
+        el.dataset.lineStart = d.start;
+        el.innerHTML = `<span class="who" style="color:${meta.cor}">${meta.emoji} ${meta.nome} · ${d.start.toFixed(1)}s</span>` +
+          `${d.text}`;
+        el.addEventListener('click', () => seekTo(d.start));
+        linesEl.appendChild(el);
+      });
+    }
+
+    // ── Amostras de voz ──
+    const VOICES = [
+      { label: 'Narrador — Ruan (voz real calibrada)', src: '../../output/audicoes/audicao_1_narrador_ruan.mp3', badge: 'PADRÃO' },
+      { label: 'Você — protagonista jovem', src: '../../output/audicoes/audicao_2_rapaz_voce_ruan.mp3', badge: 'SALA' },
+      { label: 'Lucas — entregador', src: '../../output/audicoes/audicao_3_jovem_entregador_lucas.mp3', badge: 'RUA' },
+      { label: 'Dona Camila — interfone', src: '../../output/audicoes/camila_vizinha_304.mp3', badge: 'INTERFONE' }
+    ];
+
+    const voiceAudition = new Audio();
+    let voicePlayingBtn = null;
+
+    const voiceEl = document.getElementById('voiceList');
+    if (voiceEl) {
+      VOICES.forEach((v) => {
+        const b = document.createElement('button');
+        b.className = 'voice-btn';
+        b.innerHTML = `<span>▶ ${v.label}</span><span class="vbadge">${v.badge}</span>`;
+        b.addEventListener('click', () => {
+          if (voicePlayingBtn === b && !voiceAudition.paused) {
+            voiceAudition.pause();
+            b.classList.remove('playing');
+            voicePlayingBtn = null;
+            return;
+          }
+          if (voicePlayingBtn) voicePlayingBtn.classList.remove('playing');
+          voiceAudition.src = v.src;
+          voiceAudition.play().then(() => {
+            b.classList.add('playing');
+            voicePlayingBtn = b;
+          }).catch(() => {
+            b.classList.remove('playing');
+          });
+        });
+        voiceEl.appendChild(b);
+      });
+      voiceAudition.addEventListener('ended', () => {
+        if (voicePlayingBtn) voicePlayingBtn.classList.remove('playing');
+        voicePlayingBtn = null;
+      });
+    }
+
+    // ── Biblioteca de cenas ──
+    const SCENE_INTERVAL = {
+      alavanca_macro: [15.6, 16.4],
+      cctv_eclusa_3planos: [28.8, 36.5],
+      guarita_3q: [6.9, 13.7],
+      guarita_perfil_janela: [36.6, 44.2]
+    };
+
+    const sceneEl = document.getElementById('sceneList');
+    if (sceneEl && window.StudioScenes) {
+      window.StudioScenes.list().forEach((s) => {
+        const b = document.createElement('button');
+        b.className = 'scene-item';
+        const range = SCENE_INTERVAL[s.name];
+        b.innerHTML = `<span><b>${s.nome}</b><div class="scene-meta">${s.angulo} · ${s.profundidade}</div></span>` +
+          (s.pinned ? '<span class="pin">🔒 salva</span>' : '');
+        b.addEventListener('click', () => {
+          if (range) seekTo(range[0] + 0.55);
+        });
+        sceneEl.appendChild(b);
+      });
+    }
+
+    // ── Toggles de área segura e legendas ──
+    const btnSafeEl = document.getElementById('btnSafe');
+    const btnSubsEl = document.getElementById('btnSubs');
+    if (btnSafeEl) {
+      btnSafeEl.addEventListener('click', () => {
+        showSafe = !showSafe;
+        btnSafeEl.classList.toggle('on', showSafe);
+        renderFrame();
+      });
+    }
+    if (btnSubsEl) {
+      btnSubsEl.addEventListener('click', () => {
+        showSubs = !showSubs;
+        btnSubsEl.classList.toggle('on', showSubs);
+        renderFrame();
+      });
+    }
+
+    /**
+     * Zona segura TikTok/Reels: as três faixas que a interface do app cobre.
+     * A área verde (60..W-150 × 200..1560) é a única 100% visível.
+     */
+    function drawSafeZone() {
+      if (!showSafe) return;
+      ctx.save();
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.22)';
+      ctx.fillRect(0, 0, W, 200);
+      ctx.fillRect(W - 150, 820, 150, 820);
+      ctx.fillRect(0, 1560, W, 360);
+      ctx.strokeStyle = 'rgba(34, 197, 94, 0.85)';
+      ctx.setLineDash([14, 10]);
+      ctx.lineWidth = 3;
+      ctx.strokeRect(60, 200, W - 210, 1360);
+      ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(34, 197, 94, 0.9)';
+      ctx.font = '700 20px "JetBrains Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('ÁREA SEGURA TIKTOK', 74, 236);
+      ctx.restore();
+    }
+
+    /** Destaca no painel o momento/fala que está tocando agora. */
+    function updatePanelHighlight(time) {
+      document.querySelectorAll('#beats .beat').forEach((el) => {
+        el.classList.toggle('active', Math.abs(parseFloat(el.dataset.t) - time) < 1.2);
+      });
+      document.querySelectorAll('#linesList .beat').forEach((el) => {
+        const s = parseFloat(el.dataset.lineStart);
+        el.classList.toggle('active', time >= s && time < s + 7);
+      });
     }
 
     window.addEventListener('load', () => {
