@@ -57,6 +57,39 @@
       this.time += dt;
       this.mouthOpen = mouthVal;
 
+      // Respiração Ofegante (entregador em pânico correu até a guarita)
+      const breathSpeed = this.emotion === 'terrified' || this.emotion === 'desperate' ? 3.2 : 1.9;
+      const breathCycle = this.time * breathSpeed + Math.sin(this.time * 0.8) * 0.2;
+      this.breathPhase = Math.sin(breathCycle) * 0.5 + 0.5;
+      this.chestExpand = this.breathPhase * (this.emotion === 'terrified' ? 3.5 : 2.0);
+      this.shoulderRise = this.breathPhase * (this.emotion === 'terrified' ? 1.8 : 0.9);
+
+      // Tremor de Pânico nas Mãos e Braços (quando desesperado/terrorizado)
+      if (this.emotion === 'terrified' || this.emotion === 'desperate') {
+        this.panicTremor = Math.sin(this.time * 28) * 1.2 + Math.cos(this.time * 37) * 0.8;
+        this.headShake = Math.sin(this.time * 12) * 0.025;
+      } else {
+        this.panicTremor = 0;
+        this.headShake = 0;
+      }
+
+      // Balanço de Braços em Idle (segurando a sacola com nervosismo)
+      if (!this.isWalking) {
+        this.idleArmSway = Math.sin(this.time * 1.6) * 0.06;
+        this.bagSway = Math.sin(this.time * 2.1) * 2.5;
+      } else {
+        this.idleArmSway = 0;
+        this.bagSway = 0;
+      }
+
+      // Micro-expressão reativa baseada na emoção atual
+      const emotionIntensity = {
+        'neutral': 0, 'tired': 0.2, 'desperate': 0.7, 'terrified': 1.0
+      };
+      this.emotionWeight = emotionIntensity[this.emotion] || 0;
+      this.browFurrow = this.emotionWeight * (0.9 + Math.sin(this.time * 5.0) * 0.1);
+      this.eyeWiden = this.emotionWeight * 0.5;
+
       this.blinkTimer += dt;
       if (this.blinkTimer > 3.2) {
         this.isBlinking = true;

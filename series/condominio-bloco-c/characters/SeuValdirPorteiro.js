@@ -59,6 +59,32 @@
       this.mouthOpen += (mouthVal - this.mouthOpen) * (mouthVal > this.mouthOpen ? 0.55 : 0.28);
       this.mouthWide += (wideVal - this.mouthWide) * 0.3;
 
+      // Respiração Torácica Orgânica (ciclo de 3.5-4.2s com variação natural)
+      const breathCycle = this.time * 1.65 + Math.sin(this.time * 0.7) * 0.3;
+      this.breathPhase = Math.sin(breathCycle) * 0.5 + 0.5; // 0..1 (0=expira, 1=inspira)
+      this.chestExpand = this.breathPhase * 1.8; // expansão torácica em px
+      this.shoulderRise = this.breathPhase * 0.8; // elevação dos ombros
+
+      // Balanço de Braços em Idle (micro-movimento natural quando parado)
+      if (!this.isWalking) {
+        this.idleArmSway = Math.sin(this.time * 1.2) * 0.04 + Math.sin(this.time * 2.7) * 0.02;
+        this.idleHeadTilt = Math.sin(this.time * 0.9) * 0.015;
+        this.idleWeightShift = Math.sin(this.time * 0.7) * 1.2;
+      } else {
+        this.idleArmSway = 0;
+        this.idleHeadTilt = 0;
+        this.idleWeightShift = 0;
+      }
+
+      // Micro-expressão reativa baseada na emoção atual
+      const emotionIntensity = {
+        'neutral': 0, 'worried': 0.6, 'panicked': 0.9,
+        'serious': 0.3, 'focused': 0.2, 'tense': 0.5
+      };
+      this.emotionWeight = emotionIntensity[this.emotion] || 0;
+      this.browFurrow = this.emotionWeight * (0.8 + Math.sin(this.time * 3.5) * 0.2);
+      this.eyeWiden = this.emotionWeight * 0.3;
+
       // Ciclo de Piscar Natural (a cada 3.8 a 4.5s por apenas 140ms)
       this.blinkTimer += dt;
       if (this.blinkTimer > 4.0) {
@@ -216,30 +242,33 @@
       ctx.restore();
 
       // 3. TRONCO, COLETE DE VIGILÂNCIA & GRAVATA BORDÔ (Calibrado a 247px)
+      // Respiração torácica + balanço idle aplicados ao tronco
+      const breathChest = this.chestExpand || 0;
+      const idleShift = this.idleWeightShift || 0;
       ctx.save();
-      ctx.translate(0, hipBob);
-      ctx.rotate(torsoTilt);
+      ctx.translate(idleShift, hipBob - this.shoulderRise * 0.3);
+      ctx.rotate(torsoTilt + (this.idleHeadTilt || 0) * 0.4);
 
-      // Camisa social azul-clara (colarinho e base em y = -24)
+      // Camisa social azul-clara com expansão torácica na respiração
       ctx.fillStyle = '#93c5fd';
       ctx.beginPath();
-      ctx.moveTo(-14, -24);
-      ctx.lineTo(14, -24);
-      ctx.lineTo(14, 58);
-      ctx.lineTo(-14, 58);
+      ctx.moveTo(-14 - breathChest * 0.3, -24);
+      ctx.lineTo(14 + breathChest * 0.3, -24);
+      ctx.lineTo(14 + breathChest * 0.15, 58);
+      ctx.lineTo(-14 - breathChest * 0.15, 58);
       ctx.closePath();
       ctx.fill();
 
-      // Colete de Vigilância Azul-Marinho Oficial (#1e293b a #0f172a)
+      // Colete de Vigilância Azul-Marinho Oficial com respiração
       const vestGrad = ctx.createLinearGradient(-16, -24, 16, 58);
       vestGrad.addColorStop(0, '#1e293b');
       vestGrad.addColorStop(1, '#0f172a');
       ctx.fillStyle = vestGrad;
       ctx.beginPath();
-      ctx.moveTo(-15, -24);
-      ctx.bezierCurveTo(-20, 0, -18, 35, -14, 58);
-      ctx.lineTo(14, 58);
-      ctx.bezierCurveTo(17, 35, 17, 0, 14, -24);
+      ctx.moveTo(-15 - breathChest * 0.35, -24);
+      ctx.bezierCurveTo(-20 - breathChest * 0.2, 0, -18 - breathChest * 0.1, 35, -14 - breathChest * 0.1, 58);
+      ctx.lineTo(14 + breathChest * 0.1, 58);
+      ctx.bezierCurveTo(17 + breathChest * 0.1, 35, 17 + breathChest * 0.2, 0, 14 + breathChest * 0.35, -24);
       ctx.closePath();
       ctx.fill();
 

@@ -58,6 +58,36 @@
       this.mouthOpen += (mouthVal - this.mouthOpen) * (mouthVal > this.mouthOpen ? 0.55 : 0.28);
       this.mouthWide += (wideVal - this.mouthWide) * 0.3;
 
+      // Respiração Torácica Orgânica (ciclo mais rápido que Valdir por ser jovem)
+      const breathCycle = this.time * 1.85 + Math.sin(this.time * 0.6) * 0.25;
+      this.breathPhase = Math.sin(breathCycle) * 0.5 + 0.5;
+      this.chestExpand = this.breathPhase * 2.2;
+      this.shoulderRise = this.breathPhase * 1.0;
+
+      // Balanço de Braços em Idle (jovem inquieto com smartphone)
+      if (!this.isWalking) {
+        this.idleArmSway = Math.sin(this.time * 1.4) * 0.05 + Math.sin(this.time * 3.1) * 0.025;
+        this.idleHeadTilt = Math.sin(this.time * 1.1) * 0.02;
+        this.idleWeightShift = Math.sin(this.time * 0.8) * 1.5;
+        // Micro-movimento do braço segurando o celular
+        this.phoneJitter = Math.sin(this.time * 2.3) * 0.8 + Math.cos(this.time * 3.7) * 0.4;
+      } else {
+        this.idleArmSway = 0;
+        this.idleHeadTilt = 0;
+        this.idleWeightShift = 0;
+        this.phoneJitter = 0;
+      }
+
+      // Micro-expressão reativa baseada na emoção atual
+      const emotionIntensity = {
+        'neutral': 0, 'tense': 0.5, 'shocked': 0.85,
+        'scared': 0.95, 'command': 0.3, 'determined': 0.2
+      };
+      this.emotionWeight = emotionIntensity[this.emotion] || 0;
+      this.browFurrow = this.emotionWeight * (0.7 + Math.sin(this.time * 4.2) * 0.3);
+      this.eyeWiden = this.emotionWeight * 0.4;
+      this.jawTension = this.emotionWeight * Math.sin(this.time * 5.5) * 0.15;
+
       this.blinkTimer += dt;
       if (this.blinkTimer > 3.8) {
         this.isBlinking = true;
@@ -266,16 +296,18 @@
       ctx.fill();
       ctx.restore();
 
-      // 3. TRONCO DO MOLETOM EM PERFIL (Silhueta Orgânica e Caimento Calibrado a 247px)
+      // 3. TRONCO DO MOLETOM EM PERFIL (Silhueta Orgânica + Respiração Torácica + Balanço Idle)
+      const breathChest = this.chestExpand || 0;
+      const idleShift = this.idleWeightShift || 0;
       ctx.save();
-      ctx.translate(0, hipBob);
-      ctx.rotate(torsoTilt);
+      ctx.translate(idleShift, hipBob - (this.shoulderRise || 0) * 0.3);
+      ctx.rotate(torsoTilt + (this.idleHeadTilt || 0) * 0.5);
 
-      // Capuz caído suavemente atrás da nuca
+      // Capuz caído suavemente atrás da nuca (com micro-movimento de respiração)
       ctx.fillStyle = '#0f2942';
       ctx.beginPath();
       ctx.moveTo(-14, -26);
-      ctx.bezierCurveTo(-26, -14, -22, 12, -14, 16);
+      ctx.bezierCurveTo(-26 - breathChest * 0.2, -14, -22 - breathChest * 0.15, 12, -14, 16);
       ctx.bezierCurveTo(-10, 14, -8, 2, -6, -12);
       ctx.closePath();
       ctx.fill();
@@ -283,7 +315,7 @@
       ctx.lineWidth = 1.2;
       ctx.stroke();
 
-      // Corpo do Moletom com caimento calibrado com a visão frontal (topo em y = -26, base em y = 60)
+      // Corpo do Moletom com expansão torácica na respiração + caimento calibrado
       const hoodieGrad = ctx.createLinearGradient(-18, -26, 20, 62);
       hoodieGrad.addColorStop(0, '#1e4e79');
       hoodieGrad.addColorStop(0.5, '#153a5b');
@@ -291,10 +323,10 @@
       ctx.fillStyle = hoodieGrad;
 
       ctx.beginPath();
-      ctx.moveTo(-15, -26);
-      ctx.bezierCurveTo(-20, 0, -18, 35, -13, 60);
-      ctx.lineTo(14, 60);
-      ctx.bezierCurveTo(18, 35, 18, 0, 15, -26);
+      ctx.moveTo(-15 - breathChest * 0.35, -26);
+      ctx.bezierCurveTo(-20 - breathChest * 0.2, 0, -18 - breathChest * 0.1, 35, -13 - breathChest * 0.08, 60);
+      ctx.lineTo(14 + breathChest * 0.08, 60);
+      ctx.bezierCurveTo(18 + breathChest * 0.1, 35, 18 + breathChest * 0.2, 0, 15 + breathChest * 0.35, -26);
       ctx.closePath();
       ctx.fill();
 
