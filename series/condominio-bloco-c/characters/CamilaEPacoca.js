@@ -130,7 +130,7 @@
         ? Rig.resolveProfileArms({
           phase: phi,
           walking: isWalk,
-          swing: 0.36,
+          swing: 0.72,
           elbowBase: 0.20,
           elbowFollow: 0.45,
           idleSwing: 0.04,

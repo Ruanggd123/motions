@@ -165,7 +165,7 @@
         ? Rig.resolveProfileArms({
           phase: phi,
           walking: isWalk,
-          swing: 0.40,
+          swing: 0.78,
           elbowBase: 0.18,
           elbowFollow: 0.45,
           idleSwing: 0.04,
@@ -266,7 +266,9 @@
       // tinha um balanço próprio desligado do ciclo, então ficava sempre do
       // mesmo lado e nunca trocava de profundidade com o braço da frente.
       ctx.save();
-      ctx.translate(-4, -14 + hipBob);
+      // pivô do ombro traseiro recuado: com o pivô em -4 a mão sumia atrás
+      // do tronco em três das quatro fases do passo.
+      ctx.translate(-9, -18 + hipBob);
       if (arms && arms.back) {
         Rig.drawArmChain(ctx, {
           upper: arms.back.upper,
@@ -583,9 +585,11 @@
       ctx.save();
       ctx.translate(2, -14); // Ombro dianteiro ancorado no tronco
       const armBob = isWalk ? Math.sin(phi * 2) * 0.04 : 0;
-      // Em movimento o braço obedece ao ciclo do rig (sobe à frente e recua
-      // atrás em oposição ao braço traseiro). Parado, mantém o celular no peito.
-      const upperAngle = (isWalk && arms) ? arms.front.upper : (-0.32 - armBob);
+      // O braço da frente balança um pouco (rig) mas mantém a dobra que
+      // segura o celular. Antes, andando, ele assumia o ângulo cru do rig e
+      // o gesto do smartphone desaparecia por completo.
+      const walkLift = (isWalk && arms) ? arms.front.upper * 0.22 : 0;
+      const upperAngle = -0.32 - armBob + walkLift;
 
       // Ombro dianteiro esférico com caimento de moletom
       const shoulderGrad = ctx.createRadialGradient(-2, -2, 2, 0, 0, 8.5);
@@ -624,9 +628,11 @@
 
       // Cotovelo Dianteiro com dobra de tecido (flexão para frente e para cima)
       ctx.translate(0, upperArmLen);
-      // Parado: dobra ~96° para erguer o celular ao peito. Andando: dobra menor,
-      // acompanhando o rig, para o braço não ficar travado no mesmo ângulo.
-      const elbowFlex = (isWalk && arms) ? arms.front.fore : (-1.68 + armBob * 0.5);
+      // Dobra ~96° para erguer o celular ao peito, com um respiro do rig
+      // enquanto anda. O diminuto `walkBreath` evita o braço "congelado"
+      // sem nunca soltar o gesto de quem está olhando a tela.
+      const walkBreath = (isWalk && arms) ? arms.front.fore * 0.12 : 0;
+      const elbowFlex = -1.68 + armBob * 0.5 + walkBreath;
       ctx.rotate(elbowFlex);
 
       ctx.fillStyle = '#153a5b';

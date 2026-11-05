@@ -102,15 +102,28 @@
     const elbowFollow = cfg.elbowFollow !== undefined ? cfg.elbowFollow : 0.45;
 
     const c = Math.cos(wrapPhase(phase));
-    const nearAngle = cfg.walking ? swing * c : (cfg.idleSwing !== undefined ? cfg.idleSwing : 0.03);
-    const farAngle = cfg.walking ? -swing * c : (cfg.idleSwing !== undefined ? cfg.idleSwing : 0.03);
+    const idle = cfg.idleSwing !== undefined ? cfg.idleSwing : 0.03;
 
-    // Braço que vai à frente dobra o cotovelo para frente (ângulo negativo).
+    // Cada braço balança APENAS do seu lado do tronco, para nunca atravessar
+    // o corpo. O braço próximo (desenhado por cima) vive de 0 a −swing (só à
+    // frente); o distante (desenhado atrás) vive de 0 a +swing (só atrás).
+    //
+    // A alternância continua real: na fase 0 o distante está no extremo e o
+    // próximo na linha do corpo; na fase 0,5 é o próximo que vai ao extremo
+    // à frente. É o "um na frente, outro atrás, e o inverso ocorre".
+    // Amplitude ampliada: com swing baixo a mão traseira ficava atrás do
+    // tronco e a alternância não se lia. Perto de 1,0 rad a mão passa da
+    // silhueta do corpo, que é o que o espectador percebe como "braço atrás".
+    const nearAngle = cfg.walking ? -swing * (0.75 - 0.75 * c) : idle;
+    const farAngle = cfg.walking ? swing * (0.75 + 0.75 * c) : idle;
+
+    // Braço à frente dobra o cotovelo para frente (ângulo negativo).
     const fold = (a) => -(elbowBase + Math.max(0, -a) * elbowFollow);
 
     const near = {
       side: 1,
       front: true,
+      swingAmt: Math.abs(nearAngle) / Math.max(0.001, swing),
       upper: nearAngle,
       fore: fold(nearAngle),
       shade: 1.0
@@ -118,6 +131,7 @@
     const far = {
       side: 0,
       front: false,
+      swingAmt: Math.abs(farAngle) / Math.max(0.001, swing),
       upper: farAngle,
       fore: fold(farAngle) * 0.75,
       shade: 0.62
@@ -182,7 +196,10 @@
     if (!opts.reactSide || !opts.reactAmount) return base;
 
     const local = reactLocalDirection(opts.reactSide, opts.facingRight !== false);
-    const reacted = applyReaction(base, local, opts.reactAmount);
+    // `applyReaction` recebe 1 (pose-alvo completa) e quem faz a entrada suave
+    // é o `blendLayers`. Passar `reactAmount` aqui também aplicava o fator
+    // duas vezes (efeito final k²) e a reação nunca chegava na força devida.
+    const reacted = applyReaction(base, local, 1);
     return blendLayers(base, reacted, opts.reactAmount);
   }
 
