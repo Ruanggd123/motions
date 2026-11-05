@@ -32,12 +32,27 @@
       this.walkDir = options.walkDir || 1;
       this._prevX = this.x;
 
+      // Reação lateral: de que lado vem o que assusta ('left' | 'right') e
+      // quanto da pose de reação entra (0..1). O rig troca os braços de
+      // camada conforme o lado, para o gesto ter profundidade real.
+      this.reactSide = options.reactSide || null;
+      this.reactAmount = options.reactAmount !== undefined ? options.reactAmount : 0;
+
       // Expressão e Ciclos Fisiológicos
       this.mouthOpen = 0;
       this.mouthWide = 0.5;
       this.blinkTimer = 0.8;
       this.isBlinking = false;
       this.time = 0;
+    }
+
+    /**
+     * Faz o personagem reagir a algo que vem de um lado ('left' | 'right').
+     * `amount` 0..1 permite entrar e sair da reação sem corte.
+     */
+    reactToSide(side, amount = 1) {
+      this.reactSide = side === 'left' || side === 'right' ? side : null;
+      this.reactAmount = side ? Math.max(0, Math.min(1, amount)) : 0;
     }
 
     walk(speed = 1.0, dir = 1) {
@@ -145,6 +160,20 @@
     _drawProfile(ctx) {
       const phi = this.walkCycle;
       const isWalk = this.isWalking;
+      const Rig = global.StudioEngine && global.StudioEngine.BodyRig2D;
+      const arms = Rig
+        ? Rig.resolveProfileArms({
+          phase: phi,
+          walking: isWalk,
+          swing: 0.40,
+          elbowBase: 0.18,
+          elbowFollow: 0.45,
+          idleSwing: 0.04,
+          reactSide: this.reactSide,
+          reactAmount: this.reactAmount,
+          facingRight: !this.flipX
+        })
+        : null;
 
       // Bob vertical e inclinação dinâmica do tronco
       const hipBob = isWalk ? Math.sin(phi * 2 - Math.PI / 2) * 3.0 : Math.sin(this.time * 1.0) * 0.6;
@@ -232,57 +261,34 @@
       this._drawProfileLeg(ctx, legBack.th, legBack.kn, legBack.ft, legBack.soleDrop, true);
       ctx.restore();
 
-      // 1.5. BRAÇO TRASEIRO (Camada de Profundidade Atrás do Tronco — Sem Sobreposição Fantasma)
+      // 1.5. BRAÇO TRASEIRO (camada atrás do tronco, do rig compartilhado)
+      // O rig decide o ângulo pela fase do passo e pela reação. Antes este braço
+      // tinha um balanço próprio desligado do ciclo, então ficava sempre do
+      // mesmo lado e nunca trocava de profundidade com o braço da frente.
       ctx.save();
       ctx.translate(-4, -14 + hipBob);
-      const backSwing = isWalk ? Math.sin(phi) * 0.25 : 0;
-      ctx.rotate(backSwing);
-
-      // Ombro traseiro escuro
-      ctx.fillStyle = '#0a1d2e';
-      ctx.beginPath();
-      ctx.arc(0, 0, 7.0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Bíceps traseiro
-      const upperBackLen = 27;
-      ctx.fillStyle = '#0c2338';
-      ctx.beginPath();
-      ctx.moveTo(-5.5, 0);
-      ctx.lineTo(5.5, 0);
-      ctx.lineTo(4.8, upperBackLen);
-      ctx.lineTo(-4.8, upperBackLen);
-      ctx.closePath();
-      ctx.fill();
-
-      // Cotovelo traseiro e antebraço suave
-      ctx.translate(0, upperBackLen);
-      const backForeAngle = isWalk ? -(0.2 + Math.max(0, -backSwing) * 0.25) : -0.1;
-      ctx.rotate(backForeAngle);
-
-      ctx.fillStyle = '#0a1d2e';
-      ctx.beginPath();
-      ctx.arc(0, 0, 5.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      const foreBackLen = 25;
-      ctx.fillStyle = '#0c2338';
-      ctx.beginPath();
-      ctx.moveTo(-4.5, 0);
-      ctx.lineTo(4.5, 0);
-      ctx.lineTo(3.8, foreBackLen);
-      ctx.lineTo(-3.8, foreBackLen);
-      ctx.closePath();
-      ctx.fill();
-
-      // Punho e mão traseira anatômica relaxada
-      ctx.fillStyle = '#081624';
-      ctx.fillRect(-4.0, foreBackLen - 4, 8, 4.5);
-      ctx.translate(0, foreBackLen);
-      ctx.fillStyle = '#b87d4e';
-      ctx.beginPath();
-      ctx.roundRect(-3.5, 0, 7, 8, 2.5);
-      ctx.fill();
+      if (arms && arms.back) {
+        Rig.drawArmChain(ctx, {
+          upper: arms.back.upper,
+          fore: arms.back.fore,
+          upperLen: 27,
+          foreLen: 25,
+          width: 5.6,
+          color: '#0c2338',
+          colorDark: '#081624',
+          cuffColor: '#081624',
+          skin: '#b87d4e',
+          skinDark: '#9a6440',
+          shade: arms.back.shade,
+          hand: arms.back.reaching ? 'open' : 'relaxed',
+          cuff: true
+        });
+      } else {
+        ctx.fillStyle = '#0c2338';
+        ctx.beginPath();
+        ctx.roundRect(-5.6, 0, 11.2, 52, 4);
+        ctx.fill();
+      }
       ctx.restore(); // Fim Braço Traseiro
 
       // 2. PELVE / CINTURA DO MOLETOM E BERMUDA
@@ -407,30 +413,36 @@
       ctx.closePath();
       ctx.fill();
 
-      // Cabelo Undercut Castanho Escuro com volume e mechas estilizadas (sem cobrir o olho)
-      const hairGrad = ctx.createLinearGradient(0, -42, 0, -10);
-      hairGrad.addColorStop(0, '#272038');
-      hairGrad.addColorStop(1, '#120e1c');
-      ctx.fillStyle = hairGrad;
-
-      ctx.beginPath();
-      // Nuca e lateral raspada (undercut)
-      ctx.moveTo(-15, 0);
-      ctx.bezierCurveTo(-18, -14, -14, -36, 0, -38);
-      // Volume superior do topete moderno
-      ctx.bezierCurveTo(8, -40, 16, -34, 15, -24);
-      // Franja elegante caindo sobre a testa ACIMA da sobrancelha (olho 100% livre)
-      ctx.quadraticCurveTo(15.5, -20, 13.5, -18);
-      ctx.quadraticCurveTo(11, -19, 10, -21);
-      ctx.quadraticCurveTo(8, -19, 6, -21);
-      // Curva da têmpora acima do olho
-      ctx.quadraticCurveTo(2, -22, -2, -18);
-      // Costeleta estilizada na frente da orelha
-      ctx.lineTo(-4, -11);
-      ctx.lineTo(-7, -11);
-      ctx.bezierCurveTo(-10, -8, -12, -2, -14, 0);
-      ctx.closePath();
-      ctx.fill();
+      // Cabelo Undercut Castanho Escuro — massa presa ao crânio.
+      // Antes a silhueta subia até y=-40 formando uma crista atrás: de lado
+      // parecia moicano. Agora o topo fica rente ao crânio (coroa em -38) e o
+      // volume cresce para TRÁS (nuca), não para cima.
+      if (Rig) {
+        Rig.drawProfileHair(ctx, {
+          crownY: -34,
+          backX: -15,
+          frontX: 14,
+          hairlineY: -21,
+          lift: 2.0,
+          napeY: 0,
+          color: '#120e1c',
+          color2: '#2b2440',
+          highlight: '#3b3357',
+          strandCount: 3,
+          strandWidth: 1.4
+        });
+      } else {
+        ctx.fillStyle = '#1b1628';
+        ctx.beginPath();
+        ctx.moveTo(-15, 0);
+        ctx.bezierCurveTo(-17, -14, -15, -33, 0, -35);
+        ctx.bezierCurveTo(9, -35, 15, -28, 14, -21);
+        ctx.lineTo(4, -22);
+        ctx.lineTo(-4, -19);
+        ctx.lineTo(-14, 0);
+        ctx.closePath();
+        ctx.fill();
+      }
 
       // Orelha Anatômica em Perfil com sulco e lóbulo
       ctx.fillStyle = '#c99060';
@@ -571,7 +583,9 @@
       ctx.save();
       ctx.translate(2, -14); // Ombro dianteiro ancorado no tronco
       const armBob = isWalk ? Math.sin(phi * 2) * 0.04 : 0;
-      const upperAngle = -0.32 - armBob; // Ângulo voltado para frente (+X) e baixo (+Y)
+      // Em movimento o braço obedece ao ciclo do rig (sobe à frente e recua
+      // atrás em oposição ao braço traseiro). Parado, mantém o celular no peito.
+      const upperAngle = (isWalk && arms) ? arms.front.upper : (-0.32 - armBob);
 
       // Ombro dianteiro esférico com caimento de moletom
       const shoulderGrad = ctx.createRadialGradient(-2, -2, 2, 0, 0, 8.5);
@@ -610,7 +624,9 @@
 
       // Cotovelo Dianteiro com dobra de tecido (flexão para frente e para cima)
       ctx.translate(0, upperArmLen);
-      const elbowFlex = -1.68 + armBob * 0.5; // Dobra ~96 graus elevando o celular ao peito/rosto
+      // Parado: dobra ~96° para erguer o celular ao peito. Andando: dobra menor,
+      // acompanhando o rig, para o braço não ficar travado no mesmo ângulo.
+      const elbowFlex = (isWalk && arms) ? arms.front.fore : (-1.68 + armBob * 0.5);
       ctx.rotate(elbowFlex);
 
       ctx.fillStyle = '#153a5b';
@@ -936,9 +952,9 @@
       let leftHandPose = 'relaxed';
 
       if (this.pose === 'gesturing_urgent') {
-        // Gesto de urgência com as duas mãos — mão esquerda erguida com a palma aberta
-        leftUpperAngle = -1.15 + Math.sin(this.time * 5.2) * 0.08;
-        leftForeAngle = -0.65;
+        // Braço esquerdo dobrado para frente em direção ao peito
+        leftUpperAngle = -0.15;
+        leftForeAngle = 1.25;
         leftHandPose = 'open';
       } else if (this.pose === 'step_back' || this.pose === 'listening') {
         // Recuo defensivo / ouvindo apreensivo
@@ -993,37 +1009,35 @@
         rightForeAngle = 2.15 - armBob * 0.4;
         rightHandPose = 'phone_look';
       } else if (this.pose === 'pointing' || this.pose === 'pointing_valdir') {
-        // Ordena a Seu Valdir com postura diagonal natural (cotovelo flexionado, dedo erguido)
-        rightUpperAngle = -0.85 + Math.sin(this.time * 4.5) * 0.05;
-        rightForeAngle = -0.55;
+        // Braço para frente na direção de Seu Valdir (sem esticar na horizontal)
+        rightUpperAngle = -0.35 + Math.sin(this.time * 4.5) * 0.04;
+        rightForeAngle = 1.25;
         rightHandPose = 'pointing';
       } else if (this.pose === 'pointing_window') {
-        // Aponta para a janela/porta lateral
-        rightUpperAngle = -1.05 + Math.sin(this.time * 4.0) * 0.04;
-        rightForeAngle = -0.85;
+        // Braço dobrado para frente em direção à janela
+        rightUpperAngle = -0.38 + Math.sin(this.time * 4.0) * 0.04;
+        rightForeAngle = 1.18;
         rightHandPose = 'pointing';
       } else if (this.pose === 'hands_counter' || this.pose === 'window_look') {
-        // Ambas as mãos apoiadas ou olhando com tensão
-        rightUpperAngle = -0.38;
-        rightForeAngle = 0.72;
+        rightUpperAngle = -0.28;
+        rightForeAngle = 0.82;
         rightHandPose = 'relaxed';
       } else if (this.pose === 'listening') {
-        // Escutando interfone com sobressalto
-        rightUpperAngle = -0.45;
-        rightForeAngle = 1.65;
+        rightUpperAngle = -0.32;
+        rightForeAngle = 1.45;
         rightHandPose = 'defensive';
       } else if (this.pose === 'gesturing_urgent') {
-        // Gesto de urgência / súplica
-        rightUpperAngle = -1.25 + Math.sin(this.time * 5.2 + 0.8) * 0.08;
-        rightForeAngle = -0.48;
+        // Braço direito dobrado para frente em direção ao peito
+        rightUpperAngle = 0.15;
+        rightForeAngle = -1.25;
         rightHandPose = 'open';
       } else if (this.pose === 'holding_spotlight') {
-        rightUpperAngle = -0.62;
-        rightForeAngle = -1.32;
+        rightUpperAngle = -0.30;
+        rightForeAngle = 1.20;
         rightHandPose = 'relaxed';
       } else if (this.pose === 'step_back') {
-        rightUpperAngle = 0.25;
-        rightForeAngle = 1.35;
+        rightUpperAngle = 0.18;
+        rightForeAngle = -1.15;
         rightHandPose = 'defensive';
       }
       this._drawArticulatedArm(ctx, rightUpperAngle, rightForeAngle, rightHandPose, true);

@@ -39,8 +39,18 @@
       // Expressão e Ciclos Fisiológicos
       this.mouthOpen = 0;
       this.blinkTimer = 0.5;
+      // Reação lateral (de que lado vem o que assusta) e intensidade 0..1.
+      this.reactSide = options.reactSide || null;
+      this.reactAmount = options.reactAmount !== undefined ? options.reactAmount : 0;
+
       this.isBlinking = false;
       this.time = 0;
+    }
+
+    /** Reage a algo vindo de um lado ('left' | 'right'), com entrada suave. */
+    reactToSide(side, amount = 1) {
+      this.reactSide = side === 'left' || side === 'right' ? side : null;
+      this.reactAmount = side ? Math.max(0, Math.min(1, amount)) : 0;
     }
 
     walk(speed = 1.0, dir = 1) {
@@ -115,6 +125,20 @@
     _drawProfile(ctx) {
       const phi = this.walkCycle;
       const isWalk = this.isWalking;
+      const Rig = global.StudioEngine && global.StudioEngine.BodyRig2D;
+      const arms = Rig
+        ? Rig.resolveProfileArms({
+          phase: phi,
+          walking: isWalk,
+          swing: 0.36,
+          elbowBase: 0.20,
+          elbowFollow: 0.45,
+          idleSwing: 0.04,
+          reactSide: this.reactSide,
+          reactAmount: this.reactAmount,
+          facingRight: !this.flipX
+        })
+        : null;
 
       const hipBob = isWalk ? Math.sin(phi * 2 - Math.PI / 2) * 2.8 : Math.sin(this.time * 1.0) * 0.5;
       const torsoTilt = isWalk ? 0.05 + Math.sin(phi * 2) * 0.015 : 0.03;
@@ -257,42 +281,42 @@
       ctx.closePath();
       ctx.fill();
 
-      // Coque Cacheado Alto Volumoso no Topo (#271810 / #180e07)
-      const bunBounce = isWalk ? Math.sin(phi * 2) * 1.5 : 0;
-      ctx.save();
-      ctx.translate(0, bunBounce);
-      ctx.fillStyle = '#271810';
-
-      // Base do cabelo na nuca e laterais
-      ctx.beginPath();
-      ctx.moveTo(-12, 0);
-      ctx.bezierCurveTo(-15, -14, -10, -32, 2, -32);
-      ctx.bezierCurveTo(8, -32, 12, -26, 11, -16);
-      ctx.lineTo(2, -18);
-      ctx.bezierCurveTo(-5, -18, -8, -10, -10, 0);
-      ctx.closePath();
-      ctx.fill();
-
-      // Grande coque volumoso afro/cacheado no topo
-      ctx.fillStyle = '#180e07';
-      ctx.beginPath();
-      ctx.ellipse(-1, -38, 14, 13, 0.1, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Mechas e texturas em relevo no coque
-      ctx.strokeStyle = '#3d2516';
-      ctx.lineWidth = 1.8;
-      ctx.beginPath();
-      ctx.arc(-4, -40, 6, 0, Math.PI * 1.5);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(3, -37, 7, 0.4, Math.PI * 1.8);
-      ctx.stroke();
-
-      // Elástico/Scrunchie mostarda prendendo o coque
-      ctx.fillStyle = '#f59e0b';
-      ctx.fillRect(-7, -33, 14, 4);
-      ctx.restore();
+      // Cabelo em perfil: base presa ao crânio + coque ATRÁS da cabeça.
+      // Antes o coque ficava no topo (y=-38, raio 14): de lado lia como uma
+      // crista/moicano. Agora ele assenta na nuca, que é como um coque de
+      // verdade aparece na vista de perfil.
+      const bunBounce = isWalk ? Math.sin(phi * 2) * 1.2 : 0;
+      if (Rig) {
+        Rig.drawProfileHair(ctx, {
+          crownY: -27,
+          backX: -10,
+          frontX: 11,
+          hairlineY: -18,
+          lift: 1.8,
+          napeY: 2,
+          color: '#180e07',
+          color2: '#2f1d12',
+          highlight: '#4a2e1b',
+          strandCount: 2,
+          strandWidth: 1.4
+        });
+        Rig.drawBun(ctx, {
+          x: -13,
+          y: -12 + bunBounce,
+          rx: 10.5,
+          ry: 10,
+          tilt: -0.5,
+          color: '#180e07',
+          color2: '#3d2516',
+          band: '#f59e0b',
+          curlWidth: 1.6
+        });
+      } else {
+        ctx.fillStyle = '#180e07';
+        ctx.beginPath();
+        ctx.ellipse(-13, -12 + bunBounce, 10.5, 10, -0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       // Orelha e Argola Dourada em Perfil
       ctx.fillStyle = '#946340';
@@ -364,19 +388,23 @@
       ctx.save();
       ctx.translate(2, -4 + hipBob);
 
-      // Braço Traseiro balançando livre
-      const armSwing = isWalk ? Math.sin(phi) * 0.35 : 0;
+      // Braço traseiro pelo rig (oposto ao da frente). Antes ele tinha balanço
+      // próprio e nunca trocava de profundidade com o braço da guia.
       ctx.save();
-      ctx.rotate(-armSwing);
-      ctx.fillStyle = '#b45309';
-      ctx.beginPath();
-      ctx.moveTo(-2, -6);
-      ctx.lineTo(-4, 16);
-      ctx.lineTo(2, 36);
-      ctx.lineTo(6, 34);
-      ctx.lineTo(2, 14);
-      ctx.closePath();
-      ctx.fill();
+      if (arms && arms.back) {
+        Rig.drawArmChain(ctx, {
+          upper: arms.back.upper, fore: arms.back.fore,
+          upperLen: 27, foreLen: 25, width: 5.6,
+          color: '#ca8a04', colorDark: '#a16207', cuffColor: '#0f172a',
+          skin: '#946340', skinDark: '#784c28',
+          shade: arms.back.shade, hand: arms.back.reaching ? 'open' : 'relaxed', cuff: true
+        });
+      } else {
+        ctx.fillStyle = '#b45309';
+        ctx.beginPath();
+        ctx.roundRect(-5.6, 0, 11.2, 50, 4);
+        ctx.fill();
+      }
       ctx.restore();
 
       // Braço Dianteiro segurando a Manopla da Guia Retrátil
@@ -395,6 +423,8 @@
       ctx.lineTo(4, -6);
       ctx.closePath();
       ctx.fill();
+      // (o braço da guia é o da frente; o rig cuida da alternância pelo braço
+      // traseiro, que é o que aparece trocando de lado no perfil)
 
       // Mão segurando a guia
       ctx.fillStyle = '#946340';

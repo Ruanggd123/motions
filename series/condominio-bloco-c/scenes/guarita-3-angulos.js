@@ -207,11 +207,12 @@
     // ══ PERSONAGENS DENTRO DA GUARITA (ANTES da bancada, que os esconde do quadril para baixo) ══
     // Faltavam: a cena 3/4 mostrava só o ambiente vazio. Desenhados aqui, a
     // bancada cria o corte natural na altura dos quadris, como num plano real.
+    // ── PERSONAGENS DENTRO DA GUARITA (Enquadramento Cinematográfico Médio 2-Shot) ──
     if (S.valdir) {
-      const sv = { x: S.valdir.x, y: S.valdir.y, scale: S.valdir.scale, flipX: S.valdir.flipX, viewMode: S.valdir.viewMode };
-      S.valdir.x = W * 0.245;
-      S.valdir.y = H * 0.806;
-      S.valdir.scale = 2.02;
+      const sv = { x: S.valdir.x, y: S.valdir.y, scale: S.valdir.scale, flipX: S.valdir.flipX, viewMode: S.valdir.viewMode, pose: S.valdir.pose };
+      S.valdir.x = W * 0.275;
+      S.valdir.y = H * 0.635;
+      S.valdir.scale = 2.65;
       S.valdir.flipX = false;
       S.valdir.viewMode = 'front';
       S.valdir.draw(ctx);
@@ -219,39 +220,40 @@
     }
 
     if (S.voce) {
-      const sv = { x: S.voce.x, y: S.voce.y, scale: S.voce.scale, flipX: S.voce.flipX, viewMode: S.voce.viewMode };
-      S.voce.x = W * 0.455;
-      S.voce.y = H * 0.800;
-      S.voce.scale = 1.94;
+      const sv = { x: S.voce.x, y: S.voce.y, scale: S.voce.scale, flipX: S.voce.flipX, viewMode: S.voce.viewMode, pose: S.voce.pose };
+      S.voce.x = W * 0.515;
+      S.voce.y = H * 0.628;
+      S.voce.scale = 2.55;
       S.voce.flipX = false;
       S.voce.viewMode = 'front';
       S.voce.draw(ctx);
       Object.assign(S.voce, sv);
     }
 
-    // ── BANCADA em perspectiva (converge para o VP) ───────────────────
-    const deskY = H * 0.745;
-    const deskGrad = ctx.createLinearGradient(0, deskY, 0, deskY + 150);
+    // ── BANCADA em perspectiva (Cobre do quadril para baixo com profundidade) ──
+    const deskY = H * 0.640;
+    const deskGrad = ctx.createLinearGradient(0, deskY, 0, H);
     deskGrad.addColorStop(0, '#2a3644');
-    deskGrad.addColorStop(0.15, '#1b2532');
-    deskGrad.addColorStop(1, '#0c1219');
+    deskGrad.addColorStop(0.12, '#1b2532');
+    deskGrad.addColorStop(0.5, '#0f172a');
+    deskGrad.addColorStop(1, '#060a12');
     ctx.fillStyle = deskGrad;
     ctx.beginPath();
     ctx.moveTo(-80, deskY + 40);
-    ctx.lineTo(W * 0.60, deskY - 30);
-    ctx.lineTo(W + 80, deskY - 78);
-    ctx.lineTo(W + 80, deskY + 320);
-    ctx.lineTo(-80, deskY + 420);
+    ctx.lineTo(W * 0.60, deskY - 25);
+    ctx.lineTo(W + 80, deskY - 65);
+    ctx.lineTo(W + 80, H + 80);
+    ctx.lineTo(-80, H + 80);
     ctx.closePath();
     ctx.fill();
 
     // Borda frontal iluminada
-    ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.42)';
+    ctx.lineWidth = 3.5;
     ctx.beginPath();
     ctx.moveTo(-80, deskY + 40);
-    ctx.lineTo(W * 0.60, deskY - 30);
-    ctx.lineTo(W + 80, deskY - 78);
+    ctx.lineTo(W * 0.60, deskY - 25);
+    ctx.lineTo(W + 80, deskY - 65);
     ctx.stroke();
 
     // ── MONITORES CFTV na parede esquerda, inclinados ─────────────────

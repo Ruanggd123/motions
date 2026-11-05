@@ -55,6 +55,8 @@ Regras que garantem reaproveitamento:
 
 ## Cenas disponíveis
 
+### Cenas aprovadas e travadas (🔒 `pinned`)
+
 | Nome | Ângulo | Profundidade | Usada em |
 | :--- | :--- | :--- | :--- |
 | `alavanca_macro` | close-up frontal | parede → quadro → mão | Ep.03 · 15,6s–16,4s |
@@ -63,6 +65,38 @@ Regras que garantem reaproveitamento:
 | `guarita_perfil_janela` | perfil lateral | interior → vidro → rua | Ep.03 · 47,6s–51,4s |
 | `lucas_chegada_costas` | frontal pelas costas | rua em fuga → guarita → Lucas | Ep.03 · 36,6s–38,2s |
 | `grade_cedendo` | frontal, 1º plano | massa → criatura → grade | Ep.03 · 66,2s–68,6s |
+
+### Cenas de profundidade 2.5D (novas, editáveis)
+
+Construídas sobre `engine/DepthScene2D.js`: cada uma tem planos com
+atmosfera, desfoque de foco e paralaxe. São o padrão para tudo daqui em
+diante.
+
+| Nome | Ângulo | Planos | Usada em |
+| :--- | :--- | :--- | :--- |
+| `portaria_noturna_2.5d` | frontal da entrada | 6: rua → eclusa → guarita → elenco → bancada → pilar | Ep.03 · 0,0s–6,8s |
+| `passarela_lateral_2.5d` | perfil lateral | 4: rua → grade → personagem → vidro | caminhadas laterais do elenco |
+| `corredor_elevadores_2.5d` | frontal do hall | 5: fosso → correio → elevador → corta-fogo → batente | Ep.04+ (hall) |
+| `garagem_subsolo_2.5d` | frontal em perspectiva | 5: rampa → pilares → quadro → piso → viga | Ep.04+ (energia) |
+| `reacao_lateral_2.5d` | perfil fechado | 4: externo → vidro → personagem → moldura | reações laterais do elenco |
+
+### Como uma cena 2.5D recebe estado
+
+```js
+window.StudioScenes.play('portaria_noturna_2.5d', ctx, {
+  W, H, t,
+  voce, valdir, lucas,        // elenco real (nunca redesenhar)
+  alarm: true,                // giroflex e lava vermelha
+  spotlight: true,            // feixe do reator 1000W
+  intercom: true,             // LED do interfone pulsando
+  showLucas: true,            // Lucas no vidro da eclusa
+  mood: 'panic'               // 'calm' | 'tense' | 'panic'
+});
+```
+
+O `mood` controla neblina, olhos na massa negra e intensidade da luz de
+emergência. Use `tense` na maior parte do episódio e `panic` só do clímax
+até o dilema.
 
 ## Sequência de planos do Ep.03
 

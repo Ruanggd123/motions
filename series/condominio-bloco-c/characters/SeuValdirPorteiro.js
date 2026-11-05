@@ -37,12 +37,23 @@
       // Estado do farol tático que ele segura na pose 'holding_spotlight'
       this.spotlightOn = options.spotlightOn === true;
 
+      // Reação lateral (de que lado vem o que assusta) e intensidade 0..1.
+      // O rig usa isso para inverter as camadas dos braços.
+      this.reactSide = options.reactSide || null;
+      this.reactAmount = options.reactAmount !== undefined ? options.reactAmount : 0;
+
       // Expressão e Ciclos Fisiológicos Naturais
       this.mouthOpen = 0;
       this.mouthWide = 0.5;
       this.blinkTimer = 1.2;
       this.isBlinking = false;
       this.time = 0;
+    }
+
+    /** Reage a algo vindo de um lado ('left' | 'right'), com entrada suave. */
+    reactToSide(side, amount = 1) {
+      this.reactSide = side === 'left' || side === 'right' ? side : null;
+      this.reactAmount = side ? Math.max(0, Math.min(1, amount)) : 0;
     }
 
     walk(speed = 1.0, dir = 1) {
@@ -149,6 +160,20 @@
     _drawProfile(ctx) {
       const phi = this.walkCycle;
       const isWalk = this.isWalking;
+      const Rig = global.StudioEngine && global.StudioEngine.BodyRig2D;
+      const arms = Rig
+        ? Rig.resolveProfileArms({
+          phase: phi,
+          walking: isWalk,
+          swing: 0.32,
+          elbowBase: 0.16,
+          elbowFollow: 0.42,
+          idleSwing: 0.03,
+          reactSide: this.reactSide,
+          reactAmount: this.reactAmount,
+          facingRight: !this.flipX
+        })
+        : null;
 
       const hipBob = isWalk ? Math.sin(phi * 2 - Math.PI / 2) * 2.4 : Math.sin(this.time * 1.0) * 0.5;
       const torsoTilt = isWalk ? 0.05 + Math.sin(phi * 2) * 0.01 : 0.03;
@@ -346,14 +371,32 @@
       ctx.closePath();
       ctx.fill();
 
-      // Cabelo Grisalho elegante nas têmporas e nuca
-      ctx.fillStyle = '#94a3b8';
-      ctx.beginPath();
-      ctx.moveTo(-14, 0);
-      ctx.bezierCurveTo(-16, -12, -12, -26, -2, -31);
-      ctx.bezierCurveTo(-5, -22, -8, -14, -8, -4);
-      ctx.closePath();
-      ctx.fill();
+      // Cabelo grisalho nas têmporas e nuca — massa rente ao crânio.
+      // A versão antiga criava um esporão em y=-31 que, de lado, virava crista.
+      if (Rig) {
+        Rig.drawProfileHair(ctx, {
+          crownY: -30,
+          backX: -13,
+          frontX: 10,
+          hairlineY: -20,
+          lift: 1.6,
+          napeY: 0,
+          color: '#7c8a9c',
+          color2: '#a7b4c4',
+          highlight: '#cbd5e1',
+          strandCount: 2,
+          strandWidth: 1.2,
+          strandAlpha: 0.55
+        });
+      } else {
+        ctx.fillStyle = '#94a3b8';
+        ctx.beginPath();
+        ctx.moveTo(-13, 0);
+        ctx.bezierCurveTo(-14, -12, -11, -24, -2, -27);
+        ctx.bezierCurveTo(-5, -19, -7, -12, -7, -3);
+        ctx.closePath();
+        ctx.fill();
+      }
 
       // Orelha madura em perfil
       ctx.fillStyle = '#946340';
@@ -553,25 +596,41 @@
         // braço dianteiro desenhado NA FRENTE do tronco, sempre voltado +X.
         const armSwing = isWalk ? Math.sin(phi) * 0.32 : 0;
 
-        // Braço traseiro (sempre atrás, com leve balanço)
+        // Braço traseiro — agora obedece ao ciclo do rig (ângulo oposto ao
+        // braço da frente). Antes ele tinha um balanço próprio, desligado do
+        // passo, e ficava sempre do mesmo lado do tronco.
         ctx.save();
-        ctx.rotate(-armSwing);
-        ctx.fillStyle = '#0f172a';
-        ctx.beginPath();
-        ctx.moveTo(-2, -6);
-        ctx.lineTo(-5, 16);
-        ctx.lineTo(-1, 34);
-        ctx.lineTo(4, 33);
-        ctx.lineTo(1, 15);
-        ctx.closePath();
-        ctx.fill();
+        if (arms && arms.back) {
+          Rig.drawArmChain(ctx, {
+            upper: arms.back.upper,
+            fore: arms.back.fore,
+            upperLen: 32,
+            foreLen: 30,
+            width: 6.2,
+            color: '#0f172a',
+            colorDark: '#090d16',
+            cuffColor: '#94a3b8',
+            skin: '#b5764c',
+            skinDark: '#946340',
+            shade: arms.back.shade,
+            hand: arms.back.reaching ? 'open' : 'relaxed',
+            cuff: true
+          });
+        } else {
+          ctx.fillStyle = '#0f172a';
+          ctx.beginPath();
+          ctx.roundRect(-6, 0, 12, 52, 4);
+          ctx.fill();
+        }
         ctx.restore();
 
         // Braço dianteiro: posição depende da POSE, não só da caminhada
         const s = this._profilePoseArm();
         if (s) {
           ctx.save();
-          ctx.rotate(s.shoulder + armSwing * 0.5);
+          // Andando, o braço da frente soma o ciclo do rig ao gesto da pose;
+          // parado, fica só o gesto (que já vem calibrado de _profilePoseArm).
+          ctx.rotate(s.shoulder + (isWalk && arms ? arms.front.upper * 0.55 : 0));
           // Manga superior (camisa social azul-clara)
           const sleeve = ctx.createLinearGradient(0, 0, 14, s.upperLen);
           sleeve.addColorStop(0, '#cbd5e1');
@@ -992,8 +1051,8 @@
         // Braço dianteiro orientando o refletor externo na janela
         this._drawArticulatedArm(ctx, -0.72, -0.85, true, false, false);
       } else if (this.pose === 'holding_switch') {
-        // Braço dianteiro avançando para a chave geral de 10kV
-        this._drawArticulatedArm(ctx, -1.34, -0.34, true, false, true);
+        // Braço dianteiro voltado para frente em direção ao disjuntor (sem vazar para fora)
+        this._drawArticulatedArm(ctx, -0.35, 1.25, true, false, true);
       } else {
         this._drawDeskArm(ctx);
       }

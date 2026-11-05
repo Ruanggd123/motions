@@ -37,8 +37,18 @@
       // Expressão e Ciclos Fisiológicos
       this.mouthOpen = 0;
       this.blinkTimer = 0.6;
+      // Reação lateral (de que lado vem o que assusta) e intensidade 0..1.
+      this.reactSide = options.reactSide || null;
+      this.reactAmount = options.reactAmount !== undefined ? options.reactAmount : 0;
+
       this.isBlinking = false;
       this.time = 0;
+    }
+
+    /** Reage a algo vindo de um lado ('left' | 'right'), com entrada suave. */
+    reactToSide(side, amount = 1) {
+      this.reactSide = side === 'left' || side === 'right' ? side : null;
+      this.reactAmount = side ? Math.max(0, Math.min(1, amount)) : 0;
     }
 
     walk(speed = 1.0, dir = 1) {
@@ -146,6 +156,20 @@
     _drawProfile(ctx) {
       const phi = this.walkCycle;
       const isWalk = this.isWalking;
+      const Rig = global.StudioEngine && global.StudioEngine.BodyRig2D;
+      const arms = Rig
+        ? Rig.resolveProfileArms({
+          phase: phi,
+          walking: isWalk,
+          swing: 0.42,
+          elbowBase: 0.18,
+          elbowFollow: 0.45,
+          idleSwing: 0.05,
+          reactSide: this.reactSide,
+          reactAmount: this.reactAmount,
+          facingRight: !this.flipX
+        })
+        : null;
 
       const hipBob = isWalk ? Math.sin(phi * 2 - Math.PI / 2) * 3.0 : Math.sin(this.time * 1.0) * 0.6;
       const torsoTilt = isWalk ? 0.07 + Math.sin(phi * 2) * 0.015 : 0.04;
@@ -335,12 +359,23 @@
       ctx.fill();
       ctx.stroke();
 
-      // Friso decorativo vermelho no capacete
+      // Friso vermelho do capacete — acompanha a casca em vez de cruzar o topo.
+      // O arco antigo subia até y=-32 e, contra a luz, virava uma barbatana
+      // vermelha no topo do crânio (o "moicano" na vista de perfil).
       ctx.strokeStyle = '#ef4444';
       ctx.lineWidth = 2.4;
       ctx.beginPath();
-      ctx.moveTo(-14, -10);
-      ctx.quadraticCurveTo(0, -32, 14, -22);
+      ctx.moveTo(-15, -6);
+      ctx.bezierCurveTo(-17, -20, -8, -34, 2, -34);
+      ctx.bezierCurveTo(10, -34, 17, -27, 17, -18);
+      ctx.stroke();
+      // Linha de sombra logo abaixo, para dar espessura de casca
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(-15, -4);
+      ctx.bezierCurveTo(-17, -18, -8, -32, 2, -32);
+      ctx.bezierCurveTo(10, -32, 17, -25, 17, -16);
       ctx.stroke();
 
       // Cinta jugular sob o queixo
@@ -470,15 +505,23 @@
       ctx.translate(2, -4 + hipBob);
 
       if (this.pose === 'hold_bag') {
-        // Braço Traseiro balançando sutil
-        ctx.fillStyle = '#09090b';
-        ctx.beginPath();
-        ctx.moveTo(-2, -6);
-        ctx.lineTo(4, 16);
-        ctx.lineTo(12, 14);
-        ctx.lineTo(4, 6);
-        ctx.closePath();
-        ctx.fill();
+        // Braço traseiro pelo rig: balanço em oposição ao braço da frente.
+        ctx.save();
+        if (arms && arms.back) {
+          Rig.drawArmChain(ctx, {
+            upper: arms.back.upper, fore: arms.back.fore,
+            upperLen: 26, foreLen: 24, width: 5.4,
+            color: '#18181b', colorDark: '#09090b', cuffColor: '#09090b',
+            skin: '#27272a', skinDark: '#18181b',
+            shade: arms.back.shade, hand: arms.back.reaching ? 'open' : 'relaxed', cuff: true
+          });
+        } else {
+          ctx.fillStyle = '#09090b';
+          ctx.beginPath();
+          ctx.roundRect(-5.4, 0, 10.8, 50, 4);
+          ctx.fill();
+        }
+        ctx.restore();
 
         // Braço Dianteiro segurando a Sacola Kraft de Entrega
         const armGrad = ctx.createLinearGradient(0, -6, 20, 16);
@@ -523,10 +566,10 @@
         ctx.restore();
       } else if (this.pose === 'hands_glass' || this.pose === 'bang_gate') {
         // AMBOS OS BRAÇOS EM PERFIL ESPALMANDO/ESMURRANDO O VIDRO BLINDADO
-        // Braço Traseiro (Far Arm)
+        // Braço traseiro (Far Arm) — camada atrás do tronco, também no rig
         ctx.save();
         ctx.translate(-2, -4);
-        ctx.rotate(-0.85 + (this.pose === 'bang_gate' ? Math.sin(this.time * 16 + 0.5) * 0.12 : 0));
+        ctx.rotate((arms && arms.back ? arms.back.upper * 0.5 : 0) - 0.85 + (this.pose === 'bang_gate' ? Math.sin(this.time * 16 + 0.5) * 0.12 : 0));
         ctx.fillStyle = '#991b1b';
         ctx.beginPath();
         ctx.roundRect(-4, 0, 8, 28, 3);
@@ -570,19 +613,23 @@
         ctx.fill();
         ctx.restore();
       } else {
-        // Balanço natural dos braços
-        const armSwing = isWalk ? Math.sin(phi) * 0.40 : 0;
+        // Braço traseiro pelo rig (o da frente já foi desenhado no hold_bag
+        // como a sacola; aqui só o de trás precisa do balanço alternado).
         ctx.save();
-        ctx.rotate(armSwing);
-        ctx.fillStyle = '#dc2626';
-        ctx.beginPath();
-        ctx.moveTo(2, -6);
-        ctx.lineTo(4, 18);
-        ctx.lineTo(-2, 38);
-        ctx.lineTo(2, 40);
-        ctx.lineTo(8, 18);
-        ctx.closePath();
-        ctx.fill();
+        if (arms && arms.back) {
+          Rig.drawArmChain(ctx, {
+            upper: arms.back.upper, fore: arms.back.fore,
+            upperLen: 27, foreLen: 25, width: 5.6,
+            color: '#b91c1c', colorDark: '#7f1d1d', cuffColor: '#7f1d1d',
+            skin: '#27272a', skinDark: '#18181b',
+            shade: arms.back.shade, hand: arms.back.reaching ? 'open' : 'relaxed', cuff: true
+          });
+        } else {
+          ctx.fillStyle = '#dc2626';
+          ctx.beginPath();
+          ctx.roundRect(-5.6, 0, 11.2, 52, 4);
+          ctx.fill();
+        }
         ctx.restore();
       }
 
