@@ -107,3 +107,16 @@ Um gancho por episódio. Mais de um vira ruído.
 | Massa negra | na rua, engolindo postes; cresce a cada episódio |
 
 Atualize esta tabela ao final de cada episódio.
+
+---
+
+## 6. Pendências conhecidas do motor
+
+| # | Pendência | Evidência | Onde corrigir |
+| :-- | :--- | :--- | :--- |
+| 1 | Pés 14–38 px acima da sombra nos quatro rigs | medido em `probe_feet` no commit `8eba69f` **e** no atual (mesmo delta) — pré-existente | `_drawProfileLeg` de cada personagem e o `y` da sombra em `_drawProfile` |
+| 2 | Cena `portaria_noturna_2.5d` cobre o elenco com vinheta pesada em planos fechados | aparece quando o estúdio soma a própria vinheta | baixar `vignette()` da cena ou aplicar só no estúdio |
+| 3 | `blendLayers` troca de camada em `k > 0.5` sem interpolar a ordem | troca é abrupta num frame | interpolar opacidade entre as duas camadas no meio do blend |
+
+Corrigir a #1 antes de qualquer episódio novo: é o defeito visual mais
+antigo e o mais fácil de notar em plano aberto.
