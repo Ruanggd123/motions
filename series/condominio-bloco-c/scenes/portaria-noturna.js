@@ -194,7 +194,7 @@
 
         // Luz interna quente do refúgio
         const inside = c.createRadialGradient(gx + gw * 0.5, gy + gh * 0.45, 12, gx + gw * 0.5, gy + gh * 0.45, gw * 0.85);
-        inside.addColorStop(0, `rgba(253, 224, 71, ${alarm ? 0.07 : 0.26})`);
+        inside.addColorStop(0, `rgba(253, 224, 71, ${alarm ? 0.12 : 0.40})`);
         inside.addColorStop(1, 'rgba(253, 224, 71, 0)');
         c.fillStyle = inside;
         c.fillRect(gx + 9, gy + 9, gw - 18, gh - 18);
@@ -292,19 +292,22 @@
         // Luz de emergência lavando o piso
         if (alarm) D.glow(c, W * 0.5, floorY + 60, W * 0.6, '#ef4444', 0.05 + pulse * 0.06);
 
-        if (crew.voce) {
-          D.contactShadow(c, W * 0.245, floorY + 8, 74, 0.5);
-          D.poseActor(crew.voce, c, {
-            x: W * 0.245, y: floorY, scale: 2.15,
-            viewMode: 'front', pose: 'step_back', emotion: mood === 'panic' ? 'scared' : 'tense'
+        // O elenco olha para a CÂMERA (que está na entrada). flipX=false
+        // mantém o rosto voltado para o espectador.
+        if (crew.valdir) {
+          D.contactShadow(c, W * 0.115, floorY - 90, 78, 0.42);
+          D.poseActor(crew.valdir, c, {
+            x: W * 0.115, y: floorY - 96, scale: 2.30,
+            viewMode: 'front', pose: 'radio_talk', flipX: false,
+            emotion: mood === 'panic' ? 'panicked' : 'worried'
           });
         }
-        if (crew.valdir) {
-          D.contactShadow(c, W * 0.105, floorY + 6, 74, 0.5);
-          D.poseActor(crew.valdir, c, {
-            x: W * 0.105, y: floorY - 2, scale: 2.15,
-            viewMode: 'front', pose: 'radio_talk',
-            emotion: mood === 'panic' ? 'panicked' : 'worried'
+        if (crew.voce) {
+          D.contactShadow(c, W * 0.262, floorY - 88, 78, 0.42);
+          D.poseActor(crew.voce, c, {
+            x: W * 0.262, y: floorY - 96, scale: 2.30,
+            viewMode: 'front', pose: 'step_back', flipX: false,
+            emotion: mood === 'panic' ? 'scared' : 'tense'
           });
         }
         if (S.showLucas && crew.lucas) {
@@ -322,7 +325,7 @@
       name: 'bancada',
       depth: 0.92,
       draw(c) {
-        const dy = H * 0.700;
+        const dy = H * 0.762;
         // Bancada de granito em perspectiva
         c.fillStyle = '#0a0f18';
         c.beginPath();
@@ -413,9 +416,16 @@
     D.compose(ctx, { W, H, t }, [desk, near]);
     // Contraluz frio vindo da eclusa: separa o elenco do fundo e dá o
     // "recorte" de suspense, sem apagar os rostos.
-    D.glow(ctx, W * 0.60, H * 0.50, W * 0.42, '#7dd3fc', 0.05 + fear * 0.03);
+    D.glow(ctx, W * 0.60, H * 0.50, W * 0.42, '#7dd3fc', 0.08 + fear * 0.05);
+    // Luz-base do interior: sem ela o plano some na vinheta do estúdio.
+    const base = ctx.createRadialGradient(W * 0.30, H * 0.55, 40, W * 0.30, H * 0.55, W * 0.85);
+    base.addColorStop(0, 'rgba(203, 213, 225, 0.10)');
+    base.addColorStop(0.55, 'rgba(148, 163, 184, 0.045)');
+    base.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = base;
+    ctx.fillRect(0, 0, W, H);
     D.grain(ctx, W, H, 41, 0.032);
-    D.vignette(ctx, W, H, 0.74, 0.46, 0.46);
+    D.vignette(ctx, W, H, 0.58, 0.46, 0.46);
     ctx.restore();
   };
 
