@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duplo Sentido 3D — Ep 11: O Bolo Cresceu Demais! (Cartoon 3D Preview)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #070b14; color: #f8fafc;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 18px;
+    }
+    body.render-mode { padding: 0; background: #000; overflow: hidden; }
+    body.render-mode .controls-panel { display: none !important; }
+    body.render-mode .studio-layout { gap: 0; max-width: none; width: 100vw; justify-content: center; }
+    body.render-mode .viewport { width: 100vw; height: 100vh; max-width: none; border-radius: 0; border: none; box-shadow: none; }
+    body.render-mode .retention-bar { height: 10px; }
+    body.render-mode .top-hud { top: 32px; left: 34px; right: 34px; }
+    body.render-mode .channel-pill { font-size: 24px; padding: 12px 24px; border-width: 2px; }
+    body.render-mode .timer-pill { font-size: 26px; padding: 12px 24px; border-width: 2px; }
+    body.render-mode .word-pop-wrap { top: 120px; left: 34px; right: 34px; }
+    body.render-mode .word-pop { font-size: 36px; padding: 14px 30px; border-width: 4px; }
+    body.render-mode .subtitle-wrap { bottom: 240px; left: 48px; right: 48px; }
+    body.render-mode .subtitle-box {
+      padding: 20px 30px; border-radius: 26px; border-width: 3px;
+      box-shadow: 0 18px 46px rgba(0, 0, 0, 0.72);
+    }
+    body.render-mode .sub-speaker { font-size: 20px; padding: 4px 16px; margin-bottom: 8px; }
+    body.render-mode .sub-text { font-size: 40px; line-height: 1.20; }
+
+    .studio-layout { display: flex; gap: 20px; width: 100%; max-width: 1280px; align-items: flex-start; }
+    .viewport {
+      position: relative; width: 432px; height: 768px; flex-shrink: 0;
+      border-radius: 22px; overflow: hidden; border: 2px solid #1e293b;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.65); background: #0f172a;
+    }
+    canvas#stage { width: 100%; height: 100%; display: block; }
+
+    .retention-bar {
+      position: absolute; top: 0; left: 0; right: 0; height: 5px;
+      background: rgba(15, 23, 42, 0.55); pointer-events: none; z-index: 20;
+    }
+    .retention-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #ec4899 0%, #f472b6 60%, #facc15 100%);
+      box-shadow: 0 0 12px rgba(244, 114, 182, 0.85);
+    }
+
+    .top-hud {
+      position: absolute; top: 14px; left: 14px; right: 14px;
+      display: flex; justify-content: space-between; align-items: center;
+      pointer-events: none; z-index: 10;
+    }
+    .channel-pill {
+      background: rgba(10, 15, 28, 0.80); border: 1px solid rgba(244, 114, 182, 0.78);
+      color: #fbcfe8; font-size: 11px; font-weight: 800; letter-spacing: 0.06em; padding: 6px 11px; border-radius: 999px;
+    }
+    .timer-pill {
+      background: rgba(10, 15, 28, 0.82); border: 1px solid rgba(255,255,255,0.20);
+      color: #f8fafc; font-family: monospace; font-size: 12px; font-weight: 800; padding: 6px 11px; border-radius: 999px;
+    }
+    .word-pop-wrap {
+      position: absolute; top: 56px; left: 16px; right: 16px;
+      display: flex; justify-content: center; pointer-events: none; z-index: 10;
+    }
+    .word-pop {
+      background: rgba(15, 23, 42, 0.92); border: 2px solid #f472b6; color: #fbcfe8;
+      font-size: 15px; font-weight: 900; padding: 7px 14px; border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.48);
+      text-align: center; transform-origin: center center; will-change: transform;
+    }
+
+    .subtitle-wrap {
+      position: absolute; bottom: 13%; left: 18px; right: 18px;
+      display: flex; justify-content: center; pointer-events: none; z-index: 12;
+    }
+    .subtitle-box {
+      max-width: 96%;
+      background: rgba(9, 13, 24, 0.86);
+      border: 2px solid rgba(56, 189, 248, 0.78);
+      border-radius: 14px;
+      padding: 9px 14px;
+      text-align: center;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65);
+      transform-origin: center bottom;
+      will-change: transform, opacity;
+    }
+    .sub-speaker {
+      display: inline-block;
+      font-size: 10px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 2px 9px; border-radius: 999px; margin-bottom: 4px;
+      background: rgba(56, 189, 248, 0.22); color: #bae6fd;
+    }
+    .sub-speaker.camila {
+      background: rgba(250, 204, 21, 0.22); color: #fef08a;
+    }
+    .sub-text {
+      font-size: 17px; font-weight: 900; line-height: 1.24; color: #ffffff;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.92), 0 0 2px rgba(0, 0, 0, 0.95);
+    }
+    .sub-hl {
+      color: #facc15;
+      text-shadow: 0 2px 8px rgba(249, 115, 22, 0.65), 0 2px 4px rgba(0, 0, 0, 0.95);
+    }
+    .sub-hl-hot {
+      color: #f87171;
+      text-shadow: 0 2px 8px rgba(239, 68, 68, 0.65), 0 2px 4px rgba(0, 0, 0, 0.95);
+    }
+
+    .controls-panel {
+      flex: 1; background: #0d1322; border: 1px solid #1e293b; border-radius: 18px;
+      padding: 18px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .panel-title strong { font-size: 18px; color: #f8fafc; display: block; }
+    .badge-ep { font-size: 11px; font-weight: 700; color: #f472b6; letter-spacing: 0.05em; }
+    .playback-box { background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .time-slider { width: 100%; accent-color: #f472b6; cursor: pointer; }
+    .time-row { display: flex; justify-content: space-between; font-family: monospace; font-size: 12px; color: #94a3b8; }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { border: none; border-radius: 10px; padding: 9px 14px; font-size: 12px; font-weight: 800; cursor: pointer; }
+    .btn-play { background: linear-gradient(135deg, #db2777, #f472b6); color: #fff; }
+    .btn-secondary { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; }
+    .toggles-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: #cbd5e1; }
+    .toggles-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .beat-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 11px 13px; cursor: pointer; margin-bottom: 8px; }
+    .beat-card.active { border-color: #f472b6; background: rgba(244, 114, 182, 0.08); }
+    .beat-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .beat-label { font-size: 13px; font-weight: 800; }
+    .beat-tag { font-size: 10px; font-weight: 800; color: #f472b6; }
+    .beat-line { font-size: 13px; color: #e2e8f0; margin-bottom: 3px; }
+    .beat-sub { font-size: 11px; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="studio-layout">
+    <div class="viewport">
+      <canvas id="stage" width="720" height="1280"></canvas>
+      <div class="retention-bar"><div class="retention-fill" id="retentionFill"></div></div>
+      <div class="top-hud">
+        <div class="channel-pill">DUPLO SENTIDO 3D • EP 11</div>
+        <div class="timer-pill" id="hudTimer">⏱️ 34.5s</div>
+      </div>
+      <div class="word-pop-wrap">
+        <div class="word-pop" id="wordPop">TÁ INCHANDO SEM PARAR! 😱🎂</div>
+      </div>
+      <div class="subtitle-wrap">
+        <div class="subtitle-box" id="subtitleBox">
+          <div class="sub-speaker" id="subSpeaker">🎂 VOCÊ</div>
+          <div class="sub-text" id="subText"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <strong>🎂 Canal Duplo Sentido 3D — Ep 11: O Bolo Cresceu Demais!</strong>
+          <span class="badge-ep">EP 11 · CARTOON DISTORTION &amp; COMÉDIA · DOCERIA DA CAMILA ENSOLARADA</span>
+        </div>
+      </div>
+
+      <div class="playback-box">
+        <input type="range" class="time-slider" id="timeSlider" min="0" max="34.50" step="0.05" value="0">
+        <div class="time-row">
+          <span id="curTime">00:00.0</span>
+          <span id="totTime">00:34.5</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-play" id="btnPlay">▶ ASSISTIR COM FALAS E ÁUDIO</button>
+          <button class="btn btn-secondary" id="btnRevealJump">🎂 PULAR P/ REVELAÇÃO</button>
+          <button class="btn btn-secondary" id="btnReset">↺ INÍCIO</button>
+        </div>
+        <div class="toggles-row">
+          <label><input type="checkbox" id="chkMasterAudio" checked> 🔊 Vozes (Você + Camila) + Trilha Doceria + SFX Confeitaria</label>
+        </div>
+      </div>
+
+      <div id="pane-beats"></div>
+    </div>
+  </div>
+
+  <audio id="masterAudio" src="./audio/ep11_bolo_mix.wav?v=11.0" preload="auto"></audio>
+  <script src="./engine/three.min.js"></script>
+  <script src="./engine/CartoonDistort3D.js?v=11.0"></script>
+  <script src="./characters3d/CharacterFaceTextures.js"></script>
+  <script src="./characters3d/VoceMorador3D.js"></script>
+  <script src="./characters3d/DonaCamila3D.js"></script>
+  <script src="./characters3d/BoloForno3D.js?v=11.0"></script>
+  <script src="./audio/ep11_bolo_timeline.js?v=11.0"></script>
+  <script src="./scenes/Ep11BoloForno3D.js?v=11.0"></script>
+  <script src="./ep11-bolo-forno-data.js?v=11.0"></script>
+
+  <script>
+  (function () {
+    const DATA = window.EP11_BOLO_DATA;
+    const TL = window.EP11_BOLO_TIMELINE;
+    if (TL && Array.isArray(TL.beat_starts) && TL.beat_starts.length >= 6) {
+      DATA.duration = TL.duration;
+      DATA.beats.forEach((b, i) => {
+        b.time = TL.beat_starts[i] ?? b.time;
+        b.end = (i + 1 < TL.beat_starts.length) ? TL.beat_starts[i + 1] : TL.duration;
+      });
+    }
+
+    const isRenderMode = new URLSearchParams(window.location.search).get('render') === '1';
+    const isTestFast = new URLSearchParams(window.location.search).get('test') === '1';
+    if (isRenderMode) document.body.classList.add('render-mode');
+
+    const stage = document.getElementById('stage');
+    const ctx2d = stage.getContext('2d');
+    if (isRenderMode) { stage.width = 1080; stage.height = 1920; }
+    else if (isTestFast) { stage.width = 270; stage.height = 480; }
+
+    const renderer3d = new window.Ep11BoloForno3D({ highRes: isRenderMode, fastTest: isTestFast });
+    const masterAudio = document.getElementById('masterAudio');
+
+    const timeSlider = document.getElementById('timeSlider');
+    const curTimeEl = document.getElementById('curTime');
+    const totTimeEl = document.getElementById('totTime');
+    const hudTimerEl = document.getElementById('hudTimer');
+    const wordPopEl = document.getElementById('wordPop');
+    const retentionFillEl = document.getElementById('retentionFill');
+    const subtitleBoxEl = document.getElementById('subtitleBox');
+    const subSpeakerEl = document.getElementById('subSpeaker');
+    const subTextEl = document.getElementById('subText');
+    const btnPlay = document.getElementById('btnPlay');
+    const btnRevealJump = document.getElementById('btnRevealJump');
+    const btnReset = document.getElementById('btnReset');
+    const chkMasterAudio = document.getElementById('chkMasterAudio');
+
+    timeSlider.max = DATA.duration.toFixed(2);
+    totTimeEl.textContent = '00:' + (DATA.duration < 10 ? '0' : '') + DATA.duration.toFixed(1);
+    const revealTime = (DATA.beats[1] && DATA.beats[1].time) ? DATA.beats[1].time : 9.5;
+    btnRevealJump.textContent = '🎂 PULAR P/ REVELAÇÃO (' + revealTime.toFixed(1) + 's)';
+
+    const PUNCH_HOT_RE = /(TÁ INCHANDO SEM PARAR!|NÃO ABRE DE UMA VEZ!|EITA, OLHA A COBERTURA!|ABAIXA!|BOLO TURBINADO)/gi;
+    const PUNCH_GOLD_RE = /(estourar aqui dentro|três potes inteiros de fermento|Confia no confeiteiro!|cobertura ficou bem espalhada!|Bolo ambulante!|pensou besteira)/gi;
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function formatSubtitleHtml(text) {
+      let safe = escapeHtml(text);
+      safe = safe.replace(PUNCH_HOT_RE, '<span class="sub-hl-hot">$1</span>');
+      safe = safe.replace(PUNCH_GOLD_RE, '<span class="sub-hl">$1</span>');
+      return safe;
+    }
+
+    function buildSubtitleChunks(text, startT, endT) {
+      const clean = String(text || '').trim();
+      const dur = Math.max(0.4, endT - startT);
+      if (clean.length <= 46) {
+        return [{ start: startT, end: endT, text: clean }];
+      }
+
+      let splitIdx = -1;
+      const strongRe = /(\.\.\.|[!?])\s+/g;
+      let match;
+      let bestDist = Infinity;
+      while ((match = strongRe.exec(clean)) !== null) {
+        const idx = match.index + match[0].length;
+        const ratio = idx / clean.length;
+        if (ratio >= 0.28 && ratio <= 0.66) {
+          const dist = Math.abs(ratio - 0.48);
+          if (dist < bestDist) {
+            bestDist = dist;
+            splitIdx = idx;
+          }
+        }
+      }
+      if (splitIdx < 0) {
+        const commaRe = /,\s+/g;
+        bestDist = Infinity;
+        while ((match = commaRe.exec(clean)) !== null) {
+          const idx = match.index + match[0].length;
+          const ratio = idx / clean.length;
+          if (ratio >= 0.30 && ratio <= 0.66) {
+            const dist = Math.abs(ratio - 0.50);
+            if (dist < bestDist) {
+              bestDist = dist;
+              splitIdx = idx;
+            }
+          }
+        }
+      }
+      if (splitIdx < 0) {
+        const mid = Math.floor(clean.length * 0.46);
+        const rightSp = clean.indexOf(' ', mid);
+        const leftSp = clean.lastIndexOf(' ', mid);
+        splitIdx = (leftSp > 0 && (mid - leftSp) <= (rightSp - mid)) ? leftSp + 1 : (rightSp > 0 ? rightSp + 1 : mid);
+      }
+
+      const part1 = clean.slice(0, splitIdx).trim();
+      const part2 = clean.slice(splitIdx).trim();
+      if (!part1 || !part2) {
+        return [{ start: startT, end: endT, text: clean }];
+      }
+      const splitRatio = Math.max(0.32, Math.min(0.62, part1.length / (part1.length + part2.length)));
+      const midT = startT + dur * splitRatio;
+      return [
+        { start: startT, end: midT, text: part1 },
+        { start: midT, end: endT, text: part2 }
+      ];
+    }
+
+    const SUBTITLE_ITEMS = (function () {
+      const source = (TL && Array.isArray(TL.dialogues) && TL.dialogues.length > 0)
+        ? TL.dialogues
+        : [
+            { speaker: 'voce', text: 'CAMILA, TÁ INCHANDO SEM PARAR! Vai estourar aqui dentro se eu não tirar agora!', start: 0.05, end: 4.1 },
+            { speaker: 'camila', text: 'NÃO ABRE DE UMA VEZ! Se bater ar frio agora ele murcha e mela tudo!', start: 4.2, end: 8.2 },
+            { speaker: 'camila', text: 'Cê colocou três potes inteiros de fermento num bolo de festa?!', start: 8.4, end: 12.2 },
+            { speaker: 'voce', text: 'Confia no confeiteiro! Vai ficar fofinho, gigante e no ponto!', start: 12.5, end: 16.8 },
+            { speaker: 'camila', text: 'EITA, OLHA A COBERTURA! Vai explodir na tua cara! ABAIXA!', start: 17.1, end: 21.1 },
+            { speaker: 'voce', text: 'Olha só... pelo menos a cobertura ficou bem espalhada!', start: 22.6, end: 25.9 },
+            { speaker: 'camila', text: 'Bolo ambulante!', start: 26.2, end: 27.6 },
+            { speaker: 'voce', text: 'Se você riu ou pensou besteira no começo, comenta BOLO TURBINADO aí embaixo!', start: 27.8, end: 32.6 }
+          ];
+
+      const items = [];
+      for (let i = 0; i < source.length; i++) {
+        const d = source[i];
+        const isFirst = i === 0;
+        const isLast = i === source.length - 1;
+        const visStart = isFirst ? 0.0 : Math.max(0.0, (Number(d.start) || 0) - 0.04);
+        const rawEnd = Number(d.end) || (visStart + 3.5);
+        const nextStart = !isLast ? Math.max(rawEnd, (Number(source[i + 1].start) || rawEnd) - 0.05) : DATA.duration;
+        const visEnd = isLast ? DATA.duration : Math.min(nextStart, rawEnd + 0.14);
+        const chunks = buildSubtitleChunks(d.text, Number(d.start) || visStart, rawEnd);
+        for (let c = 0; c < chunks.length; c++) {
+          items.push({
+            speaker: d.speaker,
+            start: c === 0 ? visStart : chunks[c].start,
+            end: c === chunks.length - 1 ? visEnd : chunks[c].end,
+            html: formatSubtitleHtml(chunks[c].text)
+          });
+        }
+      }
+      return items;
+    })();
+
+    function getActiveSubtitle(t) {
+      for (let i = SUBTITLE_ITEMS.length - 1; i >= 0; i--) {
+        const it = SUBTITLE_ITEMS[i];
+        if (t >= it.start && t <= it.end) return it;
+      }
+      return null;
+    }
+
+    function elasticPopScale(age, span) {
+      const s = span || 0.38;
+      if (age <= 0) return 0.78;
+      if (age >= s) return 1.0;
+      const p = age / s;
+      const fade = 1 - p;
+      return 1.0 + fade * fade * Math.sin(p * Math.PI * 2.3 - 0.90) * 0.28;
+    }
+
+    function getActiveBeat(t) {
+      for (let i = DATA.beats.length - 1; i >= 0; i--) {
+        if (t >= DATA.beats[i].time) return DATA.beats[i];
+      }
+      return DATA.beats[0];
+    }
+
+    let lastBeatId = null;
+    let lastSubHtml = null;
+    function renderAt(t) {
+      const clampedT = Math.max(0, Math.min(DATA.duration, Number(t) || 0));
+      renderer3d.renderAt(clampedT);
+      ctx2d.clearRect(0, 0, stage.width, stage.height);
+      ctx2d.drawImage(renderer3d.webglCanvas, 0, 0, stage.width, stage.height);
+
+      const pct = Math.max(0, Math.min(100, (clampedT / Math.max(0.01, DATA.duration)) * 100));
+      retentionFillEl.style.width = pct.toFixed(2) + '%';
+
+      const rem = Math.max(0, DATA.duration - clampedT);
+      hudTimerEl.textContent = '⏱️ ' + rem.toFixed(1) + 's';
+      curTimeEl.textContent = '00:' + (clampedT < 10 ? '0' : '') + clampedT.toFixed(1);
+      timeSlider.value = clampedT.toFixed(2);
+
+      const beat = getActiveBeat(clampedT);
+      if (beat) {
+        const beatAge = Math.max(0, clampedT - beat.time);
+        const wpScale = elasticPopScale(beatAge, 0.40);
+        wordPopEl.textContent = beat.wordPop;
+        wordPopEl.style.borderColor = beat.wordColor;
+        wordPopEl.style.color = beat.wordColor;
+        wordPopEl.style.transform = 'scale(' + wpScale.toFixed(4) + ')';
+        if (beat.id !== lastBeatId) {
+          lastBeatId = beat.id;
+          document.querySelectorAll('.beat-card').forEach((el) => el.classList.toggle('active', el.dataset.beatId === beat.id));
+        }
+      }
+
+      const sub = getActiveSubtitle(clampedT);
+      if (sub) {
+        const subAge = Math.max(0, clampedT - sub.start);
+        const subScale = elasticPopScale(subAge, 0.28);
+        subtitleBoxEl.style.opacity = '1';
+        subtitleBoxEl.style.transform = 'scale(' + subScale.toFixed(4) + ')';
+        const isCamila = sub.speaker === 'camila';
+        subSpeakerEl.textContent = isCamila ? '💬 CAMILA' : '🎂 VOCÊ';
+        subSpeakerEl.classList.toggle('camila', isCamila);
+        subtitleBoxEl.style.borderColor = isCamila ? 'rgba(250, 204, 21, 0.78)' : 'rgba(56, 189, 248, 0.78)';
+        if (sub.html !== lastSubHtml) {
+          lastSubHtml = sub.html;
+          subTextEl.innerHTML = sub.html;
+        }
+      } else {
+        subtitleBoxEl.style.opacity = '0';
+      }
+    }
+
+    const paneBeats = document.getElementById('pane-beats');
+    DATA.beats.forEach((b) => {
+      const card = document.createElement('div');
+      card.className = 'beat-card';
+      card.dataset.beatId = b.id;
+      card.innerHTML = `<div class="beat-top"><span class="beat-label">${b.label}</span><span class="beat-tag">${b.tag}</span></div><div class="beat-line"><strong>${b.speaker}:</strong> "${b.line}"</div><div class="beat-sub">🎥 ${b.subtext}</div>`;
+      card.addEventListener('click', () => { curT = b.time; lastBeatId = null; try { masterAudio.currentTime = curT; } catch (_) {} renderAt(curT); });
+      paneBeats.appendChild(card);
+    });
+
+    let isPlaying = false, curT = 0, lastRaf = 0;
+    chkMasterAudio.addEventListener('change', () => { masterAudio.muted = !chkMasterAudio.checked; });
+    masterAudio.muted = !chkMasterAudio.checked;
+
+    masterAudio.addEventListener('ended', () => {
+      if (!isPlaying) return;
+      curT = 0; lastBeatId = null; masterAudio.currentTime = 0; masterAudio.play().catch(() => {});
+    });
+
+    function tick(now) {
+      if (!isPlaying) return;
+      if (!lastRaf) lastRaf = now;
+      const dt = Math.min(0.05, Math.max(0.001, (now - lastRaf) / 1000));
+      lastRaf = now;
+      curT += dt;
+      if (!masterAudio.paused && !masterAudio.ended) {
+        const drift = masterAudio.currentTime - curT;
+        if (Math.abs(drift) > 0.09) curT = masterAudio.currentTime;
+        else curT += drift * 0.12;
+      }
+      if (curT >= DATA.duration) { curT = 0; lastBeatId = null; }
+      renderAt(curT);
+      requestAnimationFrame(tick);
+    }
+
+    btnPlay.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      btnPlay.textContent = isPlaying ? '⏸ PAUSAR PREVIEW' : '▶ ASSISTIR COM FALAS E ÁUDIO';
+      if (isPlaying) {
+        lastBeatId = null; lastRaf = 0;
+        try { masterAudio.currentTime = curT; masterAudio.play().catch(() => {}); } catch (_) {}
+        requestAnimationFrame(tick);
+      } else { try { masterAudio.pause(); } catch (_) {} }
+    });
+    btnRevealJump.addEventListener('click', () => { curT = revealTime; lastBeatId = null; try { masterAudio.currentTime = curT; } catch (_) {} renderAt(curT); });
+    btnReset.addEventListener('click', () => { curT = 0; lastBeatId = null; try { masterAudio.currentTime = 0; } catch (_) {} renderAt(0); });
+    timeSlider.addEventListener('input', () => { curT = parseFloat(timeSlider.value) || 0; try { masterAudio.currentTime = curT; } catch (_) {} renderAt(curT); });
+
+    window.renderAt = (t) => renderAt(t);
+    window.__EP11_BOLO_DEBUG = renderer3d;
+    renderAt(0);
+  })();
+  </script>
+</body>
+</html>

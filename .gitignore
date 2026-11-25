@@ -26,6 +26,7 @@ __pycache__/
 
 # Heavy outputs
 output/*.mp4
+**/*.mp4
 # Large backups and archives
 backups_legados/
 *.zip
@@ -44,3 +45,8 @@ output/audicoes/
 .env
 .env.local
 .env.*.local
+
+# YouTube OAuth credentials & secrets
+.youtube-auth/
+*client_secret*.json
+*token*.json

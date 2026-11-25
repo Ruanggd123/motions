@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duplo Sentido 3D — Ep 02: Cacetinho Quentinho (Preview WebGL)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #070b14;
+      color: #f8fafc;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 18px;
+    }
+    body.render-mode { padding: 0; background: #000; overflow: hidden; }
+    body.render-mode .controls-panel { display: none !important; }
+    body.render-mode .studio-layout { gap: 0; max-width: none; width: 100vw; justify-content: center; }
+    body.render-mode .viewport { width: 100vw; height: 100vh; max-width: none; border-radius: 0; border: none; box-shadow: none; }
+
+    .studio-layout { display: flex; gap: 20px; width: 100%; max-width: 1280px; align-items: flex-start; }
+    .viewport {
+      position: relative;
+      width: 432px;
+      height: 768px;
+      flex-shrink: 0;
+      border-radius: 22px;
+      overflow: hidden;
+      border: 2px solid #1e293b;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.65);
+      background: #0f172a;
+    }
+    canvas#stage { width: 100%; height: 100%; display: block; }
+    .top-hud {
+      position: absolute; top: 14px; left: 14px; right: 14px;
+      display: flex; justify-content: space-between; align-items: center;
+      pointer-events: none; z-index: 10;
+    }
+    .channel-pill {
+      background: rgba(10, 15, 28, 0.76);
+      border: 1px solid rgba(250, 204, 21, 0.45);
+      color: #fde047; font-size: 11px; font-weight: 800; letter-spacing: 0.06em;
+      padding: 6px 11px; border-radius: 999px;
+    }
+    .timer-pill {
+      background: rgba(10, 15, 28, 0.80);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #f8fafc; font-family: monospace; font-size: 12px; font-weight: 800;
+      padding: 6px 11px; border-radius: 999px;
+    }
+    .word-pop-wrap {
+      position: absolute; top: 56px; left: 16px; right: 16px;
+      display: flex; justify-content: center; pointer-events: none; z-index: 10;
+    }
+    .word-pop {
+      background: rgba(15, 23, 42, 0.88);
+      border: 2px solid #fbbf24; color: #fef08a;
+      font-size: 15px; font-weight: 900; padding: 7px 14px; border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .controls-panel {
+      flex: 1; background: #0d1322; border: 1px solid #1e293b;
+      border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .panel-title strong { font-size: 18px; color: #f8fafc; display: block; }
+    .badge-ep { font-size: 11px; font-weight: 700; color: #facc15; letter-spacing: 0.05em; }
+    .playback-box {
+      background: #0f172a; border: 1px solid #1e293b; border-radius: 14px;
+      padding: 14px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .time-slider { width: 100%; accent-color: #f59e0b; cursor: pointer; }
+    .time-row { display: flex; justify-content: space-between; font-family: monospace; font-size: 12px; color: #94a3b8; }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { border: none; border-radius: 10px; padding: 9px 14px; font-size: 12px; font-weight: 800; cursor: pointer; }
+    .btn-play { background: linear-gradient(135deg, #f59e0b, #ea580c); color: #0b0f19; }
+    .btn-secondary { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; }
+    .toggles-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: #cbd5e1; }
+    .toggles-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+
+    .beat-card {
+      background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;
+      padding: 11px 13px; cursor: pointer; margin-bottom: 8px;
+    }
+    .beat-card.active { border-color: #facc15; background: rgba(250, 204, 21, 0.08); }
+    .beat-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .beat-label { font-size: 13px; font-weight: 800; }
+    .beat-tag { font-size: 10px; font-weight: 800; color: #facc15; }
+    .beat-line { font-size: 13px; color: #e2e8f0; margin-bottom: 3px; }
+    .beat-sub { font-size: 11px; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="studio-layout">
+    <div class="viewport">
+      <canvas id="stage" width="720" height="1280"></canvas>
+      <div class="top-hud">
+        <div class="channel-pill">DUPLO SENTIDO 3D • EP 02</div>
+        <div class="timer-pill" id="hudTimer">⏱️ 24.0s</div>
+      </div>
+      <div class="word-pop-wrap">
+        <div class="word-pop" id="wordPop">CACETINHO QUENTINHO?! 👀</div>
+      </div>
+    </div>
+
+    <div class="controls-panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <strong>🥖 Canal Duplo Sentido 3D — Ep 02: Cacetinho Quentinho</strong>
+          <span class="badge-ep">EP 02 · CATEGORIA: COMIDA &amp; COZINHA · CENÁRIO: COZINHA / PADARIA</span>
+        </div>
+      </div>
+
+      <div class="playback-box">
+        <input type="range" class="time-slider" id="timeSlider" min="0" max="24.0" step="0.05" value="0">
+        <div class="time-row">
+          <span id="curTime">00:00.0</span>
+          <span id="totTime">00:24.0</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-play" id="btnPlay">▶ ASSISTIR COM FALAS E ÁUDIO</button>
+          <button class="btn btn-secondary" id="btnRevealJump">🥖 PULAR P/ REVELAÇÃO</button>
+          <button class="btn btn-secondary" id="btnReset">↺ INÍCIO</button>
+        </div>
+        <div class="toggles-row">
+          <label><input type="checkbox" id="chkMasterAudio" checked> 🔊 Vozes VoiceStudio + Trilha + SFX (Master)</label>
+        </div>
+      </div>
+
+      <div id="pane-beats"></div>
+    </div>
+  </div>
+
+  <audio id="masterAudio" src="./audio/ep02_mix.wav?v=1.0" preload="auto"></audio>
+  <script src="./engine/three.min.js"></script>
+  <script src="./characters3d/CharacterFaceTextures.js"></script>
+  <script src="./characters3d/VoceMorador3D.js"></script>
+  <script src="./characters3d/PacocaCachorro3D.js"></script>
+  <script src="./characters3d/DonaCamila3D.js"></script>
+  <script src="./audio/ep02_timeline.js?v=1.0"></script>
+  <script src="./scenes/Ep02Cacetinho3D.js"></script>
+  <script src="./ep02-data.js"></script>
+
+  <script>
+  (function () {
+    const DATA = window.EP02_DUPLO_DATA;
+    const TL = window.EP02_DUPLO_TIMELINE;
+    if (TL && Array.isArray(TL.beat_starts) && TL.beat_starts.length >= 6) {
+      DATA.duration = TL.duration;
+      DATA.beats.forEach((b, i) => {
+        b.time = TL.beat_starts[i] ?? b.time;
+        b.end = (i + 1 < TL.beat_starts.length) ? TL.beat_starts[i + 1] : TL.duration;
+        b.label = b.label.replace(/\([^)]*\)/, '(' + b.time.toFixed(1) + 's)');
+        if (Array.isArray(TL.dialogues) && TL.dialogues[i] && TL.dialogues[i].text) b.line = TL.dialogues[i].text;
+      });
+    }
+
+    const isRenderMode = new URLSearchParams(window.location.search).get('render') === '1';
+    if (isRenderMode) document.body.classList.add('render-mode');
+
+    const stage = document.getElementById('stage');
+    const ctx2d = stage.getContext('2d');
+    if (isRenderMode) { stage.width = 1080; stage.height = 1920; }
+
+    const renderer3d = new window.Ep02Cacetinho3D({ highRes: isRenderMode });
+    const masterAudio = document.getElementById('masterAudio');
+    if (TL && TL.audio_src) masterAudio.src = TL.audio_src;
+
+    const timeSlider = document.getElementById('timeSlider');
+    const curTimeEl = document.getElementById('curTime');
+    const totTimeEl = document.getElementById('totTime');
+    const hudTimerEl = document.getElementById('hudTimer');
+    const wordPopEl = document.getElementById('wordPop');
+    const btnPlay = document.getElementById('btnPlay');
+    const btnRevealJump = document.getElementById('btnRevealJump');
+    const btnReset = document.getElementById('btnReset');
+    const chkMasterAudio = document.getElementById('chkMasterAudio');
+
+    timeSlider.max = DATA.duration.toFixed(2);
+    totTimeEl.textContent = '00:' + (DATA.duration < 10 ? '0' : '') + DATA.duration.toFixed(1);
+    const revealTime = (DATA.beats[1] && DATA.beats[1].time) ? DATA.beats[1].time : 3.5;
+    btnRevealJump.textContent = '🥖 PULAR P/ REVELAÇÃO (' + revealTime.toFixed(1) + 's)';
+
+    function getActiveBeat(t) {
+      for (let i = DATA.beats.length - 1; i >= 0; i--) {
+        if (t >= DATA.beats[i].time) return DATA.beats[i];
+      }
+      return DATA.beats[0];
+    }
+
+    let lastBeatId = null;
+    function renderAt(t) {
+      const clampedT = Math.max(0, Math.min(DATA.duration, Number(t) || 0));
+      renderer3d.renderAt(clampedT);
+      ctx2d.clearRect(0, 0, stage.width, stage.height);
+      ctx2d.drawImage(renderer3d.webglCanvas, 0, 0, stage.width, stage.height);
+
+      const rem = Math.max(0, DATA.duration - clampedT);
+      hudTimerEl.textContent = '⏱️ ' + rem.toFixed(1) + 's';
+      curTimeEl.textContent = '00:' + (clampedT < 10 ? '0' : '') + clampedT.toFixed(1);
+      timeSlider.value = clampedT.toFixed(2);
+
+      const beat = getActiveBeat(clampedT);
+      if (beat) {
+        wordPopEl.textContent = beat.wordPop;
+        wordPopEl.style.borderColor = beat.wordColor;
+        wordPopEl.style.color = beat.wordColor;
+        if (beat.id !== lastBeatId) {
+          lastBeatId = beat.id;
+          document.querySelectorAll('.beat-card').forEach((el) => {
+            el.classList.toggle('active', el.dataset.beatId === beat.id);
+          });
+        }
+      }
+    }
+
+    const paneBeats = document.getElementById('pane-beats');
+    DATA.beats.forEach((b) => {
+      const card = document.createElement('div');
+      card.className = 'beat-card';
+      card.dataset.beatId = b.id;
+      card.innerHTML =
+        `<div class="beat-top"><span class="beat-label">${b.label}</span><span class="beat-tag">${b.tag}</span></div>` +
+        `<div class="beat-line"><strong>${b.speaker}:</strong> "${b.line}"</div>` +
+        `<div class="beat-sub">🎥 ${b.subtext}</div>`;
+      card.addEventListener('click', () => {
+        curT = b.time;
+        lastBeatId = null;
+        try { masterAudio.currentTime = curT; } catch (_) {}
+        renderAt(curT);
+      });
+      paneBeats.appendChild(card);
+    });
+
+    let isPlaying = false, curT = 0, lastRaf = 0;
+    chkMasterAudio.addEventListener('change', () => { masterAudio.muted = !chkMasterAudio.checked; });
+    masterAudio.muted = !chkMasterAudio.checked;
+
+    masterAudio.addEventListener('ended', () => {
+      if (!isPlaying) return;
+      curT = 0; lastBeatId = null;
+      masterAudio.currentTime = 0;
+      masterAudio.play().catch(() => {});
+    });
+
+    function tick(now) {
+      if (!isPlaying) return;
+      if (!lastRaf) lastRaf = now;
+      const dt = Math.min(0.05, Math.max(0.001, (now - lastRaf) / 1000));
+      lastRaf = now;
+
+      // Avança suave em 60-144Hz com trava de fase leve no áudio (elimina engasgos do clock do HTMLAudio)
+      curT += dt;
+      if (!masterAudio.paused && !masterAudio.ended) {
+        const drift = masterAudio.currentTime - curT;
+        if (Math.abs(drift) > 0.09) curT = masterAudio.currentTime;
+        else curT += drift * 0.12;
+      }
+      if (curT >= DATA.duration) { curT = 0; lastBeatId = null; }
+      renderAt(curT);
+      requestAnimationFrame(tick);
+    }
+
+    btnPlay.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      btnPlay.textContent = isPlaying ? '⏸ PAUSAR PREVIEW' : '▶ ASSISTIR COM FALAS E ÁUDIO';
+      if (isPlaying) {
+        lastBeatId = null; lastRaf = 0;
+        try { masterAudio.currentTime = curT; masterAudio.play().catch(() => {}); } catch (_) {}
+        requestAnimationFrame(tick);
+      } else {
+        try { masterAudio.pause(); } catch (_) {}
+      }
+    });
+
+    btnRevealJump.addEventListener('click', () => {
+      curT = revealTime; lastBeatId = null;
+      try { masterAudio.currentTime = curT; } catch (_) {}
+      renderAt(curT);
+    });
+
+    btnReset.addEventListener('click', () => {
+      curT = 0; lastBeatId = null;
+      try { masterAudio.currentTime = 0; } catch (_) {}
+      renderAt(0);
+    });
+
+    timeSlider.addEventListener('input', () => {
+      curT = parseFloat(timeSlider.value) || 0;
+      try { masterAudio.currentTime = curT; } catch (_) {}
+      renderAt(curT);
+    });
+
+    window.renderAt = (t) => renderAt(t);
+    window.__EP02_DEBUG = renderer3d;
+    renderAt(0);
+  })();
+  </script>
+</body>
+</html>

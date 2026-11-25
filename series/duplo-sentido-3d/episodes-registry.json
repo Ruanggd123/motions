@@ -1,0 +1,372 @@
+{
+  "channel": "Duplo Sentido 3D — Humor, Virada & Duas Palavras",
+  "version": "1.0.0",
+  "rules": {
+    "noConsecutiveCategory": true,
+    "noConsecutiveScenario": true,
+    "hookMaxSeconds": 2.3,
+    "targetDurationRange": [
+      18,
+      26
+    ]
+  },
+  "episodes": [
+    {
+      "episode": 1,
+      "slug": "ep01-pinto-gigante",
+      "file": "ep01-pinto-gigante-3d.html",
+      "category": "Animais",
+      "scenario": "Quintal Solar",
+      "anchorWord": "Pinto Gigante",
+      "escalationWords": [
+        "segurar com as duas mãos",
+        "acorda em pé bicando tudo",
+        "vizinha assustada",
+        "fazer carinho"
+      ],
+      "literalReveal": "Pintinho amarelinho gigante 3D (1,70m) comendo milho no quintal",
+      "characters": [
+        "VoceMorador3D",
+        "GiantChick3D",
+        "DonaCamila3D",
+        "PacocaCachorro3D"
+      ],
+      "duration": 22.5,
+      "status": "preview_ready"
+    },
+    {
+      "episode": 2,
+      "slug": "ep02-lampada-genio",
+      "file": "ep02-lampada-genio-3d.html",
+      "category": "Fantasia / Comédia Literal",
+      "scenario": "Terraço Ensolarado do Prédio",
+      "anchorWord": "Lâmpada Mágica (Vara / Tanque Trincado / Dez Milhões)",
+      "escalationWords": [
+        "maior vara da rua",
+        "tanque trincado",
+        "dez milhões",
+        "comenta seu pedido"
+      ],
+      "literalReveal": "Gênio 3D Literal entrega vara de pescar 4m, tanque de concreto rachado e 10 milhos gigantes",
+      "characters": [
+        "VoceMorador3D",
+        "Genio3D",
+        "DonaCamila3D",
+        "PacocaCachorro3D"
+      ],
+      "status": "renewed_v2"
+    },
+    {
+      "episode": 3,
+      "slug": "ep03-periquito-vizinha",
+      "file": "ep03-periquito-vizinha-3d.html",
+      "category": "Animais & Casa",
+      "scenario": "Sala Ensolarada da Vizinha",
+      "anchorWord": "Periquito Solto",
+      "escalationWords": [
+        "entrou na minha sala",
+        "segurar firme com as duas mãos",
+        "passar o dedo na cabeça",
+        "voou na câmera"
+      ],
+      "literalReveal": "Periquito verde gordinho 3D fugindo da gaiola aberta pela sala",
+      "characters": [
+        "VoceMorador3D",
+        "DonaCamila3D",
+        "PacocaCachorro3D",
+        "Periquito3D"
+      ],
+      "duration": 35.43,
+      "status": "ready_to_post"
+    },
+    {
+      "episode": 4,
+      "slug": "ep04-mandioca-feira",
+      "file": "ep04-mandioca-feira-3d.html",
+      "category": "Comida & Cozinha",
+      "scenario": "Feira Livre Ensolarada",
+      "anchorWord": "Mandioca Grossa",
+      "escalationWords": [
+        "descascar uma mandioca grossa",
+        "pegando firme com as duas mãos",
+        "dura e pesada",
+        "derrete na boca",
+        "quebrou a balança"
+      ],
+      "literalReveal": "Mandioca gigante de 1 metro na barraca da feira com panela fumegante e balança quebrando",
+      "characters": [
+        "VoceMorador3D",
+        "DonaCamila3D",
+        "MandiocaGigante3D"
+      ],
+      "duration": 36.85,
+      "status": "ready_to_post"
+    },
+    {
+      "episode": 5,
+      "slug": "ep05-mangueira-oficina",
+      "file": "ep05-mangueira-oficina-3d.html",
+      "category": "Ferramentas & Oficina",
+      "scenario": "Oficina / Garagem Ensolarada de Domingo",
+      "anchorWord": "Mangueira da Vizinha",
+      "escalationWords": [
+        "mangueira grossa demais e não para de vazar",
+        "sai chicoteando a garagem",
+        "segurando firme com as duas mãos",
+        "dura de tanta pressão",
+        "apertar o bico demais vai espirrar jato na minha cara"
+      ],
+      "literalReveal": "Mangueira amarela de alta pressão com esguicho de latão lavando carro azul ensaboado na garagem",
+      "characters": [
+        "VoceMorador3D",
+        "DonaCamila3D",
+        "MangueiraPressao3D"
+      ],
+      "duration": 36.24,
+      "status": "ready_to_post"
+    },
+    {
+      "episode": 6,
+      "slug": "ep06-barra-academia",
+      "file": "ep06-barra-academia-3d.html",
+      "category": "Academia & Esporte",
+      "scenario": "Academia Ensolarada de Bairro",
+      "anchorWord": "Barra Grossa de 60kg",
+      "escalationWords": [
+        "barra grossa",
+        "sessenta quilos",
+        "pegar firme com as duas mãos",
+        "tá dura demais de subir",
+        "olha a trava na ponta",
+        "voou a trava"
+      ],
+      "literalReveal": "Barra olímpica cromada de 60kg cheia de anilhas coloridas envergando na academia de bairro com a trava voando e estourando nuvem de giz",
+      "characters": [
+        "VoceMorador3D",
+        "DonaCamila3D",
+        "BarraOlimpica3D"
+      ],
+      "duration": 32.7,
+      "status": "ready_to_post"
+    },
+    {
+      "episode": 7,
+      "slug": "ep07-linguica-churrasco",
+      "file": "ep07-linguica-churrasco-3d.html",
+      "category": "Churrasco & Lazer",
+      "scenario": "Área Gourmet Ensolarada de Domingo",
+      "anchorWord": "Linguiça Grossa do Churrasco",
+      "escalationWords": [
+        "linguiça tá grossa demais e não tá cabendo inteira",
+        "segurar o espeto comigo",
+        "quentinha pingando e pesada",
+        "cuidado na ponta",
+        "escorregou do espeto e explodiu farofa"
+      ],
+      "literalReveal": "Linguiça toscana artesanal gigante no espeto de inox na churrasqueira de tijolinho voando e explodindo farofa na mesa",
+      "characters": [
+        "VoceMorador3D",
+        "DonaCamila3D",
+        "EspetoChurrasco3D"
+      ],
+      "duration": 33.81,
+      "status": "ready_to_post"
+    },
+    {
+      "episode": 8,
+      "slug": "ep08-coco-praia",
+      "file": "ep08-coco-praia-3d.html",
+      "category": "Praia & Verão",
+      "scenario": "Quiosque de Praia Ensolarado",
+      "anchorWord": "Coco Duro da Praia",
+      "escalationWords": [
+        "bate com força e não para",
+        "duro demais, tem que abrir logo",
+        "furar coco com canudinho",
+        "respeita o caiçara",
+        "o coco tá escorregando do banco"
+      ],
+      "literalReveal": "Coco verde gigante no banco do quiosque rachando no meio, jorrando água de coco e virando capacete na cabeça do Você",
+      "characters": [
+        "VoceMorador3D",
+        "DonaCamila3D",
+        "CocoPraia3D"
+      ],
+      "duration": 32.88,
+      "status": "ready_to_post"
+    },
+    {
+      "episode": 9,
+      "slug": "ep09-cano-cozinha",
+      "file": "ep09-cano-cozinha-3d.html",
+      "category": "Casa & Reparos",
+      "scenario": "Cozinha Ensolarada",
+      "anchorWord": "Cano Estourado da Pia",
+      "escalationWords": [
+        "tampando o cano com o dedo",
+        "não solta agora",
+        "meia volta na chave inglesa",
+        "girando pro lado que solta",
+        "desentupiu a pia inteira"
+      ],
+      "literalReveal": "Cano de PVC inchando como balão, tampa voando e gêiser de água com desentupidor virando chapéu na cabeça do Você",
+      "characters": [
+        "VoceMorador3D",
+        "DonaCamila3D"
+      ],
+      "duration": 35.17,
+      "status": "ready_to_post"
+    },
+    {
+      "episode": 10,
+      "slug": "ep10-saco-mercado",
+      "file": "ep10-saco-mercado-3d.html",
+      "category": "Supermercado & Compras",
+      "scenario": "Mercadinho do Bairro Ensolarado",
+      "anchorWord": "Saco Pesado do Mercado",
+      "escalationWords": [
+        "segura por baixo senão rasga",
+        "fundo já tá cedendo",
+        "vinte quilos de compra",
+        "saco já abriu",
+        "não paguei sacola extra"
+      ],
+      "literalReveal": "Saco de papel gigante estufado rasgando o fundo no mercado, melancia voando e saco rasgado virando chapéu",
+      "characters": [
+        "VoceMorador3D",
+        "DonaCamila3D",
+        "SacoMercado3D"
+      ],
+      "duration": 31.64,
+      "status": "ready_to_post"
+    },
+    {
+      "episode": 11,
+      "slug": "ep11-bolo-forno",
+      "file": "ep11-bolo-forno-3d.html",
+      "category": "Doceria & Confeitaria",
+      "scenario": "Doceria da Camila Ensolarada",
+      "anchorWord": "Bolo Turbinado do Forno",
+      "escalationWords": [
+        "tá inchando sem parar",
+        "não abre de uma vez",
+        "três potes inteiros de fermento",
+        "olha a cobertura",
+        "cobertura ficou bem espalhada"
+      ],
+      "literalReveal": "Bolo gigante inchando no forno, cobertura rosa explodindo e coroa de glacê com cereja pousando na cabeça",
+      "characters": [
+        "VoceMorador3D",
+        "DonaCamila3D",
+        "BoloForno3D"
+      ],
+      "duration": 33.26,
+      "status": "ready_to_post"
+    },
+    {
+      "episode": 12,
+      "slug": "ep12-pneu-garagem",
+      "file": "ep12-pneu-garagem-3d.html",
+      "category": "Garagem & Carros",
+      "scenario": "Garagem Ensolarada do Bloco (Vaga 304)",
+      "anchorWord": "Macaco Hidráulico Travado",
+      "escalationWords": [
+        "tá travado aqui embaixo",
+        "bombeando sem parar e não sobe",
+        "trocava pneu em cinco minutos",
+        "pino vermelho vai soltar a pressão",
+        "pneu já tá até fora do carro"
+      ],
+      "literalReveal": "Macaco hidráulico vermelho travado na garagem, pino de pressão saltando, calota voando na lente e cone de trânsito virando chapéu",
+      "characters": [
+        "VoceMorador3D",
+        "DonaCamila3D",
+        "MacacoPneu3D"
+      ],
+      "duration": 37.46,
+      "status": "scheduled",
+      "youtubeId": "lTZhtb8NeTo",
+      "publishAt": "2026-11-26T12:00:00-03:00"
+    },
+    {
+      "episode": 13,
+      "slug": "ep13-colchao-sala",
+      "file": "ep13-colchao-sala-3d.html",
+      "category": "Casa & Decoração",
+      "scenario": "Sala Ensolarada da Camila",
+      "anchorWord": "Colchão Inflável King-Size",
+      "escalationWords": [
+        "para de mandar ar",
+        "segura a válvula firme",
+        "colchão de casal tamanho rei",
+        "medidor no vermelho",
+        "testei o conforto do travesseiro"
+      ],
+      "literalReveal": "Colchão inflável king-size entalado na sala pequena, válvula saltando na lente, explosão de plumas e almofada roxa virando chapéu",
+      "characters": [
+        "VoceMorador3D",
+        "DonaCamila3D",
+        "ColchaoInflavel3D"
+      ],
+      "duration": 34.27,
+      "status": "scheduled",
+      "youtubeId": "cGt4A2ClrzU",
+      "publishAt": "2026-11-26T19:30:00-03:00"
+    },
+    {
+      "episode": 14,
+      "slug": "ep14-furadeira-parede",
+      "file": "ep14-furadeira-parede-3d.html",
+      "category": "Casa & Reparos",
+      "scenario": "Oficina do Apartamento 304",
+      "anchorWord": "Furadeira Turbo",
+      "escalationWords": [
+        "segura forte por trás",
+        "vibrando demais",
+        "broca fumando",
+        "ventilação natural"
+      ],
+      "literalReveal": "Furadeira gigante na oficina do 304 para pendurar quadrinho pequeno, buraco revelando céu azul, broca voando e capacete amarelo pousando na cabeça",
+      "characters": [
+        "VoceMorador3D",
+        "DonaCamila3D",
+        "FuradeiraParede3D"
+      ],
+      "duration": 36.63,
+      "status": "scheduled",
+      "youtubeId": "DhqBmfZ2Yxg",
+      "publishAt": "2026-11-27T12:00:00-03:00"
+    },
+    {
+      "episode": 15,
+      "slug": "ep15-sorvete-casquinha",
+      "file": "ep15-sorvete-casquinha-3d.html",
+      "category": "Sobremesa & Verão",
+      "scenario": "Sorveteria do Bairro Ensolarada",
+      "anchorWord": "Sorvete Gigante",
+      "escalationWords": [
+        "lambe antes que escorra",
+        "não cabe tudo de uma vez na boca",
+        "sete bolas gigantes",
+        "refrescou a cuca inteira"
+      ],
+      "literalReveal": "Casquinha gigante com 7 bolas de sorvete derretendo no sol, bola voando na lente, torre desabando e casquinha virando chapéu",
+      "characters": [
+        "VoceMorador3D",
+        "DonaCamila3D",
+        "SorveteCasquinha3D"
+      ],
+      "duration": 33.65,
+      "status": "scheduled",
+      "youtubeId": "dduiHWaY7ug",
+      "publishAt": "2026-11-27T19:30:00-03:00"
+    }
+  ],
+  "nextRecommendedRotation": {
+    "episode": 16,
+    "category": "Jardim / Esporte / Banheiro",
+    "scenario": "A definir",
+    "anchorWord": "A definir",
+    "reason": "Evita repetir Casa & Reparos ou Sobremesa & Verão consecutivamente"
+  }
+}

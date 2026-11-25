@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duplo Sentido 3D — Ep 01: O Pinto Gigante (Estúdio Preview WebGL)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800;900&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #030712;
+      color: #f8fafc;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 18px;
+    }
+    body.render-mode {
+      padding: 0;
+      background: #000;
+      display: block;
+    }
+    body.render-mode .controls-panel { display: none !important; }
+    body.render-mode .studio-layout { max-width: none; gap: 0; width: 100vw; }
+    body.render-mode .viewport { width: 100vw; height: 100vh; border-radius: 0; border: none; box-shadow: none; }
+
+    .studio-layout {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      justify-content: center;
+      max-width: 1440px;
+      width: 100%;
+    }
+
+    .viewport {
+      position: relative;
+      width: 432px;
+      height: 768px;
+      border-radius: 22px;
+      overflow: hidden;
+      background: #0f172a;
+      box-shadow: 0 25px 65px rgba(0, 0, 0, 0.88), 0 0 0 1px rgba(255, 255, 255, 0.12);
+      flex-shrink: 0;
+    }
+    #stage {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* HUD minimalista no topo (Tela 3D Pura: zero legendas embaixo) */
+    .top-hud {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 20;
+    }
+    .channel-pill {
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(250, 204, 21, 0.45);
+      color: #fef08a;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 5px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.05em;
+    }
+    .timer-pill {
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #f8fafc;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 5px 10px;
+      border-radius: 999px;
+    }
+
+    /* Palavra Cinética de Gancho (Flutua no topo sob o HUD, zero barra embaixo) */
+    .word-pop-wrap {
+      position: absolute;
+      top: 56px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 20;
+    }
+    .word-pop {
+      background: rgba(15, 23, 42, 0.88);
+      border: 2px solid #facc15;
+      color: #facc15;
+      font-weight: 900;
+      font-size: 15px;
+      letter-spacing: 0.03em;
+      padding: 7px 16px;
+      border-radius: 999px;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      transform-origin: center;
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Overlay Safe Zone opcional (para inspeção) */
+    #safeOverlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: none;
+      z-index: 25;
+      border: 2px dashed rgba(56, 189, 248, 0.65);
+    }
+    #safeOverlay::after {
+      content: 'SHORTS SAFE ZONE • PROIBIDO TEXTO ABAIXO';
+      position: absolute;
+      bottom: 140px;
+      left: 12px;
+      right: 12px;
+      border-top: 2px dashed rgba(244, 63, 94, 0.8);
+      padding-top: 6px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 800;
+      color: #fda4af;
+    }
+
+    /* Painel Direito do Estúdio */
+    .controls-panel {
+      flex: 1;
+      max-width: 720px;
+      background: #0b1120;
+      border: 1px solid #1e293b;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 12px;
+    }
+    .panel-title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .panel-title strong { font-size: 18px; color: #f8fafc; }
+    .badge-ep {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 800;
+      color: #facc15;
+      background: rgba(250, 204, 21, 0.12);
+      border: 1px solid rgba(250, 204, 21, 0.35);
+      padding: 3px 9px;
+      border-radius: 999px;
+      width: fit-content;
+    }
+    .preview-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 800;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 6px 12px;
+      border-radius: 999px;
+    }
+
+    .playback-box {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .time-slider {
+      width: 100%;
+      accent-color: #facc15;
+      cursor: pointer;
+    }
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform 0.12s, filter 0.15s;
+    }
+    .btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .btn-play {
+      background: linear-gradient(135deg, #facc15, #f97316);
+      color: #0f172a;
+      flex: 1;
+    }
+    .btn-secondary {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+    }
+
+    .toggles-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: #cbd5e1;
+      align-items: center;
+    }
+    .toggles-row label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 8px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      padding: 7px 14px;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: rgba(250, 204, 21, 0.14);
+      border-color: #facc15;
+      color: #facc15;
+    }
+
+    .tab-pane { display: none; max-height: 430px; overflow-y: auto; padding-right: 4px; }
+    .tab-pane.active { display: flex; flex-direction: column; gap: 8px; }
+
+    .beat-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 11px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .beat-card:hover { border-color: #38bdf8; }
+    .beat-card.active {
+      border-color: #facc15;
+      background: rgba(250, 204, 21, 0.08);
+    }
+    .beat-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .beat-label { font-size: 13px; font-weight: 800; color: #f8fafc; }
+    .beat-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 800;
+      color: #facc15;
+    }
+    .beat-line { font-size: 13px; color: #e2e8f0; line-height: 1.4; margin-bottom: 4px; }
+    .beat-sub { font-size: 11px; color: #94a3b8; line-height: 1.35; }
+
+    .schema-box {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+    .schema-box h4 { color: #facc15; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .schema-pill {
+      display: inline-block;
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #7dd3fc;
+      margin-right: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="studio-layout">
+    <div class="viewport">
+      <canvas id="stage" width="720" height="1280"></canvas>
+
+      <div class="top-hud">
+        <div class="channel-pill">DUPLO SENTIDO 3D • EP 01</div>
+        <div class="timer-pill" id="hudTimer">⏱️ 22.5s</div>
+      </div>
+
+      <div class="word-pop-wrap">
+        <div class="word-pop" id="wordPop">PINTO GIGANTE?! 👀</div>
+      </div>
+
+      <div id="safeOverlay"></div>
+    </div>
+
+    <div class="controls-panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <strong>🐥 Canal Novo: Duplo Sentido 3D (Humor &amp; Virada)</strong>
+          <span class="badge-ep">EP 01 · CATEGORIA: ANIMAIS · CENÁRIO: QUINTAL SOLAR</span>
+        </div>
+        <span class="preview-pill">PREVIEW WEBGL • PRONTO P/ APROVAÇÃO</span>
+      </div>
+
+      <div class="playback-box">
+        <input type="range" class="time-slider" id="timeSlider" min="0" max="30.69" step="0.05" value="0">
+        <div class="time-row">
+          <span id="curTime">00:00.0</span>
+          <span id="totTime">00:30.7</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-play" id="btnPlay">▶ ASSISTIR COM FALAS E ÁUDIO</button>
+          <button class="btn btn-secondary" id="btnRevealJump">🐥 PULAR P/ REVELAÇÃO</button>
+          <button class="btn btn-secondary" id="btnReset">↺ INÍCIO</button>
+        </div>
+        <div class="toggles-row">
+          <label><input type="checkbox" id="chkMasterAudio" checked> 🔊 Vozes VoiceStudio + Trilha + SFX (Master)</label>
+          <label><input type="checkbox" id="chkSafeZone"> Safe Zone Shorts</label>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="beats">Batidas &amp; Câmera (6 Cortes)</button>
+        <button class="tab-btn" data-tab="schema">Esquema de Palavras</button>
+        <button class="tab-btn" data-tab="bible">Regras Anti-Repetição</button>
+      </div>
+
+      <div class="tab-pane active" id="pane-beats"></div>
+
+      <div class="tab-pane" id="pane-schema">
+        <div class="schema-box">
+          <h4>🎯 Engenharia de Duas Palavras (EP 01)</h4>
+          <p><span class="schema-pill">ÂNCORA B1</span> <strong>"Pinto Gigante"</strong> — Fala séria nos primeiros 0.0–1.9s com close fechado escondendo o caixote.</p>
+          <p><span class="schema-pill">DESARME 2.2s</span> Dolly-Out rápido revela o <strong>Pintinho Amarelinho de 1,70m</strong> pulando no quintal!</p>
+          <p><span class="schema-pill">ESCADA #2</span> <em>"Segurar firme com as duas mãos pra não escapar"</em> → ele tenta abraçar o pintinho gordo e leva um tombo.</p>
+          <p><span class="schema-pill">ESCADA #3</span> <em>"Acorda em pé e bicando tudo pela frente"</em> → pintinho bicando milho e o chinelo às 6h da manhã.</p>
+          <p><span class="schema-pill">TESTEMUNHA</span> Vizinha Camila boquiaberta atrás da cerca + Paçoca latindo antes do corte final.</p>
+          <p><span class="schema-pill">CTA FINAL</span> <em>"Você teria coragem de fazer carinho no meu pinto gigante? Comenta aqui!"</em></p>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="pane-bible">
+        <div class="schema-box">
+          <h4>📖 Bíblia do Canal (biblia-duplo-sentido-3d.md)</h4>
+          <p><strong>1. Regra da 1ª Palavra:</strong> Zero introdução. A isca verbal sai nos primeiros 300ms com câmera fechada.</p>
+          <p><strong>2. Rodízio Obrigatório:</strong> Nunca repetir Categoria (Animais → Comida → Objetos → Casa) nem Cenário em episódios seguidos. Próximo recomendado: <em>Ep 02 — Cacetinho Quentinho (Padaria/Cozinha)</em>.</p>
+          <p><strong>3. Monetização Segura:</strong> Zero palavrão, zero insinuação pesada. Tudo resolve em comédia 3D inocente em menos de 3s.</p>
+          <p><strong>4. Só Gero MP4 Após Você Aprovar:</strong> Se gostou desse protótipo 3D, me avise que eu gravo as vozes no VoiceStudio e renderizo em Full HD!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Áudio Master VoiceStudio + Engine Three.js + Personagens Oficiais + Cena EP 01 -->
+  <audio id="masterAudio" src="./audio/ep01_mix.wav?v=1.1" preload="auto"></audio>
+  <script src="./engine/three.min.js"></script>
+  <script src="./characters3d/CharacterFaceTextures.js"></script>
+  <script src="./characters3d/VoceMorador3D.js"></script>
+  <script src="./characters3d/PacocaCachorro3D.js"></script>
+  <script src="./characters3d/DonaCamila3D.js"></script>
+  <script src="./audio/ep01_timeline.js?v=1.1"></script>
+  <script src="./scenes/Ep01PintoGigante3D.js"></script>
+  <script src="./ep01-data.js"></script>
+
+  <script>
+  (function () {
+    const DATA = window.EP01_DUPLO_DATA;
+    const TL = window.EP01_DUPLO_TIMELINE;
+    if (TL && Array.isArray(TL.beat_starts) && TL.beat_starts.length >= 6) {
+      DATA.duration = TL.duration;
+      DATA.beats.forEach((b, i) => {
+        b.time = TL.beat_starts[i] ?? b.time;
+        b.end = (i + 1 < TL.beat_starts.length) ? TL.beat_starts[i + 1] : TL.duration;
+        b.label = b.label.replace(/\([^)]*\)/, '(' + b.time.toFixed(1) + 's)');
+        if (Array.isArray(TL.dialogues) && TL.dialogues[i] && TL.dialogues[i].text) {
+          b.line = TL.dialogues[i].text;
+        }
+      });
+    }
+
+    const isRenderMode = new URLSearchParams(window.location.search).get('render') === '1';
+    if (isRenderMode) document.body.classList.add('render-mode');
+
+    const stage = document.getElementById('stage');
+    const ctx2d = stage.getContext('2d');
+    if (isRenderMode) {
+      stage.width = 1080;
+      stage.height = 1920;
+    }
+
+    const renderer3d = new window.Ep01PintoGigante3D({ highRes: isRenderMode });
+
+    const masterAudio = document.getElementById('masterAudio');
+    if (TL && TL.audio_src) {
+      masterAudio.src = TL.audio_src;
+    }
+
+    const timeSlider = document.getElementById('timeSlider');
+    const curTimeEl = document.getElementById('curTime');
+    const totTimeEl = document.getElementById('totTime');
+    const hudTimerEl = document.getElementById('hudTimer');
+    const wordPopEl = document.getElementById('wordPop');
+    const btnPlay = document.getElementById('btnPlay');
+    const btnRevealJump = document.getElementById('btnRevealJump');
+    const btnReset = document.getElementById('btnReset');
+    const chkMasterAudio = document.getElementById('chkMasterAudio');
+    const chkSafeZone = document.getElementById('chkSafeZone');
+    const safeOverlay = document.getElementById('safeOverlay');
+
+    timeSlider.max = DATA.duration.toFixed(2);
+    totTimeEl.textContent = '00:' + (DATA.duration < 10 ? '0' : '') + DATA.duration.toFixed(1);
+    const revealTime = (DATA.beats[1] && DATA.beats[1].time) ? DATA.beats[1].time : 2.2;
+    btnRevealJump.textContent = '🐥 PULAR P/ REVELAÇÃO (' + revealTime.toFixed(1) + 's)';
+
+    function getActiveBeat(t) {
+      for (let i = DATA.beats.length - 1; i >= 0; i--) {
+        if (t >= DATA.beats[i].time) return DATA.beats[i];
+      }
+      return DATA.beats[0];
+    }
+
+    let lastBeatId = null;
+    function renderAt(t) {
+      const clampedT = Math.max(0, Math.min(DATA.duration, Number(t) || 0));
+      renderer3d.renderAt(clampedT);
+      ctx2d.clearRect(0, 0, stage.width, stage.height);
+      ctx2d.drawImage(renderer3d.webglCanvas, 0, 0, stage.width, stage.height);
+
+      const rem = Math.max(0, DATA.duration - clampedT);
+      hudTimerEl.textContent = '⏱️ ' + rem.toFixed(1) + 's';
+      curTimeEl.textContent = '00:' + (clampedT < 10 ? '0' : '') + clampedT.toFixed(1);
+      timeSlider.value = clampedT.toFixed(2);
+
+      const beat = getActiveBeat(clampedT);
+      if (beat) {
+        wordPopEl.textContent = beat.wordPop;
+        wordPopEl.style.borderColor = beat.wordColor;
+        wordPopEl.style.color = beat.wordColor;
+
+        if (beat.id !== lastBeatId) {
+          lastBeatId = beat.id;
+          wordPopEl.style.transform = 'scale(1.14)';
+          setTimeout(() => { wordPopEl.style.transform = 'scale(1.0)'; }, 180);
+
+          document.querySelectorAll('.beat-card').forEach((el) => {
+            el.classList.toggle('active', el.dataset.beatId === beat.id);
+          });
+        }
+      }
+    }
+
+    // Popula painel de batidas
+    const paneBeats = document.getElementById('pane-beats');
+    DATA.beats.forEach((b) => {
+      const card = document.createElement('div');
+      card.className = 'beat-card';
+      card.dataset.beatId = b.id;
+      card.innerHTML =
+        `<div class="beat-top"><span class="beat-label">${b.label}</span><span class="beat-tag">${b.tag}</span></div>` +
+        `<div class="beat-line"><strong>${b.speaker}:</strong> "${b.line}"</div>` +
+        `<div class="beat-sub">🎥 ${b.subtext}</div>`;
+      card.addEventListener('click', () => {
+        curT = b.time;
+        lastBeatId = null;
+        try { masterAudio.currentTime = curT; } catch (_) {}
+        renderAt(curT);
+      });
+      paneBeats.appendChild(card);
+    });
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach((p) => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('pane-' + btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Controle de Playback Sincronizado com masterAudio
+    let isPlaying = false;
+    let curT = 0;
+    let lastRaf = 0;
+
+    function syncAudioMute() {
+      masterAudio.muted = !chkMasterAudio.checked;
+    }
+    chkMasterAudio.addEventListener('change', syncAudioMute);
+    syncAudioMute();
+
+    masterAudio.addEventListener('ended', () => {
+      if (!isPlaying) return;
+      curT = 0;
+      lastBeatId = null;
+      masterAudio.currentTime = 0;
+      masterAudio.play().catch(() => {});
+    });
+
+    function tick(now) {
+      if (!isPlaying) return;
+      if (!lastRaf) lastRaf = now;
+      const dt = Math.min(0.05, Math.max(0.001, (now - lastRaf) / 1000));
+      lastRaf = now;
+
+      curT += dt;
+      if (!masterAudio.paused && !masterAudio.ended) {
+        const drift = masterAudio.currentTime - curT;
+        if (Math.abs(drift) > 0.09) curT = masterAudio.currentTime;
+        else curT += drift * 0.12;
+      } else if (curT >= DATA.duration) {
+        curT = 0;
+        lastBeatId = null;
+        try { masterAudio.currentTime = 0; } catch (_) {}
+      }
+      renderAt(curT);
+      requestAnimationFrame(tick);
+    }
+
+    btnPlay.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      btnPlay.textContent = isPlaying ? '⏸ PAUSAR PREVIEW' : '▶ ASSISTIR COM FALAS E ÁUDIO';
+      if (isPlaying) {
+        lastBeatId = null;
+        lastRaf = 0;
+        syncAudioMute();
+        try {
+          if (curT >= DATA.duration - 0.1) curT = 0;
+          masterAudio.currentTime = curT;
+          masterAudio.play().catch(() => {});
+        } catch (_) {}
+        requestAnimationFrame(tick);
+      } else {
+        try { masterAudio.pause(); } catch (_) {}
+      }
+    });
+
+    btnRevealJump.addEventListener('click', () => {
+      curT = revealTime;
+      lastBeatId = null;
+      try { masterAudio.currentTime = curT; } catch (_) {}
+      renderAt(curT);
+    });
+
+    btnReset.addEventListener('click', () => {
+      curT = 0;
+      lastBeatId = null;
+      try { masterAudio.currentTime = 0; } catch (_) {}
+      renderAt(0);
+    });
+
+    timeSlider.addEventListener('input', () => {
+      curT = parseFloat(timeSlider.value) || 0;
+      try { masterAudio.currentTime = curT; } catch (_) {}
+      renderAt(curT);
+    });
+
+    chkSafeZone.addEventListener('change', () => {
+      safeOverlay.style.display = chkSafeZone.checked ? 'block' : 'none';
+    });
+
+    window.renderAt = (t) => renderAt(t);
+    renderAt(0);
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duplo Sentido 3D — Ep 06: A Barra Dura da Academia! (Preview WebGL)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #070b14; color: #f8fafc;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 18px;
+    }
+    body.render-mode { padding: 0; background: #000; overflow: hidden; }
+    body.render-mode .controls-panel { display: none !important; }
+    body.render-mode .studio-layout { gap: 0; max-width: none; width: 100vw; justify-content: center; }
+    body.render-mode .viewport { width: 100vw; height: 100vh; max-width: none; border-radius: 0; border: none; box-shadow: none; }
+    body.render-mode .progress-bar-track { height: 10px; }
+    body.render-mode .top-hud { top: 32px; left: 34px; right: 34px; }
+    body.render-mode .channel-pill { font-size: 24px; padding: 12px 24px; border-width: 2px; }
+    body.render-mode .timer-pill { font-size: 26px; padding: 12px 24px; border-width: 2px; }
+    body.render-mode .word-pop-wrap { top: 120px; }
+    body.render-mode .word-pop { font-size: 36px; padding: 14px 30px; border-width: 4px; }
+    body.render-mode .subtitle-wrap { bottom: 240px; left: 48px; right: 48px; }
+    body.render-mode .subtitle-speaker { font-size: 22px; padding: 6px 20px; margin-bottom: 10px; border-width: 2px; letter-spacing: 0.08em; }
+    body.render-mode .subtitle-box {
+      font-size: 46px; line-height: 1.18; padding: 18px 28px;
+      border-radius: 26px; border-width: 3px; max-width: 960px;
+      text-shadow: 0 4px 0 rgba(0,0,0,0.95), 0 0 18px rgba(0,0,0,0.85);
+    }
+
+    .studio-layout { display: flex; gap: 20px; width: 100%; max-width: 1280px; align-items: flex-start; }
+    .viewport {
+      position: relative; width: 432px; height: 768px; flex-shrink: 0;
+      border-radius: 22px; overflow: hidden; border: 2px solid #1e293b;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.65); background: #0f172a;
+    }
+    canvas#stage { width: 100%; height: 100%; display: block; }
+
+    .progress-bar-track {
+      position: absolute; top: 0; left: 0; right: 0; height: 5px;
+      background: rgba(15, 23, 42, 0.55); pointer-events: none; z-index: 20;
+    }
+    .progress-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #ef4444 0%, #facc15 55%, #22c55e 100%);
+      box-shadow: 0 0 12px rgba(250, 204, 21, 0.65);
+    }
+
+    .top-hud {
+      position: absolute; top: 14px; left: 14px; right: 14px;
+      display: flex; justify-content: space-between; align-items: center;
+      pointer-events: none; z-index: 10;
+    }
+    .channel-pill {
+      background: rgba(10, 15, 28, 0.78); border: 1px solid rgba(239, 68, 68, 0.72);
+      color: #fca5a5; font-size: 11px; font-weight: 800; letter-spacing: 0.06em; padding: 6px 11px; border-radius: 999px;
+    }
+    .timer-pill {
+      background: rgba(10, 15, 28, 0.80); border: 1px solid rgba(255,255,255,0.18);
+      color: #f8fafc; font-family: monospace; font-size: 12px; font-weight: 800; padding: 6px 11px; border-radius: 999px;
+    }
+    .word-pop-wrap {
+      position: absolute; top: 56px; left: 16px; right: 16px;
+      display: flex; justify-content: center; pointer-events: none; z-index: 10;
+    }
+    .word-pop {
+      background: rgba(15, 23, 42, 0.92); border: 2px solid #ef4444; color: #fca5a5;
+      font-size: 15px; font-weight: 900; padding: 7px 14px; border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.48);
+      transform-origin: center center;
+      will-change: transform;
+    }
+
+    .subtitle-wrap {
+      position: absolute; bottom: 13%; left: 18px; right: 18px;
+      display: flex; flex-direction: column; align-items: center;
+      pointer-events: none; z-index: 15;
+    }
+    .subtitle-speaker {
+      display: inline-block;
+      background: rgba(15, 23, 42, 0.90);
+      border: 1px solid #38bdf8;
+      color: #7dd3fc;
+      font-size: 10px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 999px; margin-bottom: 5px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.45);
+    }
+    .subtitle-speaker.camila {
+      border-color: #facc15; color: #fde047;
+    }
+    .subtitle-box {
+      background: rgba(8, 13, 25, 0.86);
+      border: 2px solid rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+      font-size: 18px; font-weight: 900; line-height: 1.20;
+      text-align: center; text-transform: uppercase; letter-spacing: 0.015em;
+      padding: 8px 13px; border-radius: 13px; max-width: 96%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.65);
+      text-shadow: 0 2px 0 rgba(0,0,0,0.95), 0 0 8px rgba(0,0,0,0.85);
+      transform-origin: center bottom;
+      will-change: transform;
+    }
+    .subtitle-box .sub-hot {
+      color: #ff4d4f;
+      text-shadow: 0 3px 0 rgba(0,0,0,0.98), 0 0 14px rgba(239, 68, 68, 0.62);
+    }
+    .subtitle-box .sub-gold {
+      color: #facc15;
+      text-shadow: 0 3px 0 rgba(0,0,0,0.98), 0 0 14px rgba(250, 204, 21, 0.58);
+    }
+
+    .controls-panel {
+      flex: 1; background: #0d1322; border: 1px solid #1e293b; border-radius: 18px;
+      padding: 18px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .panel-title strong { font-size: 18px; color: #f8fafc; display: block; }
+    .badge-ep { font-size: 11px; font-weight: 700; color: #facc15; letter-spacing: 0.05em; }
+    .playback-box { background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .time-slider { width: 100%; accent-color: #ef4444; cursor: pointer; }
+    .time-row { display: flex; justify-content: space-between; font-family: monospace; font-size: 12px; color: #94a3b8; }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { border: none; border-radius: 10px; padding: 9px 14px; font-size: 12px; font-weight: 800; cursor: pointer; }
+    .btn-play { background: linear-gradient(135deg, #ef4444, #f59e0b); color: #04101d; }
+    .btn-secondary { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; }
+    .toggles-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: #cbd5e1; }
+    .toggles-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .beat-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 11px 13px; cursor: pointer; margin-bottom: 8px; }
+    .beat-card.active { border-color: #ef4444; background: rgba(239, 68, 68, 0.08); }
+    .beat-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .beat-label { font-size: 13px; font-weight: 800; }
+    .beat-tag { font-size: 10px; font-weight: 800; color: #facc15; }
+    .beat-line { font-size: 13px; color: #e2e8f0; margin-bottom: 3px; }
+    .beat-sub { font-size: 11px; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="studio-layout">
+    <div class="viewport">
+      <canvas id="stage" width="720" height="1280"></canvas>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+      </div>
+      <div class="top-hud">
+        <div class="channel-pill">DUPLO SENTIDO 3D • EP 06</div>
+        <div class="timer-pill" id="hudTimer">⏱️ 32.7s</div>
+      </div>
+      <div class="word-pop-wrap">
+        <div class="word-pop" id="wordPop">PARA DE TREMER E ENCAIXA! 😱🔥</div>
+      </div>
+      <div class="subtitle-wrap" id="subtitleWrap">
+        <div class="subtitle-speaker camila" id="subtitleSpeaker">CAMILA</div>
+        <div class="subtitle-box" id="subtitleBox"></div>
+      </div>
+    </div>
+
+    <div class="controls-panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <strong>🏋️ Canal Duplo Sentido 3D — Ep 06: A Barra Dura da Academia!</strong>
+          <span class="badge-ep">EP 06 v3 · IN MEDIA RES · DISTORÇÃO CARTOON 3D · BARRA 60KG EM U</span>
+        </div>
+      </div>
+
+      <div class="playback-box">
+        <input type="range" class="time-slider" id="timeSlider" min="0" max="32.7" step="0.05" value="0">
+        <div class="time-row">
+          <span id="curTime">00:00.0</span>
+          <span id="totTime">00:32.7</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-play" id="btnPlay">▶ ASSISTIR COM FALAS E ÁUDIO</button>
+          <button class="btn btn-secondary" id="btnRevealJump">🏋️ PULAR P/ REVELAÇÃO</button>
+          <button class="btn btn-secondary" id="btnReset">↺ INÍCIO</button>
+        </div>
+        <div class="toggles-row">
+          <label><input type="checkbox" id="chkMasterAudio" checked> 🔊 Vozes (Camila + Você) + Trilha Academia + SFX Cartoon/Anilhas/Giz</label>
+        </div>
+      </div>
+
+      <div id="pane-beats"></div>
+    </div>
+  </div>
+
+  <audio id="masterAudio" src="./audio/ep06_academia_mix.wav?v=6.4" preload="auto"></audio>
+  <script src="./engine/three.min.js"></script>
+  <script src="./engine/CartoonDistort3D.js?v=6.4"></script>
+  <script src="./characters3d/CharacterFaceTextures.js"></script>
+  <script src="./characters3d/VoceMorador3D.js"></script>
+  <script src="./characters3d/DonaCamila3D.js"></script>
+  <script src="./characters3d/BarraOlimpica3D.js?v=6.4"></script>
+  <script src="./audio/ep06_academia_timeline.js?v=6.4"></script>
+  <script src="./scenes/Ep06BarraAcademia3D.js?v=6.4"></script>
+  <script src="./ep06-barra-academia-data.js?v=6.4"></script>
+
+  <script>
+  (function () {
+    const DATA = window.EP06_ACADEMIA_DATA;
+    const TL = window.EP06_ACADEMIA_TIMELINE;
+    if (TL && Array.isArray(TL.beat_starts) && TL.beat_starts.length >= 6) {
+      DATA.duration = TL.duration;
+      DATA.beats.forEach((b, i) => {
+        b.time = TL.beat_starts[i] ?? b.time;
+        b.end = (i + 1 < TL.beat_starts.length) ? TL.beat_starts[i + 1] : TL.duration;
+        if (Array.isArray(TL.dialogues)) {
+          const lines = TL.dialogues.filter((d) => d.beat_idx === i && d.text).map((d) => d.text);
+          if (lines.length > 0) b.line = lines.join(' — ');
+        }
+      });
+    }
+
+    const isRenderMode = new URLSearchParams(window.location.search).get('render') === '1';
+    const isTestFast = new URLSearchParams(window.location.search).get('test') === '1';
+    if (isRenderMode) document.body.classList.add('render-mode');
+
+    const stage = document.getElementById('stage');
+    const ctx2d = stage.getContext('2d');
+    if (isRenderMode) { stage.width = 1080; stage.height = 1920; }
+    else if (isTestFast) { stage.width = 270; stage.height = 480; }
+
+    const renderer3d = new window.Ep06BarraAcademia3D({ highRes: isRenderMode, fastTest: isTestFast });
+    const masterAudio = document.getElementById('masterAudio');
+
+    const timeSlider = document.getElementById('timeSlider');
+    const curTimeEl = document.getElementById('curTime');
+    const totTimeEl = document.getElementById('totTime');
+    const hudTimerEl = document.getElementById('hudTimer');
+    const wordPopEl = document.getElementById('wordPop');
+    const progressBarFill = document.getElementById('progressBarFill');
+    const subtitleWrap = document.getElementById('subtitleWrap');
+    const subtitleSpeaker = document.getElementById('subtitleSpeaker');
+    const subtitleBox = document.getElementById('subtitleBox');
+    const btnPlay = document.getElementById('btnPlay');
+    const btnRevealJump = document.getElementById('btnRevealJump');
+    const btnReset = document.getElementById('btnReset');
+    const chkMasterAudio = document.getElementById('chkMasterAudio');
+
+    timeSlider.max = DATA.duration.toFixed(2);
+    totTimeEl.textContent = '00:' + (DATA.duration < 10 ? '0' : '') + DATA.duration.toFixed(1);
+    const revealTime = (DATA.beats[1] && DATA.beats[1].time) ? DATA.beats[1].time : 7.531;
+    btnRevealJump.textContent = '🏋️ PULAR P/ REVELAÇÃO (' + revealTime.toFixed(1) + 's)';
+
+    const b1ReplyStart = (TL && Array.isArray(TL.dialogues) && TL.dialogues.length >= 2 && TL.dialogues[1].beat_idx === 0)
+      ? TL.dialogues[1].start
+      : (revealTime * 0.54);
+
+    function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+    function smoothstep(t) { const x = clamp(t, 0, 1); return x * x * (3 - 2 * x); }
+
+    function elasticPopScale(age, dur) {
+      const d = dur || 0.36;
+      if (age <= 0) return 0.62;
+      if (age >= d) return 1.0;
+      const p = age / d;
+      const damp = Math.exp(-3.4 * p) * Math.cos(p * Math.PI * 2.2) * 0.38;
+      const tailFade = 1.0 - smoothstep((p - 0.82) / 0.18);
+      return 1.0 - damp * tailFade;
+    }
+
+    function escapeHtml(s) {
+      return String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    // Destaque cinetico de palavras-chave virais em vermelho vivo / dourado brilhante!
+    const PUNCH_PATTERNS = [
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])TRAVA VERMELHA JÁ SOLTOU(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-hot' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])TRAVA VERMELHA SOLTOU(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-hot' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])TRAVA VERMELHA(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-hot' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])PARA DE TREMER(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-hot' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])ENCAIXA DIREITO(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-hot' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])MENTE POLUÍDA(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-hot' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])POTE DE GIZ NÃO(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-hot' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])PERNA TREMENDO(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-hot' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])ATÉ O TALO(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-hot' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])NÃO SE MEXE(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-hot' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])NÃO MEXE(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-hot' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])SOLTOU(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-hot' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])SEM AR(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-hot' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])DOER NOS DOIS(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-gold' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])60 QUILOS(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-gold' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])SESSENTA QUILOS(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-gold' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])TÁTICA DE ATLETA(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-gold' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])SALVEI O ESPELHO(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-gold' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])PENSOU BESTEIRA(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-gold' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])NOTA PRA MINHA CARA(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-gold' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])MOLEZA(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-gold' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])EITA(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-gold' },
+      { re: /(?<![A-ZÀ-Úa-zà-ú0-9])MANO(?![A-ZÀ-Úa-zà-ú0-9])/gi, cls: 'sub-gold' }
+    ];
+
+    function formatPunchHtml(rawText) {
+      let out = escapeHtml(rawText);
+      const tokens = [];
+      PUNCH_PATTERNS.forEach((pat) => {
+        out = out.replace(pat.re, (match) => {
+          const id = tokens.length;
+          tokens.push(`<span class="${pat.cls}">${match}</span>`);
+          return `\u0000${id}\u0001`;
+        });
+      });
+      return out.replace(/\u0000(\d+)\u0001/g, (_, idx) => tokens[Number(idx)] || '');
+    }
+
+    function splitLongClause(clause, maxChars) {
+      if (clause.length <= maxChars) return [clause];
+      const words = clause.split(/\s+/);
+      const half = clause.length * 0.5;
+      let bestIdx = Math.max(1, Math.floor(words.length / 2));
+      let bestDiff = Infinity;
+      let acc = 0;
+      const keepTogether = new Set([
+        'PARA', 'ENCAIXA', '60', 'SESSENTA', 'ATÉ', 'TÁTICA', 'PERNA', 'TRAVA', 'VERMELHA',
+        'NÃO', 'POTE', 'GIZ', 'MENTE', 'PENSOU', 'SEM', 'E', 'DE', 'A', 'O', 'NOS', 'PRA', 'DO', 'DA', 'OU'
+      ]);
+      for (let i = 1; i < words.length; i++) {
+        acc += words[i - 1].length + 1;
+        const prevWord = words[i - 1].toUpperCase().replace(/[^A-ZÀ-Ú0-9]/g, '');
+        const penalty = keepTogether.has(prevWord) ? 18 : 0;
+        const diff = Math.abs(acc - half) + penalty;
+        if (diff < bestDiff) {
+          bestDiff = diff;
+          bestIdx = i;
+        }
+      }
+      const left = words.slice(0, bestIdx).join(' ');
+      const right = words.slice(bestIdx).join(' ');
+      return [...splitLongClause(left, maxChars), ...splitLongClause(right, maxChars)];
+    }
+
+    function chunkDialogueText(text, maxChars) {
+      const clean = String(text || '').trim();
+      if (!clean) return [];
+      const rawClauses = clean.split(/(?<=[!?,:]|\.\.\.)\s+/).map((s) => s.trim()).filter(Boolean);
+      const pieces = [];
+      rawClauses.forEach((cl) => {
+        splitLongClause(cl, maxChars).forEach((p) => pieces.push(p));
+      });
+      const merged = [];
+      for (let i = 0; i < pieces.length; i++) {
+        const cur = pieces[i];
+        const prev = merged.length > 0 ? merged[merged.length - 1] : '';
+        const endsEllipsis = /\.\.\.$/.test(prev);
+        if (merged.length > 0 && !endsEllipsis && (prev.length + 1 + cur.length) <= maxChars) {
+          merged[merged.length - 1] += ' ' + cur;
+        } else {
+          merged.push(cur);
+        }
+      }
+      return merged;
+    }
+
+    // Pre-computa chunks deterministicos de legenda a partir de TODAS as 7 falas em TL.dialogues
+    const DIALOGUE_ENTRIES = (function buildSubtitleEntries() {
+      const src = (TL && Array.isArray(TL.dialogues) && TL.dialogues.length > 0)
+        ? TL.dialogues
+        : [
+            { speaker: 'camila', text: 'PARA DE TREMER E ENCAIXA DIREITO! Se você tirar antes da hora vai doer nos dois!', start: 0.04, end: 3.10 },
+            { speaker: 'voce', text: 'Pera aí, Camila! A gente mal começou e eu já tô sem ar!', start: 3.20, end: 5.88 },
+            { speaker: 'camila', text: 'Cê jurou que aguentava 60 QUILOS no primeiro dia, agora desce até o talo!', start: 6.08, end: 10.05 },
+            { speaker: 'voce', text: 'Moleza! Olha minha postura... só ignora minha perna tremendo que é tática de atleta!', start: 10.28, end: 15.05 },
+            { speaker: 'camila', text: 'EITA! A trava vermelha já soltou! NÃO SE MEXE!', start: 15.26, end: 18.05 },
+            { speaker: 'voce', text: 'Calma que eu salvei o espelho... ops, o pote de giz não!', start: 18.54, end: 22.65 },
+            { speaker: 'voce', text: 'E você que pensou besteira nos dois primeiros segundos... comenta MENTE POLUÍDA ou dá nota pra minha cara!', start: 22.88, end: 28.00 }
+          ];
+
+      return src.map((d) => {
+        const chunks = chunkDialogueText(d.text, 48);
+        const totalChars = Math.max(1, chunks.reduce((s, c) => s + c.length, 0));
+        const dur = Math.max(0.25, (d.end || (d.start + 3.0)) - (d.start || 0));
+        let acc = d.start || 0;
+        const timed = chunks.map((text, idx) => {
+          const share = (text.length / totalChars) * dur;
+          const st = acc;
+          const en = idx === chunks.length - 1 ? (d.end || (st + share)) : (st + share);
+          acc = en;
+          return { text, html: formatPunchHtml(text), start: st, end: en };
+        });
+        return {
+          speaker: d.speaker === 'camila' ? 'camila' : 'voce',
+          speakerLabel: d.speaker === 'camila' ? 'CAMILA' : 'VOCÊ',
+          start: d.start || 0,
+          end: d.end || (d.start + dur),
+          chunks: timed
+        };
+      });
+    })();
+
+    function getActiveSubtitle(t) {
+      if (!DIALOGUE_ENTRIES.length) return null;
+      // Garante legenda de gancho ja em t = 0.0s para quem assiste no mudo!
+      if (t < DIALOGUE_ENTRIES[0].start) {
+        const first = DIALOGUE_ENTRIES[0];
+        return { entry: first, chunk: first.chunks[0], age: t };
+      }
+      for (let i = 0; i < DIALOGUE_ENTRIES.length; i++) {
+        const e = DIALOGUE_ENTRIES[i];
+        const next = DIALOGUE_ENTRIES[i + 1];
+        const windowEnd = next ? next.start : DATA.duration + 1.0;
+        if (t >= e.start && t < windowEnd) {
+          let chosen = e.chunks[e.chunks.length - 1];
+          for (let c = 0; c < e.chunks.length; c++) {
+            if (t < e.chunks[c].end || c === e.chunks.length - 1) {
+              chosen = e.chunks[c];
+              break;
+            }
+          }
+          return { entry: e, chunk: chosen, age: Math.max(0, t - chosen.start) };
+        }
+      }
+      const last = DIALOGUE_ENTRIES[DIALOGUE_ENTRIES.length - 1];
+      const lastChunk = last.chunks[last.chunks.length - 1];
+      return { entry: last, chunk: lastChunk, age: Math.max(0, t - lastChunk.start) };
+    }
+
+    function getActiveBeat(t) {
+      for (let i = DATA.beats.length - 1; i >= 0; i--) {
+        if (t >= DATA.beats[i].time) return DATA.beats[i];
+      }
+      return DATA.beats[0];
+    }
+
+    let lastBeatId = null;
+    let lastSubHtml = '';
+    function renderAt(t) {
+      const clampedT = Math.max(0, Math.min(DATA.duration, Number(t) || 0));
+      renderer3d.renderAt(clampedT);
+      ctx2d.clearRect(0, 0, stage.width, stage.height);
+      ctx2d.drawImage(renderer3d.webglCanvas, 0, 0, stage.width, stage.height);
+
+      // Barra fina de progresso de retencao no topo
+      const progPct = clamp(clampedT / Math.max(0.01, DATA.duration), 0, 1) * 100;
+      progressBarFill.style.width = progPct.toFixed(3) + '%';
+
+      const rem = Math.max(0, DATA.duration - clampedT);
+      hudTimerEl.textContent = '⏱️ ' + rem.toFixed(1) + 's';
+      curTimeEl.textContent = '00:' + (clampedT < 10 ? '0' : '') + clampedT.toFixed(1);
+      timeSlider.value = clampedT.toFixed(2);
+
+      // Pill de gancho com pop-in elastico 100% deterministico (troca tambem no corte B1a -> B1b!)
+      const beat = getActiveBeat(clampedT);
+      if (beat) {
+        let popText = beat.wordPop;
+        let popColor = beat.wordColor;
+        let popAge = Math.max(0, clampedT - beat.time);
+        if (beat.id === 'b1_in_media_res' && clampedT >= b1ReplyStart) {
+          popText = 'JÁ TÔ SEM AR, CAMILA! 🥵😱';
+          popColor = '#f97316';
+          popAge = Math.max(0, clampedT - b1ReplyStart);
+        }
+        const popScale = elasticPopScale(popAge, 0.36);
+        wordPopEl.textContent = popText;
+        wordPopEl.style.borderColor = popColor;
+        wordPopEl.style.color = popColor;
+        wordPopEl.style.transform = 'scale(' + popScale.toFixed(4) + ')';
+        if (beat.id !== lastBeatId) {
+          lastBeatId = beat.id;
+          document.querySelectorAll('.beat-card').forEach((el) => el.classList.toggle('active', el.dataset.beatId === beat.id));
+        }
+      }
+
+      // Legenda cinetica Shorts de alto contraste no safe-zone inferior!
+      const sub = getActiveSubtitle(clampedT);
+      if (sub && sub.chunk) {
+        subtitleWrap.style.display = 'flex';
+        subtitleSpeaker.textContent = sub.entry.speakerLabel;
+        subtitleSpeaker.className = 'subtitle-speaker' + (sub.entry.speaker === 'camila' ? ' camila' : '');
+        subtitleBox.style.borderColor = sub.entry.speaker === 'camila'
+          ? 'rgba(250, 204, 21, 0.58)'
+          : 'rgba(56, 189, 248, 0.50)';
+        if (sub.chunk.html !== lastSubHtml) {
+          lastSubHtml = sub.chunk.html;
+          subtitleBox.innerHTML = sub.chunk.html;
+        }
+        const subScale = 0.90 + 0.10 * elasticPopScale(sub.age, 0.20);
+        subtitleBox.style.transform = 'scale(' + subScale.toFixed(4) + ')';
+      } else {
+        subtitleWrap.style.display = 'none';
+      }
+    }
+
+    const paneBeats = document.getElementById('pane-beats');
+    DATA.beats.forEach((b) => {
+      const card = document.createElement('div');
+      card.className = 'beat-card';
+      card.dataset.beatId = b.id;
+      card.innerHTML = `<div class="beat-top"><span class="beat-label">${b.label}</span><span class="beat-tag">${b.tag}</span></div><div class="beat-line"><strong>${b.speaker}:</strong> "${b.line}"</div><div class="beat-sub">🎥 ${b.subtext}</div>`;
+      card.addEventListener('click', () => { curT = b.time; lastBeatId = null; try { masterAudio.currentTime = curT; } catch (_) {} renderAt(curT); });
+      paneBeats.appendChild(card);
+    });
+
+    let isPlaying = false, curT = 0, lastRaf = 0;
+    chkMasterAudio.addEventListener('change', () => { masterAudio.muted = !chkMasterAudio.checked; });
+    masterAudio.muted = !chkMasterAudio.checked;
+
+    masterAudio.addEventListener('ended', () => {
+      if (!isPlaying) return;
+      curT = 0; lastBeatId = null; masterAudio.currentTime = 0; masterAudio.play().catch(() => {});
+    });
+
+    function tick(now) {
+      if (!isPlaying) return;
+      if (!lastRaf) lastRaf = now;
+      const dt = Math.min(0.05, Math.max(0.001, (now - lastRaf) / 1000));
+      lastRaf = now;
+      curT += dt;
+      if (!masterAudio.paused && !masterAudio.ended) {
+        const drift = masterAudio.currentTime - curT;
+        if (Math.abs(drift) > 0.09) curT = masterAudio.currentTime;
+        else curT += drift * 0.12;
+      }
+      if (curT >= DATA.duration) { curT = 0; lastBeatId = null; }
+      renderAt(curT);
+      requestAnimationFrame(tick);
+    }
+
+    btnPlay.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      btnPlay.textContent = isPlaying ? '⏸ PAUSAR PREVIEW' : '▶ ASSISTIR COM FALAS E ÁUDIO';
+      if (isPlaying) {
+        lastBeatId = null; lastRaf = 0;
+        try { masterAudio.currentTime = curT; masterAudio.play().catch(() => {}); } catch (_) {}
+        requestAnimationFrame(tick);
+      } else { try { masterAudio.pause(); } catch (_) {} }
+    });
+    btnRevealJump.addEventListener('click', () => { curT = revealTime; lastBeatId = null; try { masterAudio.currentTime = curT; } catch (_) {} renderAt(curT); });
+    btnReset.addEventListener('click', () => { curT = 0; lastBeatId = null; try { masterAudio.currentTime = 0; } catch (_) {} renderAt(0); });
+    timeSlider.addEventListener('input', () => { curT = parseFloat(timeSlider.value) || 0; try { masterAudio.currentTime = curT; } catch (_) {} renderAt(curT); });
+
+    window.renderAt = (t) => renderAt(t);
+    window.__EP06_ACADEMIA_DEBUG = renderer3d;
+    renderAt(0);
+  })();
+  </script>
+</body>
+</html>
